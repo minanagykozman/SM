@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SM.BAL", "SM.BAL\SM.BAL.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SM.API", "SM.API\SM.API.csproj", "{E04AD486-704B-4EDA-B594-092C24990B3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SM.APP", "SM.APP\SM.APP.csproj", "{0769B392-D640-40DC-BFB1-E935CAA3B5D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E04AD486-704B-4EDA-B594-092C24990B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E04AD486-704B-4EDA-B594-092C24990B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E04AD486-704B-4EDA-B594-092C24990B3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0769B392-D640-40DC-BFB1-E935CAA3B5D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0769B392-D640-40DC-BFB1-E935CAA3B5D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0769B392-D640-40DC-BFB1-E935CAA3B5D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0769B392-D640-40DC-BFB1-E935CAA3B5D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

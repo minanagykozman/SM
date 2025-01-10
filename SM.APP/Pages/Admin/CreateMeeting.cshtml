@@ -1,0 +1,84 @@
+﻿@page
+@model SM.APP.Pages.Admin.CreateMeetingModel
+
+@{
+    ViewData["Title"] = "CreateMeeting";
+}
+
+<h1>CreateMeeting</h1>
+
+<h4>Meeting</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingName" class="control-label"></label>
+                <input asp-for="Meeting.MeetingName" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.AgeStartDate" class="control-label"></label>
+                <input asp-for="Meeting.AgeStartDate" class="form-control" />
+                <span asp-validation-for="Meeting.AgeStartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.AgeEndDate" class="control-label"></label>
+                <input asp-for="Meeting.AgeEndDate" class="form-control" />
+                <span asp-validation-for="Meeting.AgeEndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingStartDate" class="control-label"></label>
+                <input asp-for="Meeting.MeetingStartDate" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingStartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingEndDate" class="control-label"></label>
+                <input asp-for="Meeting.MeetingEndDate" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingEndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingDay" class="control-label"></label>
+                <input asp-for="Meeting.MeetingDay" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingDay" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingStartTime" class="control-label"></label>
+                <input asp-for="Meeting.MeetingStartTime" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingStartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingEndTime" class="control-label"></label>
+                <input asp-for="Meeting.MeetingEndTime" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingEndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.MeetingFrequency" class="control-label"></label>
+                <input asp-for="Meeting.MeetingFrequency" class="form-control" />
+                <span asp-validation-for="Meeting.MeetingFrequency" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Meeting.IsActive" /> @Html.DisplayNameFor(model => model.Meeting.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meeting.Notes" class="control-label"></label>
+                <input asp-for="Meeting.Notes" class="form-control" />
+                <span asp-validation-for="Meeting.Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
