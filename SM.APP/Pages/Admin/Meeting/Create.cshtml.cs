@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin
+namespace SM.APP.Pages.Admin.Meeting
 {
-    public class CreateMeetingModel : PageModel
+    public class CreateModel : PageModel
     {
         private readonly SM.DAL.AppDbContext _context;
 
-        public CreateMeetingModel(SM.DAL.AppDbContext context)
+        public CreateModel(SM.DAL.AppDbContext context)
         {
             _context = context;
         }
@@ -25,7 +25,7 @@ namespace SM.APP.Pages.Admin
         }
 
         [BindProperty]
-        public Meeting Meeting { get; set; } = default!;
+        public DAL.DataModel.Meeting Meeting { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()

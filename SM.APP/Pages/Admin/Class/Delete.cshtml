@@ -1,0 +1,40 @@
+﻿@page
+@model SM.APP.Pages.Admin.Class.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Class</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Class.ClassName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Class.ClassName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Class.Meeting)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Class.Meeting.MeetingDay)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Class.IsActive)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Class.IsActive)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="Class.ClassID" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>
