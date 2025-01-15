@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SM.APP.styles.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
 </head>
 <body>
     <header>
@@ -41,17 +44,7 @@
             &copy; 2025 - SM.APP - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <!-- Add Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2Xy7oJa5j7gU2k2q80F55eY9//5LOh4E1Ahs1ztf1TohYeAN3g/PGpO4x3K9" crossorigin="anonymous">
-
-    <!-- Add Bootstrap JS (optional but recommended) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8iR8TtwfsAPw+HlbXb6fKjxhtl5j1hOBz5h7VpFwIS0m+c7go5e0b5LgX3ESb14" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-q8iR8TtwfsAPw+HlbXb6fKjxhtl5j1hOBz5h7VpFwIS0m+c7go5e0b5LgX3ESb14" crossorigin="anonymous"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
