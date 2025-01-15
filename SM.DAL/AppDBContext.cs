@@ -11,7 +11,7 @@
         {
         }
 
-        public AppDbContext() {  }
+        public AppDbContext() { }
 
         public DbSet<Member> Members { get; set; }
         public DbSet<Meeting> Meetings { get; set; }
@@ -33,7 +33,13 @@
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql(_connectionString, DBVersion);
+                optionsBuilder.UseMySql(_connectionString, DBVersion, mySqlOptions =>
+                {
+                    mySqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null);
+                });
             }
             /*optionsBuilder.UseMySql("Server=your_server;Database=your_database;User=your_username;Password=your_password;",
                 new MySqlServerVersion(new Version(8, 0, 2))); // Adjust for your MySQL version*/
@@ -80,7 +86,13 @@
         public static void ConfigureDbContextOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
         {
             _connectionString = connectionString;
-            optionsBuilder.UseMySql(connectionString, DBVersion);
+            optionsBuilder.UseMySql(connectionString, DBVersion, mySqlOptions =>
+            {
+                mySqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                    errorNumbersToAdd: null);
+            });
         }
     }
 
