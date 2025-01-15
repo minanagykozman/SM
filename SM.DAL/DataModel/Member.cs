@@ -29,6 +29,7 @@ namespace SM.DAL.DataModel
         public string? Work { get; set; }
         public bool IsMainMember { get; set; }
         public bool IsActive { get; set; }
+        public string? ImageReference { get; set; }
         public string? Notes { get; set; }
 
         public int Age

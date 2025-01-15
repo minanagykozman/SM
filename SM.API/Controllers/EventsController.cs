@@ -40,9 +40,9 @@ namespace SM.API.Controllers
             }
         }
 
-        
+
         [HttpGet("CheckRegistrationStatus")]
-        public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus( string memberCode,int eventID)
+        public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus(string memberCode, int eventID)
         {
             try
             {
@@ -61,7 +61,44 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        
+
+        [HttpGet("GetEventRegisteredMembers")]
+        public ActionResult<List<Member>> GetEventRegisteredMembers(int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var members = eventHandler.GetEventRegisteredMembers(eventID);
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("Register")]
+        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, int servantID, bool isException, string notes)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var status = eventHandler.Register(memberCode, eventID, servantID, isException, notes);
+                    return Ok(status);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
 
         public class RegistrationStatusResponse
