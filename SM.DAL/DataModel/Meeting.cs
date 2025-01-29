@@ -21,10 +21,12 @@ namespace SM.DAL.DataModel
         [Display(Name = "Age Group To")]
         [DataType(DataType.Date)]
         public DateTime AgeEndDate { get; set; }
+        [DataType(DataType.Date)]
         public DateTime? MeetingStartDate { get; set; }
+        [DataType(DataType.Date)]
         public DateTime? MeetingEndDate { get; set; }
         public string MeetingDay { get; set; } = string.Empty;
-        [RegularExpression(@"^[A-Z]+[a-zA-Z0-9""'\s-]*$")]
+        
         public string MeetingStartTime { get; set; } = string.Empty;
         public string MeetingEndTime { get; set; } = string.Empty;
         public string MeetingFrequency { get; set; } = string.Empty;

@@ -49,15 +49,21 @@ namespace SM.BAL
         {
             Event ev = (Event)_dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
             Member lmember = (Member)_dbcontext.Members.FirstOrDefault(m => (m.Code == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember)));
+
             member = lmember;
             if (ev == null)
                 return RegistrationStatus.EventNotFound;
             if (lmember == null)
                 return RegistrationStatus.MemeberNotFound;
-            if (!ev.ClassEvents.Any(ce => lmember.ClassMembers.Any(c => c.ClassID == ce.ClassID)))
+            List<int> eventClasses = _dbcontext.ClassEvents.Where(e => e.EventID == ev.EventID).Select(e => e.ClassID).ToList<int>();
+            List<int> memberClasses = _dbcontext.ClassMembers.Where(m => m.MemberID == lmember.MemberID).Select(e => e.ClassID).ToList<int>();
+            if (eventClasses == null || memberClasses == null)
+                return RegistrationStatus.MemberNotEligible;
+            if (!eventClasses.Intersect(memberClasses).Any())
                 return RegistrationStatus.MemberNotEligible;
 
-            if (ev.EventRegistrations.Any(r => r.MemberID == lmember.MemberID))
+            var registered = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).Select(e => e.MemberID).ToList<int>();
+            if (registered != null && registered.Contains(lmember.MemberID))
                 return RegistrationStatus.MemberAlreadyRegistered;
 
             return RegistrationStatus.ReadyToRegister;

@@ -1,0 +1,35 @@
+﻿@page
+@model SM.APP.Pages.Events.RegisterEventModel
+@{
+    ViewData["Title"] = "Register Event";
+}
+<h2>Register for Event</h2>
+<form>
+
+    <div>
+        <label>User Code: <input type="text" id="SearchString" asp-for="UserCode" /></label>
+        <input type="submit" value="Register" />
+    </div>
+</form>
+
+<div>
+    <label>@Model.MemberStatus</label>
+
+    @if (Model.Member != null)
+    {
+        <p><strong>Name:</strong> @Model.Member.FullName</p>
+        <p><strong>Age:</strong> @Model.Member.Age</p>
+    }
+</div>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal" style="display: none;" runat="server">
+    <div class="modal-content">
+        <span class="close" onclick="closePopup()">&times;</span>
+        <div id="popupMessage"></div>
+        <textarea id="comments" style="display: none;" placeholder="Enter comments here..."></textarea>
+        <button id="confirmBtn" style="display: none;" onclick="">Confirm Registration</button>
+
+    </div>
+</div>
+
