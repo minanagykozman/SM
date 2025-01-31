@@ -15,7 +15,8 @@ namespace SM.APP.Pages.Events
 
         [BindProperty(SupportsGet = true)]
         public string UserCode { get; set; }
-
+        [BindProperty]
+        public string Notes { get; set; }
 
         public string MemberStatus { get; set; }
 
@@ -98,7 +99,7 @@ namespace SM.APP.Pages.Events
                 int eventID = 1;
                 int servantID = 1;
                 bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
-                string notes = MemberData.Member.Notes;
+                string notes = Notes;
                 var requestData = new
                 {
                     memberCode,
@@ -109,7 +110,7 @@ namespace SM.APP.Pages.Events
                 };
 
                 string apiUrl = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/Register";
-                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException=false&notes=NA", apiUrl, MemberData.Member.Code);
+                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException={2}&notes={3}", apiUrl, memberCode, isException,Notes);
                 using (HttpClient client = new HttpClient())
                 {
                     var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");

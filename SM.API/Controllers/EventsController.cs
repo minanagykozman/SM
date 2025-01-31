@@ -82,7 +82,7 @@ namespace SM.API.Controllers
         }
 
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, int servantID, bool isException, string notes)
+        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, int servantID, bool isException, string? notes)
         {
             try
             {

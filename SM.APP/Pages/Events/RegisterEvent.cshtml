@@ -86,7 +86,7 @@
                         {
                             <p>
                                 <strong>Notes: </strong>
-                                <textarea class="form-control" id="notes"></textarea>
+                                <textarea class="form-control" id="notes" asp-for="Notes"></textarea>
                             </p>
                         }
                     }
@@ -116,6 +116,19 @@
                 searchInput.focus(); // Focus on search input when Cancel is clicked
             });
         }
+        // Handle Esc key press to close the modal and clear input
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                // Close the modal (if it's open)
+                // var myModal = bootstrap.Modal.getInstance(modal);
+                // if (myModal) {
+                //     myModal.hide();
+                // }
+
+                searchInput.value = "";
+                searchInput.focus();
+            }
+        });
 
         if (searchInput)
         {
