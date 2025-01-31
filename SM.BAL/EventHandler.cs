@@ -1,4 +1,5 @@
-﻿using SM.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using SM.DAL;
 using SM.DAL.DataModel;
 
 namespace SM.BAL
@@ -82,9 +83,9 @@ namespace SM.BAL
             return members;
         }
 
-        public RegistrationStatus Register(string memberCode, int eventID, int servantID, bool isException, string notes)
+        public RegistrationStatus Register(string memberCode, int eventID, int servantID, bool isException, string? notes)
         {
-            Event ev = (Event)_dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
+            Event ev = (Event)_dbcontext.Events.Include(e => e.EventRegistrations).Where(e => e.EventID == eventID).FirstOrDefault();
             Member member = (Member)_dbcontext.Members.FirstOrDefault(m => (m.Code == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember)));
             if (ev == null)
                 return RegistrationStatus.EventNotFound;

@@ -3,33 +3,54 @@
 @{
     ViewData["Title"] = "Register Event";
 }
+@using SM.APP.Pages.Events;
 <h2>Register for Event</h2>
 <form>
-
     <div>
         <label>User Code: <input type="text" id="SearchString" asp-for="UserCode" /></label>
-        <input type="submit" value="Register" />
+        <input type="submit" value="Check" class="btn btn-primary" />
+    </div>
+</form>
+<form method="post">
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Member Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <strong>Status:</strong><label>@Model.MemberStatus</label>
+                    </p>
+
+                    @if (RegisterEventModel.Member != null)
+                    {
+                        <p><strong>Name:</strong> @RegisterEventModel.Member.FullName</p>
+                        <p><strong>Age:</strong> @RegisterEventModel.Member.Age</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" value="Register" class="btn btn-primary" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 
-<div>
-    <label>@Model.MemberStatus</label>
+<!-- JavaScript to Show Modal on Page Load -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var isShowModal = @Model.ShowModal.ToString().ToLower();
+        if(isShowModal){
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+        myModal.show();
 
-    @if (Model.Member != null)
-    {
-        <p><strong>Name:</strong> @Model.Member.FullName</p>
-        <p><strong>Age:</strong> @Model.Member.Age</p>
-    }
-</div>
-
-<!-- Popup Modal -->
-<div id="popupModal" class="modal" style="display: none;" runat="server">
-    <div class="modal-content">
-        <span class="close" onclick="closePopup()">&times;</span>
-        <div id="popupMessage"></div>
-        <textarea id="comments" style="display: none;" placeholder="Enter comments here..."></textarea>
-        <button id="confirmBtn" style="display: none;" onclick="">Confirm Registration</button>
-
-    </div>
-</div>
+        // Ensure modal backdrop is removed when modal is closed
+        document.getElementById('myModal').addEventListener('hidden.bs.modal', function () {
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        });}
+    });
+</script>
 

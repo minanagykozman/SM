@@ -50,7 +50,7 @@ namespace SM.API.Controllers
                 {
                     Member member;
                     RegistrationStatus status = eventHandler.CheckRegistationStatus(memberCode, eventID, out member);
-                    RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status.ToString() };
+                    RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status };
                     return Ok(response);
                 }
 
@@ -104,7 +104,7 @@ namespace SM.API.Controllers
         public class RegistrationStatusResponse
         {
             public Member Member { get; set; }
-            public string Status { get; set; }
+            public RegistrationStatus Status { get; set; }
         }
     }
 }
