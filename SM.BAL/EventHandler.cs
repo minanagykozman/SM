@@ -77,7 +77,7 @@ namespace SM.BAL
 
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
-            List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).OrderBy(ev => ev.TimeStamp).Select(er => er.Member).ToList<Member>();
+            List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).OrderByDescending(ev => ev.TimeStamp).Select(er => er.Member).ToList<Member>();
             return members;
         }
 

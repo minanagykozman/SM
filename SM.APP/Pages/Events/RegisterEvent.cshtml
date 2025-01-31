@@ -64,7 +64,7 @@
         </div>
     </div>
 </form>
-<form method="post">
+<form method="post" id="registerForm">
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -74,17 +74,20 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        <strong>Status:    </strong><label class="form-label">@Model.MemberStatus</label>
+                        <strong>Status: </strong><label class="form-label">@Model.MemberStatus</label>
                     </p>
 
                     @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null)
                     {
-                        <p><strong>Name:    </strong> @RegisterEventModel.MemberData.Member.FullName</p>
-                        <p><strong>Age:     </strong> @RegisterEventModel.MemberData.Member.Age</p>
+                        <p><strong>Name: </strong> @RegisterEventModel.MemberData.Member.FullName</p>
+                        <p><strong>Age: </strong> @RegisterEventModel.MemberData.Member.Age</p>
                         @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
                        || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
                         {
-                            <p><strong>Notes:   </strong> <textarea class="form-control"></textarea></p>
+                            <p>
+                                <strong>Notes: </strong>
+                                <textarea class="form-control" id="notes"></textarea>
+                            </p>
                         }
                     }
                 </div>
@@ -93,7 +96,7 @@
                     (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
                     || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
                     {
-                        <input type="submit" value="Register" class="btn btn-primary" />
+                        <input type="submit" id="submitBtn" value="Register" class="btn btn-primary" />
                     }
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
@@ -102,26 +105,46 @@
     </div>
 </form>
 
-<!-- JavaScript to Show Modal on Page Load -->
 <script>
-     // Detect Enter key inside the modal and trigger the submit button
-    document.getElementById('myModal').addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default form submission behavior
-            document.getElementById('submitBtn').click(); // Trigger submit button
-        }
-    });
-
     document.addEventListener("DOMContentLoaded", function () {
         var isShowModal = @Model.ShowModal.ToString().ToLower();
-        if(isShowModal){
-        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
-        myModal.show();
+        var searchInput = document.getElementById("SearchString");
+        var cancelBtn = document.querySelector(".btn-secondary");
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function () {
+                searchInput.value = "";
+                searchInput.focus(); // Focus on search input when Cancel is clicked
+            });
+        }
+
+        if (searchInput)
+        {
+            searchInput.focus();
+        }
+        if (isShowModal) {
+            var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+            myModal.show();
+        }
+
+        // Handle Enter key inside modal
+        document.getElementById('myModal').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent default behavior
+                document.getElementById('submitBtn').click(); // Trigger submit button
+            }
+        });
+
+        // Allow Shift + Enter for new lines in textarea
+        document.getElementById('notes')?.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && event.shiftKey) {
+                event.stopPropagation(); // Allow new line in textarea
+            }
+        });
 
         // Ensure modal backdrop is removed when modal is closed
         document.getElementById('myModal').addEventListener('hidden.bs.modal', function () {
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-        });}
+        });
     });
 </script>
 
