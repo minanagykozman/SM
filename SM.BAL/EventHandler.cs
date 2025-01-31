@@ -56,17 +56,15 @@ namespace SM.BAL
                 return RegistrationStatus.EventNotFound;
             if (lmember == null)
                 return RegistrationStatus.MemeberNotFound;
+            var registered = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).Select(e => e.MemberID).ToList<int>();
+            if (registered != null && registered.Contains(lmember.MemberID))
+                return RegistrationStatus.MemberAlreadyRegistered;
             List<int> eventClasses = _dbcontext.ClassEvents.Where(e => e.EventID == ev.EventID).Select(e => e.ClassID).ToList<int>();
             List<int> memberClasses = _dbcontext.ClassMembers.Where(m => m.MemberID == lmember.MemberID).Select(e => e.ClassID).ToList<int>();
             if (eventClasses == null || memberClasses == null)
                 return RegistrationStatus.MemberNotEligible;
             if (!eventClasses.Intersect(memberClasses).Any())
                 return RegistrationStatus.MemberNotEligible;
-
-            var registered = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).Select(e => e.MemberID).ToList<int>();
-            if (registered != null && registered.Contains(lmember.MemberID))
-                return RegistrationStatus.MemberAlreadyRegistered;
-
             return RegistrationStatus.ReadyToRegister;
         }
 
@@ -79,7 +77,7 @@ namespace SM.BAL
 
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
-            List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).Select(er => er.Member).ToList<Member>();
+            List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).OrderBy(ev => ev.TimeStamp).Select(er => er.Member).ToList<Member>();
             return members;
         }
 

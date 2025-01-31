@@ -20,11 +20,24 @@ namespace SM.APP.Pages.Events
         public string MemberStatus { get; set; }
 
         public bool ShowModal { get; set; } = false;
-        public static Member Member { get; set; }
-
+        public static RegistrationStatusResponse? MemberData { get; set; }
+        public List<Member> EventMembers { get; set; } = new List<Member>();
 
         public async Task OnGetAsync()
         {
+            using (HttpClient client = new HttpClient())
+            {
+                string req = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/GetEventRegisteredMembers?eventID=1";
+                HttpResponseMessage response = await client.GetAsync(req);
+                string responseData = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true // Enable case insensitivity
+                };
+                EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                if (EventMembers == null)
+                    EventMembers = new List<Member>();
+            }
             if (!string.IsNullOrEmpty(UserCode))
             {
                 using (HttpClient client = new HttpClient())
@@ -36,75 +49,86 @@ namespace SM.APP.Pages.Events
                     {
                         PropertyNameCaseInsensitive = true // Enable case insensitivity
                     };
-                    var responseObj = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
-                    if (responseObj != null)
-                    {
-                        Member = responseObj.Member;
-                        switch(responseObj.Status)
-                        {
-                            case RegistrationStatus.MemeberNotFound:
-                                MemberStatus = "Member not found";
-                                ShowModal = true;
-                                break;
-                            case RegistrationStatus.EventNotFound:
-                                MemberStatus = "Event not found";
-                                ShowModal = true;
-                                break;
-                            case RegistrationStatus.MemberAlreadyRegistered:
-                                MemberStatus = "Member already registered";
-                                ShowModal = true;
-                                break;
-                            case RegistrationStatus.MemberNotEligible:
-                                MemberStatus = "Member not eligible";
-                                ShowModal = true;
-                                break;
-                            case RegistrationStatus.ReadyToRegister:
-                                MemberStatus = "Can Register";
-                                ShowModal = true;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
+                    LoadData();
                 }
+                UserCode = string.Empty;
+            }
+        }
+
+        private void LoadData()
+        {
+
+            if (MemberData != null)
+            {
+                switch (MemberData.Status)
+                {
+                    case RegistrationStatus.MemeberNotFound:
+                        MemberStatus = "Member not found";
+                        ShowModal = true;
+                        break;
+                    case RegistrationStatus.EventNotFound:
+                        MemberStatus = "Event not found";
+                        ShowModal = true;
+                        break;
+                    case RegistrationStatus.MemberAlreadyRegistered:
+                        MemberStatus = "Member already registered";
+                        ShowModal = true;
+                        break;
+                    case RegistrationStatus.MemberNotEligible:
+                        MemberStatus = "Member not eligible";
+                        ShowModal = true;
+                        break;
+                    case RegistrationStatus.ReadyToRegister:
+                        MemberStatus = "Can Register";
+                        ShowModal = true;
+                        break;
+                    default:
+                        break;
+                }
+
             }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            string memberCode = Member.Code;
-            int eventID = 1;
-            int servantID = 1;
-            bool isException = false;
-            string notes = "NA";
-            var requestData = new
+            if (MemberData != null)
             {
-                memberCode,
-                eventID,
-                servantID,
-                isException,
-                notes
-            };
-
-            string apiUrl = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/Register";
-            string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException=false&notes=NA", apiUrl, Member.Code);
-            using (HttpClient client = new HttpClient())
-            {
-                var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-
-                if (response.IsSuccessStatusCode)
+                string memberCode = MemberData.Member.Code;
+                int eventID = 1;
+                int servantID = 1;
+                bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
+                string notes = MemberData.Member.Notes;
+                var requestData = new
                 {
-                    string responseData = await response.Content.ReadAsStringAsync();
-                }
-                else
+                    memberCode,
+                    eventID,
+                    servantID,
+                    isException,
+                    notes
+                };
+
+                string apiUrl = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/Register";
+                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException=false&notes=NA", apiUrl, MemberData.Member.Code);
+                using (HttpClient client = new HttpClient())
                 {
-                    throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseData = await response.Content.ReadAsStringAsync();
+                    }
+                    else
+                    {
+                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                    }
+                    UserCode = string.Empty;
+
                 }
-                UserCode = string.Empty;
-                return RedirectToPage(); 
             }
+            return RedirectToPage();
         }
     }
     public class RegistrationStatusResponse

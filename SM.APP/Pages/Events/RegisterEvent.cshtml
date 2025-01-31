@@ -7,8 +7,61 @@
 <h2>Register for Event</h2>
 <form>
     <div>
-        <label>User Code: <input type="text" id="SearchString" asp-for="UserCode" /></label>
+        <label class="form-label">User Code: <input type="text" id="SearchString" asp-for="UserCode" class="form-control" /></label>
         <input type="submit" value="Check" class="btn btn-primary" />
+    </div>
+    <div class="container mt-4">
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].Code)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].Age)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.EventMembers)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FullName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UNFileNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UNPersonalNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Age)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Baptised)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </form>
 <form method="post">
@@ -21,17 +74,27 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        <strong>Status:</strong><label>@Model.MemberStatus</label>
+                        <strong>Status:    </strong><label class="form-label">@Model.MemberStatus</label>
                     </p>
 
-                    @if (RegisterEventModel.Member != null)
+                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null)
                     {
-                        <p><strong>Name:</strong> @RegisterEventModel.Member.FullName</p>
-                        <p><strong>Age:</strong> @RegisterEventModel.Member.Age</p>
+                        <p><strong>Name:    </strong> @RegisterEventModel.MemberData.Member.FullName</p>
+                        <p><strong>Age:     </strong> @RegisterEventModel.MemberData.Member.Age</p>
+                        @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
+                       || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
+                        {
+                            <p><strong>Notes:   </strong> <textarea class="form-control"></textarea></p>
+                        }
                     }
                 </div>
                 <div class="modal-footer">
-                    <input type="submit" value="Register" class="btn btn-primary" />
+                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null &&
+                    (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
+                    || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
+                    {
+                        <input type="submit" value="Register" class="btn btn-primary" />
+                    }
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -41,6 +104,14 @@
 
 <!-- JavaScript to Show Modal on Page Load -->
 <script>
+     // Detect Enter key inside the modal and trigger the submit button
+    document.getElementById('myModal').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default form submission behavior
+            document.getElementById('submitBtn').click(); // Trigger submit button
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         var isShowModal = @Model.ShowModal.ToString().ToLower();
         if(isShowModal){
