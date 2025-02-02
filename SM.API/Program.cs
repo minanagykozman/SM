@@ -17,14 +17,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.WebHost.ConfigureKestrel(options =>
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(80); // HTTP
+//    options.ListenAnyIP(443);
+//    //{
+//    //    listenOptions.UseHttps("path/to/your/certificate.pfx", "your-certificate-password");
+//    //});
+//});
+builder.WebHost.UseKestrel(options =>
 {
-    options.ListenAnyIP(80); // HTTP
-    options.ListenAnyIP(443);
-    //{
-    //    listenOptions.UseHttps("path/to/your/certificate.pfx", "your-certificate-password");
-    //});
+    options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
 });
+
 var app = builder.Build();
 
 // Automatically apply migrations on startup
