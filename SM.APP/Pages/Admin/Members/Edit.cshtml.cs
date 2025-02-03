@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin.Class
+namespace SM.APP.Pages.Admin.Members
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace SM.APP.Pages.Admin.Class
         }
 
         [BindProperty]
-        public SM.DAL.DataModel.Class Class { get; set; } = default!;
+        public Member Member { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,13 +30,12 @@ namespace SM.APP.Pages.Admin.Class
                 return NotFound();
             }
 
-            var cl = await _context.Classes.FirstOrDefaultAsync(m => m.ClassID == id);
-            if (cl == null)
+            var member =  await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
+            if (member == null)
             {
                 return NotFound();
             }
-            Class = cl;
-            ViewData["MeetingID"] = new SelectList(_context.Meetings, "MeetingID", "MeetingName");
+            Member = member;
             return Page();
         }
 
@@ -49,7 +48,7 @@ namespace SM.APP.Pages.Admin.Class
                 return Page();
             }
 
-            _context.Attach(Class).State = EntityState.Modified;
+            _context.Attach(Member).State = EntityState.Modified;
 
             try
             {
@@ -57,7 +56,7 @@ namespace SM.APP.Pages.Admin.Class
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClassExists(Class.ClassID))
+                if (!MemberExists(Member.MemberID))
                 {
                     return NotFound();
                 }
@@ -70,9 +69,9 @@ namespace SM.APP.Pages.Admin.Class
             return RedirectToPage("./Index");
         }
 
-        private bool ClassExists(int id)
+        private bool MemberExists(int id)
         {
-            return _context.Classes.Any(e => e.ClassID == id);
+            return _context.Members.Any(e => e.MemberID == id);
         }
     }
 }

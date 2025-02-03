@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin.Class
+namespace SM.APP.Pages.Admin.Members
 {
     public class CreateModel : PageModel
     {
@@ -21,12 +21,11 @@ namespace SM.APP.Pages.Admin.Class
 
         public IActionResult OnGet()
         {
-        ViewData["MeetingID"] = new SelectList(_context.Meetings, "MeetingID", "MeetingName");
             return Page();
         }
 
         [BindProperty]
-        public SM.DAL.DataModel.Class Class { get; set; } = default!;
+        public Member Member { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -36,7 +35,7 @@ namespace SM.APP.Pages.Admin.Class
                 return Page();
             }
 
-            _context.Classes.Add(Class);
+            _context.Members.Add(Member);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -28,7 +28,7 @@ namespace SM.APP.Pages.Events
         {
             using (HttpClient client = new HttpClient())
             {
-                string req = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/GetEventRegisteredMembers?eventID=1";
+                string req = "https://apitest.stmosesservices.com/Events/GetEventRegisteredMembers?eventID=1";
                 HttpResponseMessage response = await client.GetAsync(req);
                 string responseData = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions
@@ -43,7 +43,7 @@ namespace SM.APP.Pages.Events
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=1";
+                    string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=1";
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions
@@ -109,7 +109,7 @@ namespace SM.APP.Pages.Events
                     notes
                 };
 
-                string apiUrl = "http://ec2-98-81-132-234.compute-1.amazonaws.com/Events/Register";
+                string apiUrl = "https://apitest.stmosesservices.com/Events/Register";
                 string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException={2}&notes={3}", apiUrl, memberCode, isException,Notes);
                 using (HttpClient client = new HttpClient())
                 {

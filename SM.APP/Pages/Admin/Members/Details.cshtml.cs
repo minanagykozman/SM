@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin.Class
+namespace SM.APP.Pages.Admin.Members
 {
     public class DetailsModel : PageModel
     {
@@ -19,7 +19,7 @@ namespace SM.APP.Pages.Admin.Class
             _context = context;
         }
 
-        public SM.DAL.DataModel.Class Class { get; set; } = default!;
+        public Member Member { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,14 +28,14 @@ namespace SM.APP.Pages.Admin.Class
                 return NotFound();
             }
 
-            var cl = await _context.Classes.FirstOrDefaultAsync(m => m.ClassID == id);
-            if (cl == null)
+            var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
+            if (member == null)
             {
                 return NotFound();
             }
             else
             {
-                Class = cl;
+                Member = member;
             }
             return Page();
         }

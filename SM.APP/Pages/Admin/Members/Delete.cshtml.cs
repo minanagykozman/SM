@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin.Class
+namespace SM.APP.Pages.Admin.Members
 {
     public class DeleteModel : PageModel
     {
@@ -20,7 +20,7 @@ namespace SM.APP.Pages.Admin.Class
         }
 
         [BindProperty]
-        public SM.DAL.DataModel.Class Class { get; set; } = default!;
+        public Member Member { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,15 +29,15 @@ namespace SM.APP.Pages.Admin.Class
                 return NotFound();
             }
 
-            var cl = await _context.Classes.FirstOrDefaultAsync(m => m.ClassID == id);
+            var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
 
-            if (cl == null)
+            if (member == null)
             {
                 return NotFound();
             }
             else
             {
-                Class = cl;
+                Member = member;
             }
             return Page();
         }
@@ -49,11 +49,11 @@ namespace SM.APP.Pages.Admin.Class
                 return NotFound();
             }
 
-            var cl = await _context.Classes.FindAsync(id);
-            if (cl != null)
+            var member = await _context.Members.FindAsync(id);
+            if (member != null)
             {
-                Class = cl;
-                _context.Classes.Remove(Class);
+                Member = member;
+                _context.Members.Remove(Member);
                 await _context.SaveChangesAsync();
             }
 

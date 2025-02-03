@@ -1,0 +1,126 @@
+﻿@page
+@model SM.APP.Pages.Admin.Members.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].UNFirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].UNLastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Nickname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].UNFileNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Mobile)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Baptised)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Birthdate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].School)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Work)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].IsMainMember)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].IsActive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].ImageReference)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Member[0].Notes)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Member) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UNFirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UNLastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nickname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UNFileNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UNPersonalNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mobile)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Baptised)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Birthdate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.School)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Work)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsMainMember)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsActive)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageReference)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Notes)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.MemberID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

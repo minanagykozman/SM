@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using SM.DAL;
 using SM.DAL.DataModel;
 
-namespace SM.APP.Pages.Admin.Class
+namespace SM.APP.Pages.Admin.Members
 {
     public class IndexModel : PageModel
     {
@@ -19,12 +19,11 @@ namespace SM.APP.Pages.Admin.Class
             _context = context;
         }
 
-        public IList<SM.DAL.DataModel.Class> Class { get;set; } = default!;
+        public IList<Member> Member { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Class = await _context.Classes
-                .Include(e => e.Meeting).ToListAsync();
+            Member = await _context.Members.ToListAsync();
         }
     }
 }
