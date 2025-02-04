@@ -18,27 +18,31 @@ internal class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
 
+        builder.WebHost.UseKestrel(options =>
+        {
+            options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+        });
         // Add authentication services
-        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
-            })
-            .AddGoogle(options =>
-            {
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                options.Events.OnCreatingTicket = async context =>
-                {
-                    var email = context.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        //    .AddCookie(options =>
+        //    {
+        //        options.LoginPath = "/Account/Login";
+        //        options.LogoutPath = "/Account/Logout";
+        //    })
+        //    .AddGoogle(options =>
+        //    {
+        //        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        //        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        //        options.Events.OnCreatingTicket = async context =>
+        //        {
+        //            var email = context.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
-                    //if (!await IsUserAllowed(email, builder.Configuration.GetConnectionString("DefaultConnection")))
-                    //{
-                    //    context.Fail("Unauthorized user.");
-                    //}
-                };
-            });
+        //            //if (!await IsUserAllowed(email, builder.Configuration.GetConnectionString("DefaultConnection")))
+        //            //{
+        //            //    context.Fail("Unauthorized user.");
+        //            //}
+        //        };
+        //    });
 
         var app = builder.Build();
 
@@ -49,12 +53,12 @@ internal class Program
         }
 
         // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
+        //if (!app.Environment.IsDevelopment())
+        //{
+        //    app.UseExceptionHandler("/Error");
+        //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        //    app.UseHsts();
+        //}
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
