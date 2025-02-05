@@ -20,10 +20,10 @@ internal class Program
         builder.Services.AddRazorPages();
 
 
-        //builder.WebHost.UseKestrel(options =>
-        //{
-        //    options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
-        //});
+        builder.WebHost.UseKestrel(options =>
+        {
+            options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+        });
 
         // Add Identity with Role Support
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
