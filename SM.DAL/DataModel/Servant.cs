@@ -12,9 +12,9 @@ namespace SM.DAL.DataModel
         public string ServantName { get; set; } = string.Empty;
         public string Mobile1 { get; set; } = string.Empty;
         public string? Mobile2 { get; set; }
-        public string Role { get; set; } = string.Empty;
+        //public string Role { get; set; } = string.Empty;
         public bool IsActive { get; set; }
-
+        public string UserID { get; set; }
         public ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
         public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
         public ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();

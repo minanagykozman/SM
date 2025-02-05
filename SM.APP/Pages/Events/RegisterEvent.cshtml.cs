@@ -1,59 +1,70 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SM.DAL.DataModel;
 using System.Buffers;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.Identity;
+using SM.APP.Services;
 
 namespace SM.APP.Pages.Events
 {
+    [Authorize(Roles = "Admin,Servant")]
     public class RegisterEventModel : PageModel
     {
 
-        [BindProperty(SupportsGet = true)]
-        public string UserCode { get; set; }
-        [BindProperty]
-        public string Notes { get; set; }
 
-        public string MemberStatus { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string UserCode { get; set; } = string.Empty;
+        [BindProperty]
+        public string? Notes { get; set; } = null;
+
+        public string MemberStatus { get; set; } = string.Empty;
 
         public bool ShowModal { get; set; } = false;
         public static RegistrationStatusResponse? MemberData { get; set; }
         public List<Member> EventMembers { get; set; } = new List<Member>();
+        private int _eventID;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? eventID)
         {
-            using (HttpClient client = new HttpClient())
+            if (eventID.HasValue)
             {
-                string req = "https://apitest.stmosesservices.com/Events/GetEventRegisteredMembers?eventID=1";
-                HttpResponseMessage response = await client.GetAsync(req);
-                string responseData = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true // Enable case insensitivity
-                };
-                EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
-                if (EventMembers == null)
-                    EventMembers = new List<Member>();
-            }
-            if (!string.IsNullOrEmpty(UserCode))
-            {
+                _eventID = eventID.Value;
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=1";
+                    string req = "https://apitest.stmosesservices.com/Events/GetEventRegisteredMembers?eventID=" + eventID.ToString(); ;
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true // Enable case insensitivity
                     };
-                    MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
-                    LoadData();
+                    EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                    if (EventMembers == null)
+                        EventMembers = new List<Member>();
                 }
-                UserCode = string.Empty;
+                if (!string.IsNullOrEmpty(UserCode))
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=1";
+                        HttpResponseMessage response = await client.GetAsync(req);
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
+                        LoadData();
+                    }
+                    UserCode = string.Empty;
+                }
             }
         }
 
@@ -110,7 +121,7 @@ namespace SM.APP.Pages.Events
                 };
 
                 string apiUrl = "https://apitest.stmosesservices.com/Events/Register";
-                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException={2}&notes={3}", apiUrl, memberCode, isException,Notes);
+                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException={2}&notes={3}", apiUrl, memberCode, isException, Notes);
                 using (HttpClient client = new HttpClient())
                 {
                     var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");

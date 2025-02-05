@@ -3,32 +3,100 @@
 @{
     ViewData["Title"] = "Home page";
 }
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+    var isServant = user != null && await UserManager.IsInRoleAsync(user, "Servant");
+}
 
+@if (isAdmin || isServant)
+{
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">System Modules</h2>
+        <div class="row g-3">
+            <!-- Attendance -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="attendance.html" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-calendar-check fs-1"></i>
+                        <h5 class="mt-2">Attendance</h5>
+                    </div>
+                </a>
+            </div>
 
-<form method="post">
-    <input id="txtUNFileNumber" type="text"/>
-    <button type="submit" class="btn btn-primary" asp-page-handler="MyButtonClick">Click Me</button>
-</form>
+            <!-- Members -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="/Admin/Members" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-people fs-1"></i>
+                        <h5 class="mt-2">Members</h5>
+                    </div>
+                </a>
+            </div>
 
-<!-- Include jQuery for simplicity -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Handle button click event
-        $('#ajaxButton').on('click', function () {
-            $.ajax({
-                url: '/Index?handler=MyAjaxHandler', // Razor Pages route with the handler name
-                type: 'POST', // Use POST for the request
-                contentType: 'application/json', // Set the content type
-                success: function (response) {
-                    // Update the message div with the response
-                    $('#response-message').text(response.message);
-                },
-                error: function (xhr, status, error) {
-                    // Handle errors
-                    $('#response-message').text('An error occurred: ' + error).css('color', 'red');
-                }
-            });
-        });
-    });
-</script>
+            <!-- Events -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="/Events" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-calendar-event fs-1"></i>
+                        <h5 class="mt-2">Events</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Aids -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="aids.html" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-hospital fs-1"></i>
+                        <h5 class="mt-2">Aids</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Funds -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="funds.html" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-cash-coin fs-1"></i>
+                        <h5 class="mt-2">Funds</h5>
+                    </div>
+                </a>
+            </div>
+            @if (isAdmin)
+            {
+                <!-- Administration -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a href="administration.html" class="text-decoration-none">
+                        <div class="card text-center p-4 shadow-sm">
+                            <i class="bi bi-gear fs-1"></i>
+                            <h5 class="mt-2">Administration</h5>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (!SignInManager.IsSignedIn(User))
+{
+    <!-- Show message for non-logged-in users -->
+    <div class="container text-center mt-5">
+        <div class="alert alert-warning p-4">
+            <h4>Please log in to see available modules</h4>
+            <a href="/Identity/Account/Login" class="btn btn-primary mt-3">Log In</a>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Show message for logged-in users without access -->
+    <div class="container text-center mt-5">
+        <div class="alert alert-danger p-4">
+            <h4>You don't have access to any module!</h4>
+        </div>
+    </div>
+}

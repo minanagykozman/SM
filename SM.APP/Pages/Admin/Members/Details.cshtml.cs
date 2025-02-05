@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Members
 {
+    [Authorize(Roles = "Admin,Servant")]
     public class DetailsModel : PageModel
     {
         private readonly SM.DAL.AppDbContext _context;

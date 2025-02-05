@@ -17,6 +17,7 @@ namespace SM.DAL.DataModel
         [Display(Name = "Last name")]
         public string? UNLastName { get; set; }
         public string? Nickname { get; set; }
+        [Display(Name = "UN File Number")]
         public string? UNFileNumber { get; set; }
         [Display(Name = "UN Number")]
         public string? UNPersonalNumber { get; set; }
@@ -31,7 +32,6 @@ namespace SM.DAL.DataModel
         public bool IsActive { get; set; }
         public string? ImageReference { get; set; }
         public string? Notes { get; set; }
-
         public int Age
         {
             get
@@ -55,11 +55,11 @@ namespace SM.DAL.DataModel
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
             }
         }
-        public ICollection<ClassMember> ClassMembers { get; set; } = new List<ClassMember>();
-        public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
-        public ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
-        public ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
-        public ICollection<Fund> Funds { get; set; } = new List<Fund>();
+        public virtual ICollection<ClassMember> ClassMembers { get; set; } = new List<ClassMember>();
+        public virtual ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
+        public virtual ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
+        public virtual ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
+        public virtual ICollection<Fund> Funds { get; set; } = new List<Fund>();
     }
 
 }

@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using SM.APP.Services;
 using SM.DAL;
 
 internal class Program
@@ -18,31 +19,27 @@ internal class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
 
-        builder.WebHost.UseKestrel(options =>
-        {
-            options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
-        });
-        // Add authentication services
-        //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        //    .AddCookie(options =>
-        //    {
-        //        options.LoginPath = "/Account/Login";
-        //        options.LogoutPath = "/Account/Logout";
-        //    })
-        //    .AddGoogle(options =>
-        //    {
-        //        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        //        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        //        options.Events.OnCreatingTicket = async context =>
-        //        {
-        //            var email = context.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
-        //            //if (!await IsUserAllowed(email, builder.Configuration.GetConnectionString("DefaultConnection")))
-        //            //{
-        //            //    context.Fail("Unauthorized user.");
-        //            //}
-        //        };
-        //    });
+        //builder.WebHost.UseKestrel(options =>
+        //{
+        //    options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+        //});
+
+        // Add Identity with Role Support
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = false;
+        }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Identity/Account/Login";
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied"; 
+        });
+
+        builder.Services.AddSingleton<IEmailSender, EmailSender>();
+
+        //builder.Services.AddSingleton<IServantManager, ServantManager>();
 
         var app = builder.Build();
 

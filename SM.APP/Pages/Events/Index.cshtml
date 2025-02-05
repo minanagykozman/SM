@@ -1,0 +1,24 @@
+﻿@page
+@model SM.APP.Pages.Events.IndexModel
+@{
+    ViewData["Title"] = "Events";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Upcoming Events</h2>
+    <div class="row g-3">
+        @foreach (var item in Model.Events)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.EventName)</h5>
+                    <div class="d-flex justify-content-between">
+                        <a asp-page="./RegisterEvent" asp-route-eventID="@item.EventID" class="btn btn-primary">Registration</a>
+                        <a asp-page="./EventAttendance" asp-route-eventID="@item.EventID" class="btn btn-success">Attendance</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>

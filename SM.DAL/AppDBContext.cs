@@ -1,10 +1,12 @@
 ﻿namespace SM.DAL
 {
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using SM.DAL.DataModel;
 
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -41,8 +43,6 @@
                         errorNumbersToAdd: null);
                 });
             }
-            /*optionsBuilder.UseMySql("Server=your_server;Database=your_database;User=your_username;Password=your_password;",
-                new MySqlServerVersion(new Version(8, 0, 2))); // Adjust for your MySQL version*/
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,6 +67,50 @@
 
             modelBuilder.Entity<MemberAid>()
                 .HasKey(ea => new { ea.AidID, ea.MemberID });
+
+            modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
+            modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+
+            #region Seed Data
+            // Seed roles
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "383d20f8-ac3b-46ff-b322-4f21cda036dc", Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "30f10ff2-8ac3-4acc-b88d-abb2fd554653", Name = "Servant", NormalizedName = "SERVANT" }
+            );
+
+            // Seed an Admin user
+            var hasher = new PasswordHasher<IdentityUser>();
+
+            var adminUser = new IdentityUser
+            {
+                Id = "78769c53-5336-4411-8488-1983111d7be7",
+                UserName = "ssudan.stpual@gmail.com",
+                NormalizedUserName = "SSUDAN.STPAUL@GMAIL.COM",
+                Email = "ssudan.stpual@gmail.com",
+                NormalizedEmail = "SSUDAN.STPAUL@GMAIL.COM",
+                EmailConfirmed = true,
+                PasswordHash = "AQAAAAIAAYagAAAAEAvxm8Ul6/CAsvy/Ylk9GobRdQrfCnhyTSTEO0s149pYHw6oPn9vcCqhwIvF558hSw==",
+                SecurityStamp = "394139b6-fd9c-4d25-a9a5-ef1565d13bab",
+                ConcurrencyStamp = "7c62d744-b320-49c6-871a-273d2f53a81f"
+            };
+            //hasher.HashPassword(null, "stP@ul$25")
+            modelBuilder.Entity<IdentityUser>().HasData(adminUser);
+
+            // Assign the Admin user to the Admin role
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string> { UserId = "78769c53-5336-4411-8488-1983111d7be7", RoleId = "383d20f8-ac3b-46ff-b322-4f21cda036dc" }
+            );
+            var adminServant = new Servant()
+            {
+                ServantID = -1,
+                ServantName = "admin",
+                IsActive = true,
+                UserID = "78769c53-5336-4411-8488-1983111d7be7"
+            };
+            modelBuilder.Entity<Servant>().HasData(adminServant);
+            #endregion
         }
 
         static MySqlServerVersion _serverVersion;
