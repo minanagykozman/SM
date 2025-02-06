@@ -17,13 +17,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-if (!builder.Environment.IsDevelopment())
+builder.WebHost.UseKestrel(options =>
 {
-    builder.WebHost.UseKestrel(options =>
-    {
-        options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
-    });
-}
+    options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+});
 
 var app = builder.Build();
 
