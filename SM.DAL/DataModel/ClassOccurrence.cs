@@ -11,7 +11,8 @@ namespace SM.DAL.DataModel
         public int ClassOccurrenceID { get; set; }
         public int ClassID { get; set; }
         public Class Class { get; set; } = null!;
-        public DateTime ClassOccurrenceDate { get; set; }
+        public DateTime ClassOccurrenceStartDate { get; set; }
+        public DateTime ClassOccurrenceEndDate { get; set; }
     }
 
 }

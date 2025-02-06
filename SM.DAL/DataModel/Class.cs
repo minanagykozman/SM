@@ -11,9 +11,8 @@ namespace SM.DAL.DataModel
         public int ClassID { get; set; }
         public string ClassName { get; set; } = string.Empty;
         public int MeetingID { get; set; }
-        public virtual Meeting Meeting { get; set; } = null!;
         public bool IsActive { get; set; }
-
+        public virtual Meeting Meeting { get; set; } = null!;
         public virtual ICollection<ClassMember> ClassMembers { get; set; } = new List<ClassMember>();
         public virtual ICollection<ClassOccurrence> ClassOccurrences { get; set; } = new List<ClassOccurrence>();
         public virtual ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();

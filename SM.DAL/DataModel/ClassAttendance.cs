@@ -9,12 +9,12 @@ namespace SM.DAL.DataModel
     public class ClassAttendance
     {
         public int ClassOccurrenceID { get; set; }
-        public ClassOccurrence ClassOccurrence { get; set; } = null!;
         public int MemberID { get; set; }
-        public Member Member { get; set; } = null!;
         public int ServantID { get; set; }
-        public Servant Servant { get; set; } = null!;
         public DateTime TimeStamp { get; set; }
+        public virtual ClassOccurrence ClassOccurrence { get; set; } = null!;
+        public virtual Member Member { get; set; } = null!;
+        public virtual Servant Servant { get; set; } = null!;
     }
 
 }

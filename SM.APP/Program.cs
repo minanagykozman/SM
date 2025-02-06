@@ -20,10 +20,13 @@ internal class Program
         builder.Services.AddRazorPages();
 
 
-        builder.WebHost.UseKestrel(options =>
+        if (!builder.Environment.IsDevelopment())
         {
-            options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
-        });
+            builder.WebHost.UseKestrel(options =>
+            {
+                options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+            });
+        }
 
         // Add Identity with Role Support
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -34,7 +37,7 @@ internal class Program
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = "/Identity/Account/Login";
-            options.AccessDeniedPath = "/Identity/Account/AccessDenied"; 
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
         });
 
         builder.Services.AddSingleton<IEmailSender, EmailSender>();
