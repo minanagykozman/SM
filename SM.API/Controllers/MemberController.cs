@@ -35,6 +35,24 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet(Name = "GetMembers")]
+        public ActionResult<List<Member>> GetMembers(string memberCode, string firstName, string lastName)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    List<Member> members = memberHandler.GetMembers(memberCode, firstName, lastName);
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
     }
 }

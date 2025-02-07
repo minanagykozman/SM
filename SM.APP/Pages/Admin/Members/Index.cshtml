@@ -2,28 +2,30 @@
 @model SM.APP.Pages.Admin.Members.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Members";
 }
 
-<h1>Index</h1>
+<h1>Members</h1>
+<form method="get">
+    <div class="mb-3 d-flex align-items-center">
+        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+        <div class="form-floating flex-grow-1">
+            <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
+            <label asp-for="UserCode">Code</label>
+        </div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
+        <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Search</button>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Member[0].UNFirstName)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Member[0].Code)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Member[0].UNLastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Nickname)
+                @Html.DisplayNameFor(model => model.Member[0].FullName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Member[0].UNFileNumber)
@@ -32,28 +34,16 @@
                 @Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Member[0].Age)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Member[0].Mobile)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Member[0].Baptised)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Member[0].Birthdate)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Member[0].Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].School)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Work)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].IsMainMember)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].IsActive)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Member[0].ImageReference)
@@ -65,62 +55,45 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Member) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UNFirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UNLastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nickname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UNFileNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Mobile)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Baptised)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Birthdate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.School)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Work)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsMainMember)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageReference)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.MemberID">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Member)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UNFileNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UNPersonalNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Mobile)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Baptised)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ImageReference)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.MemberID">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
