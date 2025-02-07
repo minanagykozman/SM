@@ -17,7 +17,7 @@ namespace SM.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetFamily/{unFileNumber}")]
+        [HttpGet("GetFamily")]
         public ActionResult<List<Member>> GetFamily(string unFileNumber)
         {
             try
@@ -35,8 +35,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet(Name = "GetMembers")]
-        public ActionResult<List<Member>> GetMembers(string memberCode, string firstName, string lastName)
+        [HttpGet("SearchMembers")]
+        public ActionResult<List<Member>> SearchMembers(string memberCode, string firstName, string lastName)
         {
             try
             {
@@ -44,6 +44,43 @@ namespace SM.API.Controllers
                 {
                     List<Member> members = memberHandler.GetMembers(memberCode, firstName, lastName);
                     return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetMember")]
+        public ActionResult<Member> GetMember(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    Member member = memberHandler.GetMember(memberID);
+                    return Ok(member);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("UpdateMember")]
+        public ActionResult<string> UpdateMember(Member member)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
+                {
+                    eventHandler.UpdateMember(member);
+                    return Ok("Member updated");
                 }
 
             }
