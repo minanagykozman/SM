@@ -23,13 +23,14 @@ namespace SM.APP.Pages.Attendance
         public string UserCode { get; set; } = string.Empty;
         [BindProperty]
         public string? Notes { get; set; } = null;
-
+        [BindProperty]
+        public int ClassOccurenceID { get; set; }
         public string MemberStatus { get; set; } = string.Empty;
 
         public bool ShowModal { get; set; } = false;
         public static MemberAttendanceResult? MemberData { get; set; }
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
-        public int ClassOccurenceID;
+
         public async Task OnGetAsync(int? classOccurenceID)
         {
             if (_sevantID == 0)
@@ -133,6 +134,12 @@ namespace SM.APP.Pages.Attendance
         }
         public async Task<IActionResult> OnPostAsync()
         {
+            if (_sevantID == 0)
+            {
+                var userId = _userManager.GetUserId(User);
+                ServantService service = new ServantService();
+                _sevantID = service.GetServantID(userId);
+            }
             if (MemberData != null)
             {
                 StringContent jsonContent;
@@ -153,7 +160,7 @@ namespace SM.APP.Pages.Attendance
                     UserCode = string.Empty;
                 }
             }
-            return RedirectToPage();
+            return RedirectToPage("", new { classOccurenceID = ClassOccurenceID });
         }
 
         private string TakeAttendanceString(string memberCode, int classOccuranceID, bool forceRegister, out StringContent jsonContent)

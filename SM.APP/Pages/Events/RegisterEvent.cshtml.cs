@@ -17,7 +17,13 @@ namespace SM.APP.Pages.Events
     [Authorize(Roles = "Admin,Servant")]
     public class RegisterEventModel : PageModel
     {
+        int _sevantID ;
+        private readonly UserManager<IdentityUser> _userManager;
+        public RegisterEventModel(UserManager<IdentityUser> userManager)
+        {
+            _userManager = userManager;
 
+        }
 
         [BindProperty(SupportsGet = true)]
         public string UserCode { get; set; } = string.Empty;
@@ -29,10 +35,17 @@ namespace SM.APP.Pages.Events
         public bool ShowModal { get; set; } = false;
         public static RegistrationStatusResponse? MemberData { get; set; }
         public List<Member> EventMembers { get; set; } = new List<Member>();
-        public int EventID;
+        [BindProperty]
+        public int EventID { get; set; }
 
         public async Task OnGetAsync(int? eventID)
         {
+            if (_sevantID == 0)
+            {
+                var userId = _userManager.GetUserId(User);
+                ServantService service = new ServantService();
+                _sevantID = service.GetServantID(userId);
+            }
             if (eventID.HasValue)
             {
                 EventID = eventID.Value;
@@ -53,7 +66,7 @@ namespace SM.APP.Pages.Events
                 {
                     using (HttpClient client = new HttpClient())
                     {
-                        string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=1";
+                        string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=" + eventID.ToString();
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
                         var options = new JsonSerializerOptions
@@ -106,11 +119,17 @@ namespace SM.APP.Pages.Events
         {
             if (MemberData != null)
             {
+                if (_sevantID == 0)
+                {
+                    var userId = _userManager.GetUserId(User);
+                    ServantService service = new ServantService();
+                    _sevantID = service.GetServantID(userId);
+                }
                 string memberCode = MemberData.Member.Code;
                 int eventID = EventID;
-                int servantID = 1;
+                int servantID = _sevantID;
                 bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
-                string notes = Notes;
+                string notes = string.IsNullOrEmpty(Notes) ? string.Empty : Notes;
                 var requestData = new
                 {
                     memberCode,
@@ -121,7 +140,7 @@ namespace SM.APP.Pages.Events
                 };
 
                 string apiUrl = "https://apitest.stmosesservices.com/Events/Register";
-                string request = string.Format("{0}?memberCode={1}&eventID=1&servantID=1&isException={2}&notes={3}", apiUrl, memberCode, isException, Notes);
+                string request = string.Format("{0}?memberCode={1}&eventID={2}&servantID={3}&isException={4}&notes={5}", apiUrl, memberCode, EventID, _sevantID, isException.ToString().ToLower(), notes);
                 using (HttpClient client = new HttpClient())
                 {
                     var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
@@ -140,7 +159,7 @@ namespace SM.APP.Pages.Events
 
                 }
             }
-            return RedirectToPage();
+            return RedirectToPage("", new { eventID = EventID });
         }
     }
     public class RegistrationStatusResponse
