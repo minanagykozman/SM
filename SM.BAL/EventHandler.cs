@@ -48,14 +48,21 @@ namespace SM.BAL
 
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
         {
-            Event ev = (Event)_dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
-            Member lmember = (Member)_dbcontext.Members.FirstOrDefault(m => (m.Code == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember)));
-
-            member = lmember;
+            Event? ev = _dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
+            Member? lmember = _dbcontext.Members.Include(m => m.ClassMembers).
+                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+            if (lmember == null)
+            {
+                member = null;
+                return RegistrationStatus.MemeberNotFound;
+            }
+            else
+            {
+                member = lmember;
+            }
             if (ev == null)
                 return RegistrationStatus.EventNotFound;
-            if (lmember == null)
-                return RegistrationStatus.MemeberNotFound;
+           
             var registered = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).Select(e => e.MemberID).ToList<int>();
             if (registered != null && registered.Contains(lmember.MemberID))
                 return RegistrationStatus.MemberAlreadyRegistered;

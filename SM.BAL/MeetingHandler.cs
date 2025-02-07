@@ -17,7 +17,7 @@ namespace SM.BAL
         {
             return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servantID)).ToList();
         }
-        public List<ClassOccurrence> GetClassOccurances(int classID)
+        public List<ClassOccurrence> GetClassOccurences(int classID)
         {
             return _dbcontext.ClassOccurrences.Where(c => c.ClassID == classID).ToList();
         }

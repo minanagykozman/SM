@@ -3,13 +3,13 @@
 @{
 }
 @using SM.APP.Pages.Attendance
-<h2>Register for Event</h2>
+<h2>Take Attendance</h2>
 <form method="get">
     <div class="form-floating mb-3">
-        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
+        <input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
         <input asp-for="UserCode" class="form-control" id="SearchString" />
         <label asp-for="UserCode">Code</label>
-        <button  id="btnCheck" type="submit" class="btn-primary">Check</button>
+        <button id="btnCheck" type="submit" class="btn-primary">Check</button>
     </div>
     <div class="container mt-4">
         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
@@ -75,10 +75,10 @@
                 </div>
                 <div class="modal-footer">
                     @if (TakeAttendanceModel.MemberData != null && TakeAttendanceModel.MemberData.Member != null &&
-                    TakeAttendanceModel.MemberData.Status == AttendanceStatus.NotRegisteredInClass)
+                    TakeAttendanceModel.MemberData.AttendanceStatus == AttendanceStatus.NotRegisteredInClass)
                     {
-                        <label>This will automatically register member in class</label>
-                        <input type="submit" id="submitBtn" value="Register" class="btn btn-primary" />
+                        <label>This will automatically add member in class</label>
+                        <input type="submit" id="submitBtn" value="Present" class="btn btn-primary" />
                     }
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>

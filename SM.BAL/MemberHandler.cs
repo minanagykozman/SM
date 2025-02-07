@@ -1,4 +1,5 @@
-﻿using SM.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using SM.DAL;
 using SM.DAL.DataModel;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,12 @@ namespace SM.BAL
         {
             var members = _dbcontext.Members.Where(m => m.UNFileNumber == unFileNumber).ToList<Member>();
             return members.OrderBy(m => m.Birthdate).ToList<Member>();
+        }
+
+        public Member? GetMember(string memberCode)
+        {
+            return  _dbcontext.Members.Include(m => m.ClassMembers).
+                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
         }
         public void Dispose()
         {

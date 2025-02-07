@@ -18,7 +18,7 @@ namespace SM.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetClasses/{servantID}")]
+        [HttpGet("GetClasses")]
         public ActionResult<List<Class>> GetServantClasses(int servantID)
         {
             try
@@ -40,8 +40,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("GetClasseOccurances/{classID}")]
-        public ActionResult<List<ClassOccurrence>> GetClasseOccurances(int classID)
+        [HttpGet("GetClasseOccurences")]
+        public ActionResult<List<ClassOccurrence>> GetClasseOccurences(int classID)
         {
             try
             {
@@ -49,9 +49,9 @@ namespace SM.API.Controllers
                 {
                     return BadRequest("Invalid servantID");
                 }
-                using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    List<ClassOccurrence> classes = classHandler.GetClassOccurances(classID);
+                    List<ClassOccurrence> classes = meetingHandler.GetClassOccurences(classID);
                     return Ok(classes);
                 }
 
@@ -62,7 +62,7 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("GetAttendedMembers/{occurenceID}")]
+        [HttpGet("GetAttendedMembers")]
         public ActionResult<List<Member>> GetAttendedMembers(int occurenceID)
         {
             try
@@ -85,7 +85,7 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("CheckAteendance")]
-        public ActionResult<MemberAttendanceResult> CheckAteendance(int classOccuranceID, string memberCode)
+        public ActionResult<MemberAttendanceResult> CheckAteendance(int classOccurenceID, string memberCode)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace SM.API.Controllers
                 using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
                 {
                     Member member;
-                    AttendanceStatus status = classHandler.CheckAteendance(classOccuranceID, memberCode, out member);
+                    AttendanceStatus status = classHandler.CheckAteendance(classOccurenceID, memberCode, out member);
 
                     return Ok(new MemberAttendanceResult() { AttendanceStatus = status, Member = member });
                 }
@@ -123,8 +123,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpPost("CreateClassOccurances")]
-        public ActionResult<string> CreateClassOccurances(int classID)
+        [HttpPost("CreateClassOccurences")]
+        public ActionResult<string> CreateClassOccurences(int classID)
         {
             try
             {
@@ -141,8 +141,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpPost("CreateClassOccurancesTimed")]
-        public ActionResult<List<ClassOccurrence>> CreateClassOccurancesTimed(int classID, DateTime startDate, DateTime endDate)
+        [HttpPost("CreateClassOccurencesTimed")]
+        public ActionResult<List<ClassOccurrence>> CreateClassOccurencesTimed(int classID, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -160,13 +160,13 @@ namespace SM.API.Controllers
             }
         }
         [HttpPost("TakeAttendance")]
-        public ActionResult<AttendanceStatus> TakeAttendance(int classOccuranceID, string memberCode, int servantID, bool forceRegister)
+        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode, int servantID, bool forceRegister)
         {
             try
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    var cl = meetingHandler.TakeClassAteendance(classOccuranceID, memberCode, servantID, forceRegister);
+                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberCode, servantID, forceRegister);
                     return Ok(cl);
                 }
 
@@ -178,13 +178,13 @@ namespace SM.API.Controllers
             }
         }
         [HttpPost("TakeAttendanceBulk")]
-        public ActionResult<string> TakeAttendanceBulk(int classOccuranceID, List<int> memberIDs, int servantID)
+        public ActionResult<string> TakeAttendanceBulk(int classOccurenceID, List<int> memberIDs, int servantID)
         {
             try
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    var cl = meetingHandler.TakeClassAteendance(classOccuranceID, memberIDs, servantID);
+                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberIDs, servantID);
                     return Ok(cl);
                 }
 

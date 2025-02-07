@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SM.APP.Services;
 using SM.DAL.DataModel;
 using System.Text;
 using System.Text.Json;
@@ -10,6 +12,13 @@ namespace SM.APP.Pages.Attendance
     [Authorize(Roles = "Admin,Servant")]
     public class TakeAttendanceModel : PageModel
     {
+        int _sevantID = 0;
+        private readonly UserManager<IdentityUser> _userManager;
+        public TakeAttendanceModel(UserManager<IdentityUser> userManager)
+        {
+            _userManager = userManager;
+
+        }
         [BindProperty(SupportsGet = true)]
         public string UserCode { get; set; } = string.Empty;
         [BindProperty]
@@ -18,11 +27,17 @@ namespace SM.APP.Pages.Attendance
         public string MemberStatus { get; set; } = string.Empty;
 
         public bool ShowModal { get; set; } = false;
-        public static AttendanceStatusResponse? MemberData { get; set; }
+        public static MemberAttendanceResult? MemberData { get; set; }
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
         public int ClassOccurenceID;
         public async Task OnGetAsync(int? classOccurenceID)
         {
+            if (_sevantID == 0)
+            {
+                var userId = _userManager.GetUserId(User);
+                ServantService service = new ServantService();
+                _sevantID = service.GetServantID(userId);
+            }
             if (classOccurenceID.HasValue)
             {
                 ClassOccurenceID = classOccurenceID.Value;
@@ -37,14 +52,14 @@ namespace SM.APP.Pages.Attendance
                         {
                             PropertyNameCaseInsensitive = true // Enable case insensitivity
                         };
-                        MemberData = JsonSerializer.Deserialize<AttendanceStatusResponse>(responseData, options);
+                        MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
                     }
                     if (MemberData != null)
                     {
-                        if (MemberData.Status == AttendanceStatus.Ready)
+                        if (MemberData.AttendanceStatus == AttendanceStatus.Ready)
                         {
                             StringContent jsonContent;
-                            string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, 1, false, out jsonContent);
+                            string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, false, out jsonContent);
                             using (HttpClient client = new HttpClient())
                             {
                                 HttpResponseMessage response = await client.PostAsync(request, jsonContent);
@@ -66,14 +81,17 @@ namespace SM.APP.Pages.Attendance
                 }
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Meeting/GetAttendedMembers?occurenceID=" + ClassOccurenceID.ToString(); ;
+                    string req = "https://apitest.stmosesservices.com/Meeting/GetAttendedMembers?occurenceID=" + ClassOccurenceID.ToString();
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions
+                    if (!string.IsNullOrEmpty(responseData))
                     {
-                        PropertyNameCaseInsensitive = true // Enable case insensitivity
-                    };
-                    ClassOccurenceMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        ClassOccurenceMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                    }
                     if (ClassOccurenceMembers == null)
                         ClassOccurenceMembers = new List<Member>();
                 }
@@ -83,7 +101,7 @@ namespace SM.APP.Pages.Attendance
         private void LoadData()
         {
 
-            switch (MemberData.Status)
+            switch (MemberData.AttendanceStatus)
             {
                 case AttendanceStatus.MemberNotFound:
                     MemberStatus = "Member not found";
@@ -116,7 +134,7 @@ namespace SM.APP.Pages.Attendance
             if (MemberData != null)
             {
                 StringContent jsonContent;
-                string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, 1, true, out jsonContent);
+                string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, true, out jsonContent);
                 using (HttpClient client = new HttpClient())
                 {
 
@@ -136,8 +154,9 @@ namespace SM.APP.Pages.Attendance
             return RedirectToPage();
         }
 
-        private string TakeAttendanceString(string memberCode, int classOccuranceID, int servantID, bool forceRegister, out StringContent jsonContent)
+        private string TakeAttendanceString(string memberCode, int classOccuranceID, bool forceRegister, out StringContent jsonContent)
         {
+            int servantID = _sevantID;
             var requestData = new
             {
                 classOccuranceID,
@@ -147,15 +166,15 @@ namespace SM.APP.Pages.Attendance
             };
 
             string apiUrl = "https://apitest.stmosesservices.com/Meeting/TakeAttendance";
-            string request = string.Format("{0}?classOccuranceID={0}&memberCode={1}&servantID={2}&forceRegister={3}", apiUrl, ClassOccurenceID, 1, true);
+            string request = string.Format("{0}?classOccuranceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", apiUrl, memberCode, ClassOccurenceID, _sevantID, true);
             jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
             return request;
         }
     }
-    public class AttendanceStatusResponse
+    public class MemberAttendanceResult
     {
+        public AttendanceStatus AttendanceStatus { get; set; }
         public Member Member { get; set; }
-        public AttendanceStatus Status { get; set; }
     }
     public enum AttendanceStatus
     {
