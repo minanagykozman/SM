@@ -21,6 +21,10 @@ namespace SM.BAL
         {
             return _dbcontext.ClassOccurrences.Where(c => c.ClassID == classID).ToList();
         }
+        public List<Member> GetAttendedMembers(int occurrenceID)
+        {
+            return _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == occurrenceID).OrderByDescending(c => c.TimeStamp).Select(c => c.Member).ToList();
+        }
         public Class CreateClass(string className, int meetingID)
         {
             try

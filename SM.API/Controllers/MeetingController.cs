@@ -62,6 +62,28 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("GetAttendedMembers/{occurenceID}")]
+        public ActionResult<List<Member>> GetAttendedMembers(int occurenceID)
+        {
+            try
+            {
+                if (occurenceID <= 0)
+                {
+                    return BadRequest("Invalid servantID");
+                }
+                using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
+                {
+                    List<Member> classes = classHandler.GetAttendedMembers(occurenceID);
+                    return Ok(classes);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         [HttpGet("CheckAteendance")]
         public ActionResult<MemberAttendanceResult> CheckAteendance(int classOccuranceID, string memberCode)
         {

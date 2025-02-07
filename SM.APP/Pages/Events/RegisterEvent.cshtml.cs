@@ -29,13 +29,13 @@ namespace SM.APP.Pages.Events
         public bool ShowModal { get; set; } = false;
         public static RegistrationStatusResponse? MemberData { get; set; }
         public List<Member> EventMembers { get; set; } = new List<Member>();
-        private int _eventID;
+        public int EventID;
 
         public async Task OnGetAsync(int? eventID)
         {
             if (eventID.HasValue)
             {
-                _eventID = eventID.Value;
+                EventID = eventID.Value;
                 using (HttpClient client = new HttpClient())
                 {
                     string req = "https://apitest.stmosesservices.com/Events/GetEventRegisteredMembers?eventID=" + eventID.ToString(); ;
@@ -107,7 +107,7 @@ namespace SM.APP.Pages.Events
             if (MemberData != null)
             {
                 string memberCode = MemberData.Member.Code;
-                int eventID = 1;
+                int eventID = EventID;
                 int servantID = 1;
                 bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
                 string notes = Notes;

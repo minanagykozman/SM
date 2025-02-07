@@ -1,0 +1,83 @@
+﻿@page
+@model SM.APP.Pages.Attendance.ClassOccurancesModel
+@{
+    ViewData["Title"] = "Class Occurences";
+}
+<div class="container mt-5">
+    <!-- Today Classes -->
+    <h2 class="text-center mb-4">
+        <button class="btn btn-link text-decoration-none" data-bs-toggle="collapse" data-bs-target="#todayClasses" aria-expanded="true">
+            Today Classes <i class="bi bi-chevron-down"></i>
+        </button>
+    </h2>
+    <div id="todayClasses" class="collapse">
+        <div class="row g-3">
+            @{
+                if (Model.TodayClasses.Count() > 0)
+                {
+
+                    @foreach (var item in Model.TodayClasses)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card p-3 shadow-sm">
+                                <h5 class="card-title">@Html.DisplayFor(modelItem => item.ClassOccurrenceName)</h5>
+                                <div class="d-flex justify-content-between">
+                                    <a asp-page="./TakeAttendance" asp-route-classOccuID="@item.ClassOccurrenceID" class="btn btn-primary">Take Attendance</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                }
+                else
+                {
+                    <div class="col-md-6 col-lg-4">No events today!</div>
+                }
+            }
+
+        </div>
+    </div>
+    <!-- Upcoming Classes -->
+    <h2 class="text-center mb-4">
+        <button class="btn btn-link text-decoration-none" data-bs-toggle="collapse" data-bs-target="#upcomingClasses" aria-expanded="false">
+            Upcoming Classes <i class="bi bi-chevron-down"></i>
+        </button>
+    </h2>
+    <div id="upcomingClasses" class="collapse">
+        <div class="row g-3">
+            @foreach (var item in Model.UpcomingClasses)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.ClassOccurrenceName)</h5>
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./TakeAttendance" asp-route-classOccuID="@item.ClassOccurrenceID" class="btn btn-primary">Take Attendance</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Past Classes -->
+    <h2 class="text-center mb-4">
+        <button class="btn btn-link text-decoration-none" data-bs-toggle="collapse" data-bs-target="#pastClasses" aria-expanded="false">
+            Past Classes <i class="bi bi-chevron-down"></i>
+        </button>
+    </h2>
+    <div id="pastClasses" class="collapse">
+        <div class="row g-3">
+            @foreach (var item in Model.PastClasses)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.ClassOccurrenceName)</h5>
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./TakeAttendance" asp-route-classOccuID="@item.ClassOccurrenceID" class="btn btn-primary">Take Attendance</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

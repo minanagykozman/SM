@@ -1,13 +1,12 @@
 ﻿@page
-@model SM.APP.Pages.Events.RegisterEventModel
+@model SM.APP.Pages.Attendance.TakeAttendanceModel
 @{
-    ViewData["Title"] = "Register Event";
 }
-@using SM.APP.Pages.Events;
+@using SM.APP.Pages.Attendance
 <h2>Register for Event</h2>
 <form method="get">
     <div class="form-floating mb-3">
-        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
         <input asp-for="UserCode" class="form-control" id="SearchString" />
         <label asp-for="UserCode">Code</label>
         <button  id="btnCheck" type="submit" class="btn-primary">Check</button>
@@ -18,27 +17,21 @@
                 <thead class="table-dark">
                     <tr>
                         <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Code)
+                            @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].Code)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
+                            @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].FullName)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
+                            @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].UNFileNumber)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Age)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
+                            @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].UNPersonalNumber)
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.EventMembers)
+                    @foreach (var item in Model.ClassOccurenceMembers)
                     {
                         <tr>
                             <td>
@@ -52,12 +45,6 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Age)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Baptised)
                             </td>
                         </tr>
                     }
@@ -79,26 +66,18 @@
                         <strong>Status: </strong><label class="form-label">@Model.MemberStatus</label>
                     </p>
 
-                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null)
+                    @if (TakeAttendanceModel.MemberData != null && TakeAttendanceModel.MemberData.Member != null)
                     {
-                        <p><strong>Name: </strong> @RegisterEventModel.MemberData.Member.FullName</p>
-                        <p><strong>Age: </strong> @RegisterEventModel.MemberData.Member.Age</p>
-                        <p><strong>Image: </strong> @RegisterEventModel.MemberData.Member.ImageReference</p>
-                        @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
-                       || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
-                        {
-                            <p>
-                                <strong>Notes: </strong>
-                                <textarea class="form-control" id="notes" asp-for="Notes"></textarea>
-                            </p>
-                        }
+                        <p><strong>Name: </strong> @TakeAttendanceModel.MemberData.Member.FullName</p>
+                        <p><strong>Age: </strong> @TakeAttendanceModel.MemberData.Member.Age</p>
+                        <p><strong>Image: </strong> @TakeAttendanceModel.MemberData.Member.ImageReference</p>
                     }
                 </div>
                 <div class="modal-footer">
-                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null &&
-                    (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
-                    || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
+                    @if (TakeAttendanceModel.MemberData != null && TakeAttendanceModel.MemberData.Member != null &&
+                    TakeAttendanceModel.MemberData.Status == AttendanceStatus.NotRegisteredInClass)
                     {
+                        <label>This will automatically register member in class</label>
                         <input type="submit" id="submitBtn" value="Register" class="btn btn-primary" />
                     }
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -162,5 +141,4 @@
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
         });
     });
-</script>
-
+</script>;

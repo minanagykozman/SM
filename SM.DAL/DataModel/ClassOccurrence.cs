@@ -13,6 +13,12 @@ namespace SM.DAL.DataModel
         public Class Class { get; set; } = null!;
         public DateTime ClassOccurrenceStartDate { get; set; }
         public DateTime ClassOccurrenceEndDate { get; set; }
+        public string ClassOccurrenceName
+        {
+            get
+            {
+                return string.Format("{0} {1}", ClassOccurrenceStartDate.ToString("ddd"), ClassOccurrenceStartDate.ToString("dd-MM-yy"));
+            }
+        }
     }
-
 }
