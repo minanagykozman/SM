@@ -45,14 +45,16 @@ namespace SM.APP.Pages.Attendance
                 {
                     using (HttpClient client = new HttpClient())
                     {
-                        string req = "https://apitest.stmosesservices.com/Meeting/CheckAteendance?classOccuranceID=" + classOccurenceID + "&memberCode=" + UserCode;
+                        string url = "https://apitest.stmosesservices.com/Meeting/CheckAttendance";
+                        string req = string.Format("{0}?classOccurenceID={1},&memberCode={2}", url, classOccurenceID, UserCode);
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true // Enable case insensitivity
                         };
-                        MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
+                        if (!string.IsNullOrEmpty(responseData))
+                            MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
                     }
                     if (MemberData != null)
                     {

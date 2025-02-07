@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SM.DAL.DataModel
@@ -55,10 +56,15 @@ namespace SM.DAL.DataModel
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
             }
         }
+        [JsonIgnore]
         public virtual ICollection<ClassMember> ClassMembers { get; set; } = new List<ClassMember>();
+        [JsonIgnore]
         public virtual ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
+        [JsonIgnore]
         public virtual ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
+        [JsonIgnore]
         public virtual ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
+        [JsonIgnore]
         public virtual ICollection<Fund> Funds { get; set; } = new List<Fund>();
     }
 

@@ -40,8 +40,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("GetClasseOccurences")]
-        public ActionResult<List<ClassOccurrence>> GetClasseOccurences(int classID)
+        [HttpGet("GetClassOccurences")]
+        public ActionResult<List<ClassOccurrence>> GetClassOccurences(int classID)
         {
             try
             {
@@ -84,8 +84,8 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("CheckAteendance")]
-        public ActionResult<MemberAttendanceResult> CheckAteendance(int classOccurenceID, string memberCode)
+        [HttpGet("CheckAttendance")]
+        public ActionResult<MemberAttendanceResult> CheckAttendance(int classOccurenceID, string memberCode)
         {
             try
             {
@@ -94,8 +94,8 @@ namespace SM.API.Controllers
                 {
                     Member member;
                     AttendanceStatus status = classHandler.CheckAteendance(classOccurenceID, memberCode, out member);
-
-                    return Ok(new MemberAttendanceResult() { AttendanceStatus = status, Member = member });
+                    MemberAttendanceResult response = new MemberAttendanceResult() { AttendanceStatus = status, Member = member };
+                    return Ok(response);
                 }
 
             }

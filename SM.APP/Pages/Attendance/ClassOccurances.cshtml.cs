@@ -19,7 +19,7 @@ namespace SM.APP.Pages.Attendance
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Meeting/GetClasseOccurances/" + classID.Value.ToString();
+                    string req = "https://apitest.stmosesservices.com/Meeting/GetClassOccurences?classID=" + classID.Value.ToString();
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions
