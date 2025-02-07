@@ -6,11 +6,14 @@
 @using SM.APP.Pages.Events;
 <h2>Register for Event</h2>
 <form method="get">
-    <div class="form-floating mb-3">
+    <div class="mb-3 d-flex align-items-center">
         <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
-        <input asp-for="UserCode" class="form-control" id="SearchString" />
-        <label asp-for="UserCode">Code</label>
-        <button  id="btnCheck" type="submit" class="btn-primary">Check</button>
+        <div class="form-floating flex-grow-1">
+            <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
+            <label asp-for="UserCode">Code</label>
+        </div>
+
+        <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Check</button>
     </div>
     <div class="container mt-4">
         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">

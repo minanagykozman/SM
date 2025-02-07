@@ -46,7 +46,7 @@ namespace SM.APP.Pages.Attendance
                     using (HttpClient client = new HttpClient())
                     {
                         string url = "https://apitest.stmosesservices.com/Meeting/CheckAttendance";
-                        string req = string.Format("{0}?classOccurenceID={1},&memberCode={2}", url, classOccurenceID, UserCode);
+                        string req = string.Format("{0}?classOccurenceID={1}&memberCode={2}", url, classOccurenceID, UserCode);
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
                         var options = new JsonSerializerOptions
@@ -75,9 +75,9 @@ namespace SM.APP.Pages.Attendance
                                 }
                                 UserCode = string.Empty;
                             }
+
                         }
-                        else
-                        { LoadData(); }
+                        LoadData();
                     }
                     UserCode = string.Empty;
                 }
@@ -168,7 +168,7 @@ namespace SM.APP.Pages.Attendance
             };
 
             string apiUrl = "https://apitest.stmosesservices.com/Meeting/TakeAttendance";
-            string request = string.Format("{0}?classOccuranceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", apiUrl, memberCode, ClassOccurenceID, _sevantID, true);
+            string request = string.Format("{0}?classOccurenceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", apiUrl, ClassOccurenceID, memberCode, _sevantID, forceRegister.ToString().ToLower());
             jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
             return request;
         }

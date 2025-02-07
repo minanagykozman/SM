@@ -5,11 +5,15 @@
 @using SM.APP.Pages.Attendance
 <h2>Take Attendance</h2>
 <form method="get">
-    <div class="form-floating mb-3">
+    <div class="mb-3 d-flex align-items-center">
         <input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
-        <input asp-for="UserCode" class="form-control" id="SearchString" />
-        <label asp-for="UserCode">Code</label>
-        <button id="btnCheck" type="submit" class="btn-primary">Check</button>
+
+        <div class="form-floating flex-grow-1">
+            <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
+            <label asp-for="UserCode">Code</label>
+        </div>
+
+        <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Check</button>
     </div>
     <div class="container mt-4">
         <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
@@ -92,6 +96,8 @@
         var isShowModal = @Model.ShowModal.ToString().ToLower();
         var searchInput = document.getElementById("SearchString");
         var cancelBtn = document.querySelector(".btn-secondary");
+        searchInput.value = "";
+        searchInput.focus();
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function () {
                 searchInput.value = "";
@@ -101,12 +107,6 @@
         // Handle Esc key press to close the modal and clear input
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
-                // Close the modal (if it's open)
-                // var myModal = bootstrap.Modal.getInstance(modal);
-                // if (myModal) {
-                //     myModal.hide();
-                // }
-
                 searchInput.value = "";
                 searchInput.focus();
             }
