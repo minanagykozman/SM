@@ -36,7 +36,7 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("SearchMembers")]
-        public ActionResult<List<Member>> SearchMembers(string memberCode, string firstName, string lastName)
+        public ActionResult<List<Member>> SearchMembers(string? memberCode, string? firstName, string? lastName)
         {
             try
             {

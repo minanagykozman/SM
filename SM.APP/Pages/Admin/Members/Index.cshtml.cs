@@ -18,9 +18,13 @@ namespace SM.APP.Pages.Admin.Members
     {
         [BindProperty(SupportsGet = true)]
         public string UserCode { get; set; } = string.Empty;
-        
+        [BindProperty(SupportsGet = true)]
+        public string FirstName { get; set; } = string.Empty;
+        [BindProperty(SupportsGet = true)]
+        public string LastName { get; set; } = string.Empty;
 
-        public IList<Member> Member { get;set; } = default!;
+
+        public IList<Member> Member { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
@@ -28,7 +32,8 @@ namespace SM.APP.Pages.Admin.Members
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode;
+                    string url = "https://apitest.stmosesservices.com/Member/SearchMembers";
+                    string req = string.Format("{0}?memberCode={1}&firstName={2}&lastName={3}", url,UserCode, FirstName, LastName);
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions
@@ -36,9 +41,14 @@ namespace SM.APP.Pages.Admin.Members
                         PropertyNameCaseInsensitive = true // Enable case insensitivity
                     };
                     Member = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                    if (Member == null)
+                        Member = new List<Member>();
                 }
+
                 UserCode = string.Empty;
             }
+            if (Member == null)
+                Member = new List<Member>();
         }
     }
 }

@@ -54,7 +54,7 @@ namespace SM.BAL
             {
                 var member = _dbcontext.Members.Include(m => m.ClassMembers).
                     FirstOrDefault(m => m.Code == memberCode ||
-                    m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+                    m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode);
 
                 if (member == null)
                     return members;

@@ -8,12 +8,18 @@
 <h1>Members</h1>
 <form method="get">
     <div class="mb-3 d-flex align-items-center">
-        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
         <div class="form-floating flex-grow-1">
             <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
             <label asp-for="UserCode">Code</label>
         </div>
-
+        <div class="form-floating flex-grow-1">
+            <input asp-for="FirstName" class="form-control" id="SearchString" placeholder="First Name" />
+            <label asp-for="FirstName">First Name</label>
+        </div>
+        <div class="form-floating flex-grow-1">
+            <input asp-for="LastName" class="form-control" id="SearchString" placeholder="Last Name" />
+            <label asp-for="LastName">Last Name</label>
+        </div>
         <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Search</button>
     </div>
 </form>
