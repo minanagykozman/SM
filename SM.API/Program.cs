@@ -4,7 +4,19 @@ using SM.DAL;
 var builder = WebApplication.CreateBuilder(args);
 
 // Retrieve the connection string from appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString = string.Empty;
+if (!builder.Environment.IsDevelopment())
+{
+    connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
+    builder.WebHost.UseKestrel(options =>
+    {
+        options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+    });
+}
+else
+{
+    connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+}
 
 // Register ApplicationDbContext with the MySQL connection string
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -17,13 +29,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.WebHost.UseKestrel(options =>
-    {
-        options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
-    });
-}
+
 
 var app = builder.Build();
 

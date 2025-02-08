@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using SM.DAL.DataModel;
-using System.Buffers;
-using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
-using static System.Net.WebRequestMethods;
 using Microsoft.AspNetCore.Identity;
 using SM.APP.Services;
 

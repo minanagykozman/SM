@@ -9,24 +9,27 @@ internal class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        // Retrieve the connection string from appsettings.json
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-        // Register ApplicationDbContext with the MySQL connection string
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            AppDbContext.ConfigureDbContextOptions(options, connectionString));
 
         // Add services to the container.
         builder.Services.AddRazorPages();
 
-
+        string connectionString = string.Empty;
         if (!builder.Environment.IsDevelopment())
         {
+            connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
             builder.WebHost.UseKestrel(options =>
             {
                 options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
             });
         }
+        else
+        {
+            connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+        }
+        // Register ApplicationDbContext with the MySQL connection string
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            AppDbContext.ConfigureDbContextOptions(options, connectionString));
+
 
         // Add Identity with Role Support
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

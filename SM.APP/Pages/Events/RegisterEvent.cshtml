@@ -4,71 +4,92 @@
     ViewData["Title"] = "Register Event";
 }
 @using SM.APP.Pages.Events;
-<h2>Register for Event</h2>
-<form method="get">
-    <div class="mb-3 d-flex align-items-center">
-        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
-        <div class="form-floating flex-grow-1">
-            <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
-            <label asp-for="UserCode">Code</label>
-        </div>
+<div class="container my-4">
+    <!-- Page Title -->
+    <h1 class="text-center mb-4">Register for Event</h1>
+    <form method="get">
+        <div class="mb-3 d-flex align-items-center">
+            <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+            <div class="form-floating flex-grow-1">
+                <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
+                <label asp-for="UserCode">Code</label>
+            </div>
 
-        <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Check</button>
-    </div>
-    <div class="container mt-4">
-        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-            <table class="table table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Code)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Age)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.EventMembers)
-                    {
+            <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Check</button>
+        </div>
+    </form>
+    <!-- Table for Larger Screens -->
+    <div class="d-none d-md-block">
+        <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
                         <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Code)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.FullName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.UNFileNumber)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Age)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Baptised)
-                            </td>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Code)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Age)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
+                            </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.EventMembers)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Code)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FullName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UNFileNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UNPersonalNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Age)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Baptised)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</form>
+    <!-- Card Layout for Mobile -->
+    <div class="d-md-none">
+        @foreach (var item in Model.EventMembers)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.FullName)</h5>
+                    <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
+                    <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
+                    <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
+                    <p class="mb-1"><strong>Baptised:</strong> @Html.DisplayFor(modelItem => item.Baptised)</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 <form method="post" id="registerForm">
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

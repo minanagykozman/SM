@@ -4,108 +4,129 @@
 @{
     ViewData["Title"] = "Members";
 }
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-@{
-    var user = await UserManager.GetUserAsync(User);
-    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
-}
-<h1>Members</h1>
-<form method="get">
-    <div class="mb-3 d-flex align-items-center">
-        <div class="form-floating flex-grow-1">
-            <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
-            <label asp-for="UserCode">Code</label>
-        </div>
-        <div class="form-floating flex-grow-1">
-            <input asp-for="FirstName" class="form-control" id="SearchString" placeholder="First Name" />
-            <label asp-for="FirstName">First Name</label>
-        </div>
-        <div class="form-floating flex-grow-1">
-            <input asp-for="LastName" class="form-control" id="SearchString" placeholder="Last Name" />
-            <label asp-for="LastName">Last Name</label>
-        </div>
-        <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Search</button>
-    </div>
-</form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].UNFileNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Age)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Mobile)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Baptised)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].ImageReference)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member[0].Notes)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container my-4">
+    <!-- Page Title -->
+    <h1 class="text-center mb-4">Members</h1>
+
+    <!-- Search Form -->
+    <form method="get" class="mb-4">
+        <div class="row g-2">
+            <div class="col-12 col-md-4">
+                <div class="form-floating">
+                    <input asp-for="UserCode" class="form-control" id="SearchCode" placeholder="Enter Code" />
+                    <label for="SearchCode">Code</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="form-floating">
+                    <input asp-for="FirstName" class="form-control" id="SearchFirstName" placeholder="First Name" />
+                    <label for="SearchFirstName">First Name</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="form-floating">
+                    <input asp-for="LastName" class="form-control" id="SearchLastName" placeholder="Last Name" />
+                    <label for="SearchLastName">Last Name</label>
+                </div>
+            </div>
+            <div class="col-12 text-center">
+                <button id="btnCheck" type="submit" class="btn btn-primary w-100 w-md-auto">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Table for Larger Screens -->
+    <div class="d-none d-md-block">
+        <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Code)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].FullName)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].UNFileNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Age)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Mobile)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Baptised)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Gender)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].ImageReference)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Notes)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Member)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Code)</td>
+                                <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                                <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Age)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Mobile)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Baptised)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Gender)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ImageReference)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a></li>
+                                            <li><a class="dropdown-item" asp-page="./Details" asp-route-id="@item.MemberID">Details</a></li>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <li><a class="dropdown-item text-danger" asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a></li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Layout for Mobile -->
+    <div class="d-md-none">
         @foreach (var item in Model.Member)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Code)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FullName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UNFileNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Age)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Mobile)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Baptised)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Gender)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageReference)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Notes)
-                </td>
-                <td>
-                    <a asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.MemberID">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a>
-                </td>
-            </tr>
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.FullName)</h5>
+                    <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
+                    <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
+                    <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
+                    <p class="mb-1"><strong>Image Reference:</strong> @Html.DisplayFor(modelItem => item.ImageReference)</p>
+                    <p class="mb-1"><strong>Notes:</strong> @Html.DisplayFor(modelItem => item.Notes)</p>
+
+                    <div class="mt-3 text-center">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a></li>
+                            <li><a class="dropdown-item" asp-page="./Details" asp-route-id="@item.MemberID">Details</a></li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li><a class="dropdown-item text-danger" asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("SearchCode").focus();
+    });
+</script>
