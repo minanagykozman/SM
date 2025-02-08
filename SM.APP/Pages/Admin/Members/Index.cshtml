@@ -4,7 +4,13 @@
 @{
     ViewData["Title"] = "Members";
 }
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+}
 <h1>Members</h1>
 <form method="get">
     <div class="mb-3 d-flex align-items-center">

@@ -11,7 +11,7 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Members
 {
-    [Authorize(Roles = "Admin,Servant")]
+    [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
         private readonly SM.DAL.AppDbContext _context;
