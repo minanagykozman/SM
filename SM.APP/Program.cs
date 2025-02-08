@@ -14,9 +14,10 @@ internal class Program
         builder.Services.AddRazorPages();
 
         string connectionString = string.Empty;
+        connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
         if (!builder.Environment.IsDevelopment())
         {
-            connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
+            //connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
             builder.WebHost.UseKestrel(options =>
             {
                 options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
@@ -24,7 +25,7 @@ internal class Program
         }
         else
         {
-            connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+            //connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
         }
         // Register ApplicationDbContext with the MySQL connection string
         builder.Services.AddDbContext<AppDbContext>(options =>
