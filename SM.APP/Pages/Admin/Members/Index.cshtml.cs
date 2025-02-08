@@ -28,7 +28,7 @@ namespace SM.APP.Pages.Admin.Members
 
         public async Task OnGetAsync()
         {
-            if (!string.IsNullOrEmpty(UserCode))
+            if (!string.IsNullOrEmpty(UserCode)|| !string.IsNullOrEmpty(FirstName) || !string.IsNullOrEmpty(LastName))
             {
                 using (HttpClient client = new HttpClient())
                 {

@@ -69,11 +69,11 @@ namespace SM.BAL
             {
                 if (string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
                 {
-                    members = _dbcontext.Members.Where(m => m.UNFirstName.Contains(firstName)).ToList();
+                    members = _dbcontext.Members.Where(m => m.UNLastName.Contains(lastName)).ToList();
                 }
                 else if (!string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
                 {
-                    members = _dbcontext.Members.Where(m => m.UNLastName.Contains(lastName)).ToList();
+                    members = _dbcontext.Members.Where(m => m.UNFirstName.Contains(firstName)).ToList();
                 }
                 else
                 {
