@@ -15,7 +15,10 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
+                        <input asp-for="Member.UNPersonalNumber" class="form-control"
+                               id="UNPersonalNumber"
+                               placeholder="Enter Personal Number"
+                               onblur="validateUNPersonalNumber()" />
                         <label asp-for="Member.UNPersonalNumber"></label>
                     </div>
                     <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
@@ -45,8 +48,8 @@
                     <div class="form-floating">
                         <select asp-for="Member.Gender" class="form-select">
                             <option value="">Select Gender</option>
-                            <option value="Male">M</option>
-                            <option value="Female">F</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                         <label asp-for="Member.Gender"></label>
                     </div>
@@ -74,6 +77,13 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
+                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
+                        <label asp-for="Member.ImageReference"></label>
+                    </div>
+                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
                         <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
                         <label asp-for="Member.Nickname"></label>
                     </div>
@@ -93,13 +103,6 @@
                     </div>
                     <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
-                    </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
-                </div>
                 <div class="col-md-12">
                     <div class="form-floating">
                         <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
@@ -107,7 +110,6 @@
                     </div>
                     <span asp-validation-for="Member.Notes" class="text-danger"></span>
                 </div>
-                
             </div>
 
             <div class="d-flex justify-content-between mt-4">
@@ -117,6 +119,33 @@
         </form>
     </div>
 </div>
+
+<script>
+    async function validateUNPersonalNumber() {
+        let inputField = document.getElementById("UNPersonalNumber");
+        let personalNumber = inputField.value.trim();
+        let errorSpan = document.getElementById("UNPersonalNumberError");
+
+        if (!personalNumber) {
+            errorSpan.textContent = "Personal number is required.";
+            return;
+        }
+
+        try {
+            let response = await fetch(`?number=${encodeURIComponent(personalNumber)}`);
+            let data = await response.json();
+
+            if (response.ok && data.isValid) {
+                errorSpan.textContent = ""; // No error
+            } else {
+                errorSpan.textContent = data.message || "Invalid personal number.";
+            }
+        } catch (error) {
+            console.error("Error validating UNPersonalNumber:", error);
+            errorSpan.textContent = "Validation service is unavailable.";
+        }
+    }
+</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -35,6 +35,24 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("ValidateUNNumber")]
+        public ActionResult<bool> ValidateUNNumber(string unFileNumber)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    bool result = memberHandler.ValidateUNNumber(unFileNumber);
+                    return Ok(result);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         [HttpGet("SearchMembers")]
         public ActionResult<List<Member>> SearchMembers(string? memberCode, string? firstName, string? lastName)
         {

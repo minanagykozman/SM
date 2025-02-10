@@ -89,7 +89,7 @@ namespace SM.BAL
             int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
             return string.Format("{0}{1}-{2}");
         }
-        public bool IsUNPersonalNoUnique(string unPersonalNo)
+        public bool ValidateUNNumber(string unPersonalNo)
         {
             return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower());
         }

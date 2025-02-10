@@ -149,7 +149,8 @@ namespace SM.APP.Areas.Identity.Pages.Account
                         ServantName = ServantObj.ServantName,
                         Mobile1 = ServantObj.Mobile1,
                         Mobile2 = ServantObj.Mobile2,
-                        UserID = user.Id
+                        UserID = user.Id,
+                        IsActive = true
                     };
                     _context.Servants.Add(servant);
                     _context.SaveChanges();
