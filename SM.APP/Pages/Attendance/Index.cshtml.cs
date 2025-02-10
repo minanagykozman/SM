@@ -30,7 +30,8 @@ namespace SM.APP.Pages.Attendance
             }
             using (HttpClient client = new HttpClient())
             {
-                string req = "https://apitest.stmosesservices.com/Meeting/GetClasses?servantID="+ _sevantID;
+                string url = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
+                string req = string.Format("{0}?servantID={1}", url, _sevantID.ToString());
                 HttpResponseMessage response = await client.GetAsync(req);
                 string responseData = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions

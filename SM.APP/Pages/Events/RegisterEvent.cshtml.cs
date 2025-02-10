@@ -12,7 +12,7 @@ namespace SM.APP.Pages.Events
     [Authorize(Roles = "Admin,Servant")]
     public class RegisterEventModel : PageModel
     {
-        int _sevantID ;
+        int _sevantID;
         private readonly UserManager<IdentityUser> _userManager;
         public RegisterEventModel(UserManager<IdentityUser> userManager)
         {
@@ -46,7 +46,8 @@ namespace SM.APP.Pages.Events
                 EventID = eventID.Value;
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Events/GetEventRegisteredMembers?eventID=" + eventID.ToString(); ;
+                    string url = string.Format("{0}/Events/GetEventRegisteredMembers", SMConfigurationManager.ApiBase);
+                    string req = string.Format("{0}?eventID={1}", url, eventID.ToString());
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions
@@ -61,7 +62,8 @@ namespace SM.APP.Pages.Events
                 {
                     using (HttpClient client = new HttpClient())
                     {
-                        string req = "https://apitest.stmosesservices.com/Events/CheckRegistrationStatus?memberCode=" + UserCode + "&eventID=" + eventID.ToString();
+                        string url = string.Format("{0}/Events/CheckRegistrationStatus", SMConfigurationManager.ApiBase);
+                        string req = string.Format("{0}?memberCode={1}&eventID={2}", url, UserCode, eventID.ToString());
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
                         var options = new JsonSerializerOptions
@@ -133,9 +135,8 @@ namespace SM.APP.Pages.Events
                     isException,
                     notes
                 };
-
-                string apiUrl = "https://apitest.stmosesservices.com/Events/Register";
-                string request = string.Format("{0}?memberCode={1}&eventID={2}&servantID={3}&isException={4}&notes={5}", apiUrl, memberCode, EventID, _sevantID, isException.ToString().ToLower(), notes);
+                string url = string.Format("{0}/Events/Register", SMConfigurationManager.ApiBase);
+                string request = string.Format("{0}?memberCode={1}&eventID={2}&servantID={3}&isException={4}&notes={5}", url, memberCode, EventID, _sevantID, isException.ToString().ToLower(), notes);
                 using (HttpClient client = new HttpClient())
                 {
                     var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");

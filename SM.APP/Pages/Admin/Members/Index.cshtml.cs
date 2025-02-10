@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SM.APP.Services;
 using SM.DAL;
 using SM.DAL.DataModel;
 
@@ -32,7 +33,7 @@ namespace SM.APP.Pages.Admin.Members
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string url = "https://apitest.stmosesservices.com/Member/SearchMembers";
+                    string url = string.Format("{0}/Member/SearchMembers", SMConfigurationManager.ApiBase);
                     string req = string.Format("{0}?memberCode={1}&firstName={2}&lastName={3}", url,UserCode, FirstName, LastName);
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();

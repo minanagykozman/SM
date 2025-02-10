@@ -30,7 +30,8 @@ namespace SM.APP.Pages.Events
             }
             using (HttpClient client = new HttpClient())
             {
-                string req = "https://apitest.stmosesservices.com/Events/GetEvents/" + _sevantID.ToString();
+                string url = string.Format("{0}/Events/GetEvents", SMConfigurationManager.ApiBase);
+                string req = string.Format("{0}/{1}", url, _sevantID.ToString());
                 HttpResponseMessage response = await client.GetAsync(req);
                 string responseData = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions

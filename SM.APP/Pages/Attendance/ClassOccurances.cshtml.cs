@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SM.APP.Services;
 using SM.DAL.DataModel;
 using System.Text.Json;
 
@@ -19,7 +20,8 @@ namespace SM.APP.Pages.Attendance
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Meeting/GetClassOccurences?classID=" + classID.Value.ToString();
+                    string url = string.Format("{0}/Meeting/GetClassOccurences", SMConfigurationManager.ApiBase);
+                    string req = string.Format("{0}?classID={1}", url, classID.Value.ToString());
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions

@@ -46,7 +46,7 @@ namespace SM.APP.Pages.Attendance
                 {
                     using (HttpClient client = new HttpClient())
                     {
-                        string url = "https://apitest.stmosesservices.com/Meeting/CheckAttendance";
+                        string url = string.Format("{0}/Meeting/CheckAttendance", SMConfigurationManager.ApiBase);
                         string req = string.Format("{0}?classOccurenceID={1}&memberCode={2}", url, classOccurenceID, UserCode);
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
@@ -84,7 +84,8 @@ namespace SM.APP.Pages.Attendance
                 }
                 using (HttpClient client = new HttpClient())
                 {
-                    string req = "https://apitest.stmosesservices.com/Meeting/GetAttendedMembers?occurenceID=" + ClassOccurenceID.ToString();
+                    string url = string.Format("{0}/Meeting/GetAttendedMembers", SMConfigurationManager.ApiBase);
+                    string req = string.Format("{0}?occurenceID={1}",url, ClassOccurenceID.ToString());
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     if (!string.IsNullOrEmpty(responseData))
@@ -173,9 +174,8 @@ namespace SM.APP.Pages.Attendance
                 servantID,
                 forceRegister
             };
-
-            string apiUrl = "https://apitest.stmosesservices.com/Meeting/TakeAttendance";
-            string request = string.Format("{0}?classOccurenceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", apiUrl, ClassOccurenceID, memberCode, _sevantID, forceRegister.ToString().ToLower());
+            string url = string.Format("{0}/Meeting/TakeAttendance", SMConfigurationManager.ApiBase);
+            string request = string.Format("{0}?classOccurenceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", url, ClassOccurenceID, memberCode, _sevantID, forceRegister.ToString().ToLower());
             jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
             return request;
         }

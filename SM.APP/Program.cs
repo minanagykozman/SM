@@ -10,6 +10,9 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Pass IConfiguration to the helper class
+        SMConfigurationManager.SetConfiguration(builder.Configuration);
+
         // Add services to the container.
         builder.Services.AddRazorPages();
 
