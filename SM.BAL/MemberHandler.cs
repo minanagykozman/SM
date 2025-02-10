@@ -83,6 +83,16 @@ namespace SM.BAL
             return members;
 
         }
+
+        public string GenerateCode(string gender, DateTime birthdate)
+        {
+            int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
+            return string.Format("{0}{1}-{2}");
+        }
+        public bool IsUNPersonalNoUnique(string unPersonalNo)
+        {
+            return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower());
+        }
         public void Dispose()
         {
             if (_dbcontext != null)

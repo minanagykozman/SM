@@ -154,12 +154,6 @@
         // Handle Esc key press to close the modal and clear input
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
-                // Close the modal (if it's open)
-                // var myModal = bootstrap.Modal.getInstance(modal);
-                // if (myModal) {
-                //     myModal.hide();
-                // }
-
                 searchInput.value = "";
                 searchInput.focus();
             }
@@ -193,50 +187,49 @@
         document.getElementById('myModal').addEventListener('hidden.bs.modal', function () {
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
         });
+
+
+
+        // const scanButton = document.getElementById("btnScanQR");
+        // const qrScannerContainer = document.getElementById("qrScannerContainer");
+        // const stopScanButton = document.getElementById("btnStopScan");
+
+        // let html5QrCode;
+
+        // // Show QR scanner on mobile only
+        // if (window.innerWidth <= 768) {
+        //     scanButton.addEventListener("click", function () {
+        //         qrScannerContainer.classList.remove("d-none");
+
+        //         html5QrCode = new Html5Qrcode("reader");
+        //         html5QrCode.start(
+        //             { facingMode: "environment" }, // Use back camera
+        //             {
+        //                 fps: 10,
+        //                 qrbox: { width: 250, height: 250 }
+        //             },
+        //             (decodedText) => {
+        //                 searchInput.value = decodedText;
+        //                 html5QrCode.stop();
+        //                 qrScannerContainer.classList.add("d-none");
+        //             },
+        //             (errorMessage) => {
+        //                 console.warn("QR Code scan error: ", errorMessage);
+        //             }
+        //         ).catch((err) => {
+        //             console.error("QR Code scanning failed: ", err);
+        //         });
+        //     });
+
+        //     // Stop scanning
+        //     stopScanButton.addEventListener("click", function () {
+        //         if (html5QrCode) {
+        //             html5QrCode.stop();
+        //         }
+        //         qrScannerContainer.classList.add("d-none");
+        //     });
+        // }
     });
 </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const scanButton = document.getElementById("btnScanQR");
-        const qrScannerContainer = document.getElementById("qrScannerContainer");
-        const stopScanButton = document.getElementById("btnStopScan");
-        const searchInput = document.getElementById("SearchString");
 
-        let html5QrCode;
-
-        // Show QR scanner on mobile only
-        if (window.innerWidth <= 768) {
-            scanButton.addEventListener("click", function () {
-                qrScannerContainer.classList.remove("d-none");
-
-                html5QrCode = new Html5Qrcode("reader");
-                html5QrCode.start(
-                    { facingMode: "environment" }, // Use back camera
-                    {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 }
-                    },
-                    (decodedText) => {
-                        searchInput.value = decodedText;
-                        html5QrCode.stop();
-                        qrScannerContainer.classList.add("d-none");
-                    },
-                    (errorMessage) => {
-                        console.warn("QR Code scan error: ", errorMessage);
-                    }
-                ).catch((err) => {
-                    console.error("QR Code scanning failed: ", err);
-                });
-            });
-
-            // Stop scanning
-            stopScanButton.addEventListener("click", function () {
-                if (html5QrCode) {
-                    html5QrCode.stop();
-                }
-                qrScannerContainer.classList.add("d-none");
-            });
-        }
-    });
-</script>
 
