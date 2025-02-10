@@ -21,7 +21,7 @@
                                onblur="validateUNPersonalNumber()" />
                         <label asp-for="Member.UNPersonalNumber"></label>
                     </div>
-                    <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
+                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
@@ -132,16 +132,18 @@
         }
 
         try {
-            let response = await fetch(`?number=${encodeURIComponent(personalNumber)}`);
+            const request = `https://apitest.stmosesservices.com/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
+            const response = await fetch(request);
+            alert(response.ok);
             let data = await response.json();
-
+            alert(data);
             if (response.ok && data.isValid) {
                 errorSpan.textContent = ""; // No error
             } else {
                 errorSpan.textContent = data.message || "Invalid personal number.";
             }
         } catch (error) {
-            console.error("Error validating UNPersonalNumber:", error);
+            alert(error);
             errorSpan.textContent = "Validation service is unavailable.";
         }
     }

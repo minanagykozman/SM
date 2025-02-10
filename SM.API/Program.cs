@@ -22,6 +22,13 @@ else
 builder.Services.AddDbContext<AppDbContext>(options =>
     AppDbContext.ConfigureDbContextOptions(options, connectionString));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin() //  Allows any frontend
+                        .AllowAnyMethod() //  Allows GET, POST, PUT, DELETE, etc.
+                        .AllowAnyHeader()); //  Allows any headers
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -40,12 +47,12 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
+
 app.UseSwagger();
 app.UseSwaggerUI();
-//}
+
+//Apply CORS globally
+app.UseCors("AllowAll");
 
 
 
