@@ -87,7 +87,7 @@ namespace SM.BAL
         public string GenerateCode(string gender, DateTime birthdate)
         {
             int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
-            return string.Format("{0}{1}-{2}");
+            return string.Format("{0}{1}-{2}", birthdate.ToString("yy"),gender,seq.ToString("0000"));
         }
         public bool ValidateUNNumber(string unPersonalNo)
         {

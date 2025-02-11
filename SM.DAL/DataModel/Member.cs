@@ -11,10 +11,12 @@ namespace SM.DAL.DataModel
     public class Member
     {
         public int MemberID { get; set; }
+        [Required]
         [Display(Name = "First name")]
         public string? UNFirstName { get; set; }
         [MaxLength(10)]
         public string Code { get; set; } = string.Empty;
+        [Required]
         [Display(Name = "Last name")]
         public string? UNLastName { get; set; }
         public string? Nickname { get; set; }
@@ -22,6 +24,7 @@ namespace SM.DAL.DataModel
         public string? UNFileNumber { get; set; }
         [Display(Name = "UN Number")]
         [MaxLength(50)]
+        [Required]
         public string? UNPersonalNumber { get; set; }
         public string? Mobile { get; set; }
         public bool Baptised { get; set; }
@@ -32,6 +35,7 @@ namespace SM.DAL.DataModel
         public string? Work { get; set; }
         public bool IsMainMember { get; set; }
         public bool IsActive { get; set; }
+        [Display(Name = "Image Reference")]
         public string? ImageReference { get; set; }
         public string? Notes { get; set; }
         public int Sequence { get; set; } = 0;
