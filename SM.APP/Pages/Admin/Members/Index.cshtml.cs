@@ -27,8 +27,12 @@ namespace SM.APP.Pages.Admin.Members
 
         public IList<Member> Member { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string userCode)
         {
+            if (!string.IsNullOrEmpty(userCode))
+            {
+                UserCode = userCode;
+            }
             if (!string.IsNullOrEmpty(UserCode)|| !string.IsNullOrEmpty(FirstName) || !string.IsNullOrEmpty(LastName))
             {
                 using (HttpClient client = new HttpClient())
