@@ -32,7 +32,7 @@ namespace SM.APP.Pages.Admin.Members
                 return NotFound();
             }
 
-            var member =  await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
+            var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
             if (member == null)
             {
                 return NotFound();
@@ -68,7 +68,7 @@ namespace SM.APP.Pages.Admin.Members
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { userCode = Member.Code });
         }
 
         private bool MemberExists(int id)

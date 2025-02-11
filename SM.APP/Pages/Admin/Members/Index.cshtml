@@ -7,7 +7,6 @@
 
 <div class="container my-4">
     <!-- Page Title -->
-    <h1 class="text-center mb-4">Members</h1>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Search Members</h4> <!-- Optional title -->
         <a asp-page="Create" class="btn btn-success">Create</a>
@@ -64,7 +63,9 @@
                         {
                             <tr>
                                 <td>@Html.DisplayFor(modelItem => item.Code)</td>
-                                <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                                <td>
+                                    <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                                </td>
                                 <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
                                 <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Age)</td>
@@ -80,7 +81,6 @@
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a></li>
-                                            <li><a class="dropdown-item" asp-page="./Details" asp-route-id="@item.MemberID">Details</a></li>
                                             @if (User.IsInRole("Admin"))
                                             {
                                                 <li><a class="dropdown-item text-danger" asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a></li>
@@ -105,7 +105,9 @@
         {
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.FullName)</h5>
+                    <h5 class="card-title">
+                        <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                    </h5>
                     <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
                     <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
@@ -118,7 +120,6 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.MemberID">Edit</a></li>
-                            <li><a class="dropdown-item" asp-page="./Details" asp-route-id="@item.MemberID">Details</a></li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <li><a class="dropdown-item text-danger" asp-page="./Delete" asp-route-id="@item.MemberID">Delete</a></li>

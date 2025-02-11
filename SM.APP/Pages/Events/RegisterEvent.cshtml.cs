@@ -24,6 +24,8 @@ namespace SM.APP.Pages.Events
         public string UserCode { get; set; } = string.Empty;
         [BindProperty]
         public string? Notes { get; set; } = null;
+        [BindProperty]
+        public int RegisteredCount{ get; set; } = 0;
 
         public string MemberStatus { get; set; } = string.Empty;
 
@@ -55,6 +57,7 @@ namespace SM.APP.Pages.Events
                         PropertyNameCaseInsensitive = true // Enable case insensitivity
                     };
                     EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                    RegisteredCount = EventMembers.Count();
                     if (EventMembers == null)
                         EventMembers = new List<Member>();
                 }

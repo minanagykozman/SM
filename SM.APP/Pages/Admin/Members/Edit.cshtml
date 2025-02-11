@@ -11,13 +11,18 @@
     <div class="card shadow-lg p-4">
         <form method="post">
             <input type="hidden" asp-for="Member.MemberID" />
-            <input type="hidden" asp-for="Member.Code" />
             <input type="hidden" asp-for="Member.IsActive" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
+                        <label asp-for="Member.Code"></label>
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
+                        <input asp-for="Member.UNPersonalNumber" id="UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
                         <label asp-for="Member.UNPersonalNumber"></label>
                     </div>
                     <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
@@ -76,6 +81,13 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
+                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
+                        <label asp-for="Member.ImageReference"></label>
+                    </div>
+                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
                         <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
                         <label asp-for="Member.Nickname"></label>
                     </div>
@@ -95,13 +107,6 @@
                     </div>
                     <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
-                    </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
-                </div>
                 <div class="col-md-12">
                     <div class="form-floating">
                         <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
@@ -114,12 +119,16 @@
 
             <div class="d-flex justify-content-between mt-4">
                 <a asp-page="Index" asp-route-userCode="@Model.Member.Code" class="btn btn-outline-secondary">Back to List</a>
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>
 </div>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("UNPersonalNumber").focus();
+    });
+</script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

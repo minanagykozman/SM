@@ -6,7 +6,11 @@
 @using SM.APP.Pages.Events;
 <div class="container my-4">
     <!-- Page Title -->
-    <h1 class="text-center mb-4">Register for Event</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Register Event</h4> <!-- Optional title -->
+        <span class="badge bg-success px-3 py-2 fs-6">Registered @Model.RegisteredCount</span>
+    </div>
+
     <form method="get">
         <div class="mb-3 d-flex align-items-center">
             <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
@@ -61,7 +65,7 @@
                                     @Html.DisplayFor(modelItem => item.Code)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.FullName)
+                                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.FullName)</a>
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.UNFileNumber)
@@ -88,7 +92,9 @@
         {
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.FullName)</h5>
+                    <h5 class="card-title">
+                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.FullName)</a>
+                    </h5>
                     <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
                     <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
@@ -100,51 +106,85 @@
 </div>
 <form method="post" id="registerForm">
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <!-- Modal Header -->
+                <div class="modal-header bg-light">
                     <h5 class="modal-title" id="myModalLabel">Member Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p>
-                        <strong>Status: </strong><label class="form-label">@Model.MemberStatus</label>
-                    </p>
 
-                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null)
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <!-- Status -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="MemberStatus" value="@Model.MemberStatus" readonly>
+                        <label for="MemberStatus">Status</label>
+                    </div>
+
+                    @if (RegisterEventModel.MemberData?.Member != null)
                     {
-                        <p><strong>Name: </strong> @RegisterEventModel.MemberData.Member.FullName</p>
-                        <p><strong>Age: </strong> @RegisterEventModel.MemberData.Member.Age</p>
-                        <p><strong>Image: </strong> @RegisterEventModel.MemberData.Member.ImageReference</p>
-                        @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
-                       || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
-                        {
-                            <p>
-                                <strong>Notes: </strong>
-                                <textarea class="form-control" id="notes" asp-for="Notes"></textarea>
-                            </p>
-                        }
+                        <!-- Name & Age Row -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberName" value="@RegisterEventModel.MemberData.Member.FullName" readonly>
+                                    <label for="MemberName">Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberAge" value="@RegisterEventModel.MemberData.Member.Age" readonly>
+                                    <label for="MemberAge">Age</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="ImageReference" value="@RegisterEventModel.MemberData.Member.ImageReference" readonly>
+                                    <label for="MemberAge">Image Reference</label>
+                                </div>
+                            </div>
+                            @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible ||
+                           RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
+                            {
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="notes" asp-for="Notes" placeholder="Enter any notes here..." style="height: 100px;"></textarea>
+                                        <label for="notes">Notes</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
-                <div class="modal-footer">
-                    @if (RegisterEventModel.MemberData != null && RegisterEventModel.MemberData.Member != null &&
-                    (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible
-                    || RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
+
+                <!-- Modal Footer -->
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+
+                    @if (RegisterEventModel.MemberData?.Member != null &&
+                    (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible ||
+                    RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
                     {
-                        <input type="submit" id="submitBtn" value="Register" class="btn btn-primary" />
+                        <button type="submit" id="submitBtn" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Register
+                        </button>
                     }
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 </form>
 
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var isShowModal = @Model.ShowModal.ToString().ToLower();
         var searchInput = document.getElementById("SearchString");
-        var cancelBtn = document.querySelector(".btn-secondary");
+        var cancelBtn = document.getElementById("btnCancel");
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function () {
                 searchInput.value = "";
@@ -190,45 +230,44 @@
 
 
 
-        // const scanButton = document.getElementById("btnScanQR");
-        // const qrScannerContainer = document.getElementById("qrScannerContainer");
-        // const stopScanButton = document.getElementById("btnStopScan");
+         const scanButton = document.getElementById("btnScanQR");
+         const qrScannerContainer = document.getElementById("qrScannerContainer");
+         const stopScanButton = document.getElementById("btnStopScan");
 
-        // let html5QrCode;
+         let html5QrCode;
 
-        // // Show QR scanner on mobile only
-        // if (window.innerWidth <= 768) {
-        //     scanButton.addEventListener("click", function () {
-        //         qrScannerContainer.classList.remove("d-none");
+         // Show QR scanner on mobile only
+         if (window.innerWidth <= 768) {
+             scanButton.addEventListener("click", function () {
+                 qrScannerContainer.classList.remove("d-none");
 
-        //         html5QrCode = new Html5Qrcode("reader");
-        //         html5QrCode.start(
-        //             { facingMode: "environment" }, // Use back camera
-        //             {
-        //                 fps: 10,
-        //                 qrbox: { width: 250, height: 250 }
-        //             },
-        //             (decodedText) => {
-        //                 searchInput.value = decodedText;
-        //                 html5QrCode.stop();
-        //                 qrScannerContainer.classList.add("d-none");
-        //             },
-        //             (errorMessage) => {
-        //                 console.warn("QR Code scan error: ", errorMessage);
-        //             }
-        //         ).catch((err) => {
-        //             console.error("QR Code scanning failed: ", err);
-        //         });
-        //     });
-
-        //     // Stop scanning
-        //     stopScanButton.addEventListener("click", function () {
-        //         if (html5QrCode) {
-        //             html5QrCode.stop();
-        //         }
-        //         qrScannerContainer.classList.add("d-none");
-        //     });
-        // }
+                 html5QrCode = new Html5Qrcode("reader");
+                 html5QrCode.start(
+                     { facingMode: "environment" }, // Use back camera
+                     {
+                         fps: 10,
+                         qrbox: { width: 250, height: 250 }
+                     },
+                     (decodedText) => {
+                         searchInput.value = decodedText;
+                         html5QrCode.stop();
+                         qrScannerContainer.classList.add("d-none");
+                     },
+                     (errorMessage) => {
+                         console.warn("QR Code scan error: ", errorMessage);
+                     }
+                 ).catch((err) => {
+                     console.error("QR Code scanning failed: ", err);
+                 });
+             });
+                  // Stop scanning
+             stopScanButton.addEventListener("click", function () {
+                 if (html5QrCode) {
+                     html5QrCode.stop();
+                 }
+                 qrScannerContainer.classList.add("d-none");
+             });
+         }
     });
 </script>
 
