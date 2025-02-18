@@ -17,9 +17,9 @@ string audience = string.Empty;
 if (!builder.Environment.IsDevelopment())
 {
     connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
-    secretKey = Environment.GetEnvironmentVariable("DBConnectionString");
-    issuer = Environment.GetEnvironmentVariable("DBConnectionString");
-    audience = Environment.GetEnvironmentVariable("DBConnectionString");
+    secretKey = Environment.GetEnvironmentVariable("JWTSecretKey");
+    issuer = Environment.GetEnvironmentVariable("JWTIssuer");
+    audience = Environment.GetEnvironmentVariable("JWTAudience");
     builder.WebHost.UseKestrel(options =>
     {
         options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
