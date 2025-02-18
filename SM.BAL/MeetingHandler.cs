@@ -6,16 +6,13 @@ using System.Linq;
 
 namespace SM.BAL
 {
-    public class MeetingHandler : IDisposable
+    public class MeetingHandler : HandlerBase
     {
-        private AppDbContext _dbcontext;
-        public MeetingHandler()
+        
+        public List<Class> GetServantClasses(string username)
         {
-            _dbcontext = new AppDbContext();
-        }
-        public List<Class> GetServantClasses(int servantID)
-        {
-            return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servantID)).ToList();
+            var servant =GetServantByUsername(username);
+            return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servant.ServantID)).ToList();
         }
         public List<ClassOccurrence> GetClassOccurences(int classID)
         {
@@ -141,8 +138,10 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return classOccurances;
         }
-        public AttendanceStatus TakeClassAteendance(int classOccuranceID, string memberCode, int servantID, bool forceRegister)
+        public AttendanceStatus TakeClassAteendance(int classOccuranceID, string memberCode, string username, bool forceRegister)
         {
+            var servant = GetServantByUsername(username);
+
             Member member = new Member();
             AttendanceStatus status = CheckAteendance(classOccuranceID, memberCode, out member);
             if (status == AttendanceStatus.MemberNotFound)
@@ -163,7 +162,7 @@ namespace SM.BAL
                 {
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = member.MemberID,
-                    ServantID = servantID,
+                    ServantID = servant.ServantID,
                     TimeStamp = DateTime.Now
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
@@ -174,7 +173,7 @@ namespace SM.BAL
                 {
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = member.MemberID,
-                    ServantID = servantID,
+                    ServantID = servant.ServantID,
                     TimeStamp = DateTime.Now
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
@@ -183,15 +182,16 @@ namespace SM.BAL
             return AttendanceStatus.Ok;
         }
 
-        public string TakeClassAteendance(int classOccuranceID, List<int> memberIDs, int servantID)
+        public string TakeClassAteendance(int classOccuranceID, List<int> memberIDs, string username)
         {
+            var servant = GetServantByUsername(username);
             foreach (int memberID in memberIDs)
             {
                 ClassAttendance classAttendance = new ClassAttendance()
                 {
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = memberID,
-                    ServantID = servantID,
+                    ServantID = servant.ServantID,
                     TimeStamp = DateTime.Now
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
@@ -201,6 +201,7 @@ namespace SM.BAL
         }
         public AttendanceStatus CheckAteendance(int classOccuranceID, string memberCode, out Member member)
         {
+            
             member = _dbcontext.Members.Include(m => m.ClassMembers).
                 FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
             if (member == null)
@@ -219,19 +220,6 @@ namespace SM.BAL
             return AttendanceStatus.Ready;
 
         }
-        public void Dispose()
-        {
-            if (_dbcontext != null)
-                _dbcontext.Dispose();
-        }
     }
-    public enum AttendanceStatus
-    {
-        NotRegisteredInClass,
-        MemberNotFound,
-        ClassNotFound,
-        AlreadyAttended,
-        Ready,
-        Ok
-    }
+    
 }

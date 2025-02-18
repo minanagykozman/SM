@@ -24,7 +24,6 @@ namespace SM.DAL.DataModel
 
         public ICollection<ClassEvent> ClassEvents { get; set; } = new List<ClassEvent>();
         public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
-        public ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
     }
 
 }

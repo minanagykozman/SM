@@ -4,19 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SM.APP.Services;
 using SM.DAL.DataModel;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
 namespace SM.APP.Pages.Attendance
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class TakeAttendanceModel : PageModel
+    public class TakeAttendanceModel : PageModelBase
     {
-        int _sevantID = 0;
-        private readonly UserManager<IdentityUser> _userManager;
-        public TakeAttendanceModel(UserManager<IdentityUser> userManager)
+        public TakeAttendanceModel(UserManager<IdentityUser> userManager) : base(userManager)
         {
-            _userManager = userManager;
 
         }
         [BindProperty(SupportsGet = true)]
@@ -28,17 +26,11 @@ namespace SM.APP.Pages.Attendance
         public string MemberStatus { get; set; } = string.Empty;
 
         public bool ShowModal { get; set; } = false;
-        public static MemberAttendanceResult? MemberData { get; set; }
+        public MemberAttendanceResult? MemberData { get; set; }
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
 
         public async Task OnGetAsync(int? classOccurenceID)
         {
-            if (_sevantID == 0)
-            {
-                var userId = _userManager.GetUserId(User);
-                ServantService service = new ServantService();
-                _sevantID = service.GetServantID(userId);
-            }
             if (classOccurenceID.HasValue)
             {
                 ClassOccurenceID = classOccurenceID.Value;
@@ -46,6 +38,8 @@ namespace SM.APP.Pages.Attendance
                 {
                     using (HttpClient client = new HttpClient())
                     {
+                        string jwtToken = await GetAPIToken();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                         string url = string.Format("{0}/Meeting/CheckAttendance", SMConfigurationManager.ApiBase);
                         string req = string.Format("{0}?classOccurenceID={1}&memberCode={2}", url, classOccurenceID, UserCode);
                         HttpResponseMessage response = await client.GetAsync(req);
@@ -55,7 +49,10 @@ namespace SM.APP.Pages.Attendance
                             PropertyNameCaseInsensitive = true // Enable case insensitivity
                         };
                         if (!string.IsNullOrEmpty(responseData))
+                        {
                             MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
+                            HttpContext.Session.SetString("MemberAttendanceData", JsonSerializer.Serialize(MemberData));
+                        }
                     }
                     if (MemberData != null)
                     {
@@ -65,6 +62,8 @@ namespace SM.APP.Pages.Attendance
                             string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, false, out jsonContent);
                             using (HttpClient client = new HttpClient())
                             {
+                                string jwtToken = await GetAPIToken();
+                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                                 HttpResponseMessage response = await client.PostAsync(request, jsonContent);
                                 if (response.IsSuccessStatusCode)
                                 {
@@ -84,8 +83,10 @@ namespace SM.APP.Pages.Attendance
                 }
                 using (HttpClient client = new HttpClient())
                 {
+                    string jwtToken = await GetAPIToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                     string url = string.Format("{0}/Meeting/GetAttendedMembers", SMConfigurationManager.ApiBase);
-                    string req = string.Format("{0}?occurenceID={1}",url, ClassOccurenceID.ToString());
+                    string req = string.Format("{0}?occurenceID={1}", url, ClassOccurenceID.ToString());
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     if (!string.IsNullOrEmpty(responseData))
@@ -135,11 +136,10 @@ namespace SM.APP.Pages.Attendance
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            if (_sevantID == 0)
+            var sessionData = HttpContext.Session.GetString("MemberAttendanceData");
+            if (!string.IsNullOrEmpty(sessionData))
             {
-                var userId = _userManager.GetUserId(User);
-                ServantService service = new ServantService();
-                _sevantID = service.GetServantID(userId);
+                MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(sessionData);
             }
             if (MemberData != null)
             {
@@ -147,9 +147,9 @@ namespace SM.APP.Pages.Attendance
                 string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, true, out jsonContent);
                 using (HttpClient client = new HttpClient())
                 {
-
+                    string jwtToken = await GetAPIToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                     HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-
                     if (response.IsSuccessStatusCode)
                     {
                         string responseData = await response.Content.ReadAsStringAsync();
@@ -166,16 +166,15 @@ namespace SM.APP.Pages.Attendance
 
         private string TakeAttendanceString(string memberCode, int classOccuranceID, bool forceRegister, out StringContent jsonContent)
         {
-            int servantID = _sevantID;
+
             var requestData = new
             {
                 classOccuranceID,
                 memberCode,
-                servantID,
                 forceRegister
             };
             string url = string.Format("{0}/Meeting/TakeAttendance", SMConfigurationManager.ApiBase);
-            string request = string.Format("{0}?classOccurenceID={1}&memberCode={2}&servantID={3}&forceRegister={4}", url, ClassOccurenceID, memberCode, _sevantID, forceRegister.ToString().ToLower());
+            string request = string.Format("{0}?classOccurenceID={1}&memberCode={2}&forceRegister={3}", url, ClassOccurenceID, memberCode, forceRegister.ToString().ToLower());
             jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
             return request;
         }
@@ -184,14 +183,5 @@ namespace SM.APP.Pages.Attendance
     {
         public AttendanceStatus AttendanceStatus { get; set; }
         public Member Member { get; set; }
-    }
-    public enum AttendanceStatus
-    {
-        NotRegisteredInClass,
-        MemberNotFound,
-        ClassNotFound,
-        AlreadyAttended,
-        Ready,
-        Ok
     }
 }

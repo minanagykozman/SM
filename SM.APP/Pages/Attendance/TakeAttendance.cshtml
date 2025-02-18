@@ -3,6 +3,7 @@
 @{
 }
 @using SM.APP.Pages.Attendance
+@using SM.DAL.DataModel
 <h2>Take Attendance</h2>
 <form method="get">
     <div class="mb-3 d-flex align-items-center">
@@ -59,32 +60,56 @@
 </form>
 <form method="post" id="registerForm">
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <!-- Modal Header -->
+                <div class="modal-header bg-light">
                     <h5 class="modal-title" id="myModalLabel">Member Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>
-                        <strong>Status: </strong><label class="form-label">@Model.MemberStatus</label>
-                    </p>
+                    <!-- Status -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="MemberStatus" value="@Model.MemberStatus" readonly>
+                        <label for="MemberStatus">Status</label>
+                    </div>
 
-                    @if (TakeAttendanceModel.MemberData != null && TakeAttendanceModel.MemberData.Member != null)
+                    @if (Model.MemberData != null && Model.MemberData.Member != null)
                     {
-                        <p><strong>Name: </strong> @TakeAttendanceModel.MemberData.Member.FullName</p>
-                        <p><strong>Age: </strong> @TakeAttendanceModel.MemberData.Member.Age</p>
-                        <p><strong>Image: </strong> @TakeAttendanceModel.MemberData.Member.ImageReference</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberName" value="@Model.MemberData.Member.FullName" readonly>
+                                    <label for="MemberName">Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberAge" value="@Model.MemberData.Member.Age" readonly>
+                                    <label for="MemberAge">Age</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="ImageReference" value="@Model.MemberData.Member.ImageReference" readonly>
+                                    <label for="MemberAge">Image Reference</label>
+                                </div>
+                            </div>
+                        </div>
                     }
                 </div>
-                <div class="modal-footer">
-                    @if (TakeAttendanceModel.MemberData != null && TakeAttendanceModel.MemberData.Member != null &&
-                    TakeAttendanceModel.MemberData.AttendanceStatus == AttendanceStatus.NotRegisteredInClass)
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    @if (Model.MemberData != null && Model.MemberData.Member != null &&
+                    Model.MemberData.AttendanceStatus == AttendanceStatus.NotRegisteredInClass)
                     {
                         <label>This will automatically add member in class</label>
-                        <input type="submit" id="submitBtn" value="Present" class="btn btn-primary" />
+                        <button type="submit" id="submitBtn" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Present
+                        </button>
                     }
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -95,7 +120,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         var isShowModal = @Model.ShowModal.ToString().ToLower();
         var searchInput = document.getElementById("SearchString");
-        var cancelBtn = document.querySelector(".btn-secondary");
+        var cancelBtn = document.getElementById("btnCancel");
         searchInput.value = "";
         searchInput.focus();
         if (cancelBtn) {

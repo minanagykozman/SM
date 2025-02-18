@@ -26,10 +26,11 @@
         public DbSet<Event> Events { get; set; }
         public DbSet<ClassEvent> ClassEvents { get; set; }
         public DbSet<EventRegistration> EventRegistrations { get; set; }
-        public DbSet<EventAttendance> EventAttendances { get; set; }
         public DbSet<Aid> Aids { get; set; }
         public DbSet<MemberAid> MemberAids { get; set; }
         public DbSet<Fund> Funds { get; set; }
+        public DbSet<MemberEventView> MemberEventView { get; set; }
+        public DbSet<MemberClasssAttendanceView> MemberClasssAttendanceView { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -62,8 +63,6 @@
             modelBuilder.Entity<EventRegistration>()
                 .HasKey(er => new { er.EventID, er.MemberID });
 
-            modelBuilder.Entity<EventAttendance>()
-                .HasKey(ea => new { ea.EventID, ea.MemberID });
 
             modelBuilder.Entity<MemberAid>()
                 .HasKey(ea => new { ea.AidID, ea.MemberID });
@@ -77,6 +76,8 @@
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
             modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+            modelBuilder.Entity<MemberEventView>().ToView("MemberEventView").HasKey(v => new { v.MemberID, v.EventID });
+            modelBuilder.Entity<MemberClasssAttendanceView>().ToView("MemberClasssAttendanceView").HasKey(v => new { v.MemberID, v.ClassOccurrenceID });
 
             #region Seed Data
             // Seed roles

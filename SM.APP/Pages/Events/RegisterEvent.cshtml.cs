@@ -6,18 +6,17 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using SM.APP.Services;
+using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 
 namespace SM.APP.Pages.Events
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class RegisterEventModel : PageModel
+    public class RegisterEventModel : PageModelBase
     {
-        int _sevantID;
         private readonly UserManager<IdentityUser> _userManager;
-        public RegisterEventModel(UserManager<IdentityUser> userManager)
+        public RegisterEventModel(UserManager<IdentityUser> userManager) : base(userManager)
         {
-            _userManager = userManager;
-
         }
 
         [BindProperty(SupportsGet = true)]
@@ -25,39 +24,39 @@ namespace SM.APP.Pages.Events
         [BindProperty]
         public string? Notes { get; set; } = null;
         [BindProperty]
-        public int RegisteredCount{ get; set; } = 0;
+        public int RegisteredCount { get; set; } = 0;
 
         public string MemberStatus { get; set; } = string.Empty;
 
         public bool ShowModal { get; set; } = false;
-        public static RegistrationStatusResponse? MemberData { get; set; }
+
+        public RegistrationStatusResponse? MemberData { get; set; }
         public List<Member> EventMembers { get; set; } = new List<Member>();
         [BindProperty]
         public int EventID { get; set; }
 
         public async Task OnGetAsync(int? eventID)
         {
-            if (_sevantID == 0)
-            {
-                var userId = _userManager.GetUserId(User);
-                ServantService service = new ServantService();
-                _sevantID = service.GetServantID(userId);
-            }
             if (eventID.HasValue)
             {
                 EventID = eventID.Value;
+                string jwtToken = await GetAPIToken();
                 using (HttpClient client = new HttpClient())
                 {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                     string url = string.Format("{0}/Events/GetEventRegisteredMembers", SMConfigurationManager.ApiBase);
                     string req = string.Format("{0}?eventID={1}", url, eventID.ToString());
                     HttpResponseMessage response = await client.GetAsync(req);
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions
+                    if (response.IsSuccessStatusCode)
                     {
-                        PropertyNameCaseInsensitive = true // Enable case insensitivity
-                    };
-                    EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
-                    RegisteredCount = EventMembers.Count();
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                        RegisteredCount = EventMembers.Count();
+                    }
                     if (EventMembers == null)
                         EventMembers = new List<Member>();
                 }
@@ -65,16 +64,21 @@ namespace SM.APP.Pages.Events
                 {
                     using (HttpClient client = new HttpClient())
                     {
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                         string url = string.Format("{0}/Events/CheckRegistrationStatus", SMConfigurationManager.ApiBase);
                         string req = string.Format("{0}?memberCode={1}&eventID={2}", url, UserCode, eventID.ToString());
                         HttpResponseMessage response = await client.GetAsync(req);
-                        string responseData = await response.Content.ReadAsStringAsync();
-                        var options = new JsonSerializerOptions
+                        if (response.IsSuccessStatusCode)
                         {
-                            PropertyNameCaseInsensitive = true // Enable case insensitivity
-                        };
-                        MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
-                        LoadData();
+                            string responseData = await response.Content.ReadAsStringAsync();
+                            var options = new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true // Enable case insensitivity
+                            };
+                            MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
+                            HttpContext.Session.SetString("MemberData", JsonSerializer.Serialize(MemberData));
+                            LoadData();
+                        }
                     }
                     UserCode = string.Empty;
                 }
@@ -117,45 +121,39 @@ namespace SM.APP.Pages.Events
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var sessionData = HttpContext.Session.GetString("MemberData");
+            if (!string.IsNullOrEmpty(sessionData))
+            {
+                MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(sessionData);
+            }
             if (MemberData != null)
             {
-                if (_sevantID == 0)
-                {
-                    var userId = _userManager.GetUserId(User);
-                    ServantService service = new ServantService();
-                    _sevantID = service.GetServantID(userId);
-                }
                 string memberCode = MemberData.Member.Code;
                 int eventID = EventID;
-                int servantID = _sevantID;
                 bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
                 string notes = string.IsNullOrEmpty(Notes) ? string.Empty : Notes;
                 var requestData = new
                 {
                     memberCode,
                     eventID,
-                    servantID,
                     isException,
                     notes
                 };
                 string url = string.Format("{0}/Events/Register", SMConfigurationManager.ApiBase);
-                string request = string.Format("{0}?memberCode={1}&eventID={2}&servantID={3}&isException={4}&notes={5}", url, memberCode, EventID, _sevantID, isException.ToString().ToLower(), notes);
+                string request = string.Format("{0}?memberCode={1}&eventID={2}&&isException={3}&notes={4}", url, memberCode, EventID, isException.ToString().ToLower(), notes);
+                string jwtToken = await GetAPIToken();
                 using (HttpClient client = new HttpClient())
                 {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                     var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
 
                     HttpResponseMessage response = await client.PostAsync(request, jsonContent);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseData = await response.Content.ReadAsStringAsync();
-                    }
-                    else
+                    if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
                     }
                     UserCode = string.Empty;
-
                 }
             }
             return RedirectToPage("", new { eventID = EventID });
@@ -166,15 +164,6 @@ namespace SM.APP.Pages.Events
         public Member Member { get; set; }
         public RegistrationStatus Status { get; set; }
     }
-    public enum RegistrationStatus
-    {
-        MemeberNotFound,
-        EventNotFound,
-        MemberNotEligible,
-        MemberAlreadyRegistered,
-        ReadyToRegister,
-        Ok,
-        Error
-    }
+    
 
 }

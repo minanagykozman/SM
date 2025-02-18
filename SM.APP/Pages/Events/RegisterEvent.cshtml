@@ -4,6 +4,7 @@
     ViewData["Title"] = "Register Event";
 }
 @using SM.APP.Pages.Events;
+@using SM.DAL.DataModel;
 <div class="container my-4">
     <!-- Page Title -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -14,7 +15,6 @@
     <form method="get">
         <div class="mb-3 d-flex align-items-center">
             <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
-
             <div class="form-floating flex-grow-1">
                 <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
                 <label asp-for="UserCode">Code</label>
@@ -93,7 +93,7 @@
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.FullName)</a>
+                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" >@Html.DisplayFor(modelItem => item.FullName)</a>
                     </h5>
                     <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
                     <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
@@ -122,30 +122,30 @@
                         <label for="MemberStatus">Status</label>
                     </div>
 
-                    @if (RegisterEventModel.MemberData?.Member != null)
+                    @if (Model.MemberData?.Member != null)
                     {
                         <!-- Name & Age Row -->
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="MemberName" value="@RegisterEventModel.MemberData.Member.FullName" readonly>
+                                    <input type="text" class="form-control" id="MemberName" value="@Model.MemberData.Member.FullName" readonly>
                                     <label for="MemberName">Name</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="MemberAge" value="@RegisterEventModel.MemberData.Member.Age" readonly>
+                                    <input type="text" class="form-control" id="MemberAge" value="@Model.MemberData.Member.Age" readonly>
                                     <label for="MemberAge">Age</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="ImageReference" value="@RegisterEventModel.MemberData.Member.ImageReference" readonly>
+                                    <input type="text" class="form-control" id="ImageReference" value="@Model.MemberData.Member.ImageReference" readonly>
                                     <label for="MemberAge">Image Reference</label>
                                 </div>
                             </div>
-                            @if (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible ||
-                           RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister)
+                            @if (Model.MemberData.Status == RegistrationStatus.MemberNotEligible ||
+                           Model.MemberData.Status == RegistrationStatus.ReadyToRegister)
                             {
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3">
@@ -164,9 +164,9 @@
                         <i class="bi bi-x-circle"></i> Cancel
                     </button>
 
-                    @if (RegisterEventModel.MemberData?.Member != null &&
-                    (RegisterEventModel.MemberData.Status == RegistrationStatus.MemberNotEligible ||
-                    RegisterEventModel.MemberData.Status == RegistrationStatus.ReadyToRegister))
+                    @if (Model.MemberData?.Member != null &&
+                    (Model.MemberData.Status == RegistrationStatus.MemberNotEligible ||
+                    Model.MemberData.Status == RegistrationStatus.ReadyToRegister))
                     {
                         <button type="submit" id="submitBtn" class="btn btn-success">
                             <i class="bi bi-check-circle"></i> Register
@@ -177,8 +177,6 @@
         </div>
     </div>
 </form>
-
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

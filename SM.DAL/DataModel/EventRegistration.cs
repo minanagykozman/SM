@@ -17,6 +17,9 @@ namespace SM.DAL.DataModel
         public DateTime TimeStamp { get; set; }
         public string? Notes { get; set; }
         public bool IsException { get; set; }
+        public bool? Attended { get; set; }
+        public int? AttendanceServantID { get; set; }
+        public DateTime? AttendanceTimeStamp { get; set; }
     }
 
 }

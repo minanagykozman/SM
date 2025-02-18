@@ -4,23 +4,8 @@ using SM.DAL.DataModel;
 
 namespace SM.BAL
 {
-    public class EventHandler : IDisposable
+    public class EventHandler : HandlerBase
     {
-        private AppDbContext _dbcontext;
-        public EventHandler()
-        {
-            _dbcontext = new AppDbContext();
-        }
-        public enum RegistrationStatus
-        {
-            MemeberNotFound,
-            EventNotFound,
-            MemberNotEligible,
-            MemberAlreadyRegistered,
-            ReadyToRegister,
-            Ok,
-            Error
-        }
         public void CreateEvent(string eventName, DateTime eventStartDate, DateTime eventEndDate, List<int> classIDs)
         {
             try
@@ -62,7 +47,7 @@ namespace SM.BAL
             }
             if (ev == null)
                 return RegistrationStatus.EventNotFound;
-           
+
             var registered = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).Select(e => e.MemberID).ToList<int>();
             if (registered != null && registered.Contains(lmember.MemberID))
                 return RegistrationStatus.MemberAlreadyRegistered;
@@ -74,13 +59,47 @@ namespace SM.BAL
                 return RegistrationStatus.MemberNotEligible;
             return RegistrationStatus.ReadyToRegister;
         }
+        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode, int servantID)
+        {
+            var member = _dbcontext.Members.Include(m => m.ClassMembers).
+                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+            if (member == null)
+            {
+                return RegistrationStatus.MemeberNotFound;
+            }
+            var ev = _dbcontext.Events.FirstOrDefault(e => e.EventID == eventID);
+            if (ev == null)
+            {
+                return RegistrationStatus.EventNotFound;
+            }
+            var eventRegistration = _dbcontext.EventRegistrations.FirstOrDefault(e => e.EventID == eventID && e.MemberID == member.MemberID);
+            if (eventRegistration == null)
+            {
+                return RegistrationStatus.MemberNotRegistered;
+            }
+            eventRegistration.Attended = true;
+            eventRegistration.AttendanceServantID = servantID;
+            eventRegistration.AttendanceTimeStamp = DateTime.Now;
+            _dbcontext.SaveChanges();
 
+            return RegistrationStatus.Ok;
+        }
         public List<Event> GetEvents(int servantID)
         {
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
             return _dbcontext.Events.Where(e => events.Contains(e.EventID)).ToList<Event>();
         }
+        public List<Event> GetEvents(string username)
+        {
+            var servant = GetServantByUsername(username);
+            if (servant == null)
+                throw new Exception("Servant not found");
+            List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
+            List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID)).ToList<Event>();
+        }
+
 
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
@@ -88,8 +107,11 @@ namespace SM.BAL
             return members;
         }
 
-        public RegistrationStatus Register(string memberCode, int eventID, int servantID, bool isException, string? notes)
+        public RegistrationStatus Register(string memberCode, int eventID, string username, bool isException, string? notes)
         {
+            var servant = GetServantByUsername(username);
+            if (servant == null)
+                throw new Exception("Servant not found");
             Event ev = (Event)_dbcontext.Events.Include(e => e.EventRegistrations).Where(e => e.EventID == eventID).FirstOrDefault();
             Member member = (Member)_dbcontext.Members.FirstOrDefault(m => (m.Code == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember)));
             if (ev == null)
@@ -102,7 +124,7 @@ namespace SM.BAL
             {
                 EventID = eventID,
                 MemberID = member.MemberID,
-                ServantID = servantID,
+                ServantID = servant.ServantID,
                 Notes = notes,
                 TimeStamp = DateTime.Now,
                 IsException = isException

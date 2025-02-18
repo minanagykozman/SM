@@ -17,10 +17,15 @@ internal class Program
         builder.Services.AddRazorPages();
 
         string connectionString = string.Empty;
-        //connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+        string secretKey = string.Empty;
+        string issuer = string.Empty;
+        string audience = string.Empty;
         if (!builder.Environment.IsDevelopment())
         {
             connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
+            secretKey = Environment.GetEnvironmentVariable("DBConnectionString");
+            issuer = Environment.GetEnvironmentVariable("DBConnectionString");
+            audience = Environment.GetEnvironmentVariable("DBConnectionString");
             builder.WebHost.UseKestrel(options =>
             {
                 options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
@@ -29,6 +34,9 @@ internal class Program
         else
         {
             connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+            secretKey = builder.Configuration["JwtSettings:SecretKey"];
+            issuer = builder.Configuration["JwtSettings:Issuer"];
+            audience = builder.Configuration["JwtSettings:Audience"];
         }
         // Register ApplicationDbContext with the MySQL connection string
         builder.Services.AddDbContext<AppDbContext>(options =>
@@ -49,7 +57,19 @@ internal class Program
 
         builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
-        //builder.Services.AddSingleton<IServantManager, ServantManager>();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAppAndApi",
+                policy =>
+                {
+                    policy.WithOrigins(issuer, audience)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+        });
+        builder.Services.AddSession(); // Add session service
+        builder.Services.AddDistributedMemoryCache(); // Required for session storage
 
         var app = builder.Build();
 
@@ -59,17 +79,12 @@ internal class Program
             dbContext.Database.Migrate();
         }
 
-        // Configure the HTTP request pipeline.
-        //if (!app.Environment.IsDevelopment())
-        //{
-        //    app.UseExceptionHandler("/Error");
-        //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-        //    app.UseHsts();
-        //}
+
+        app.UseCors("AllowAppAndApi");
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
+        app.UseSession();
         app.UseRouting();
 
         app.UseAuthorization();

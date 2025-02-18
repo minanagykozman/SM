@@ -4,34 +4,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SM.APP.Services;
 using SM.DAL.DataModel;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace SM.APP.Pages.Attendance
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class IndexModel : PageModel
+    public class IndexModel : PageModelBase
     {
-        int _sevantID = 0;
-        private readonly UserManager<IdentityUser> _userManager;
-        public IndexModel(UserManager<IdentityUser> userManager)
+
+        public IndexModel(UserManager<IdentityUser> userManager) : base(userManager)
         {
-            _userManager = userManager;
 
         }
         [BindProperty(SupportsGet = true)]
         public List<Class> Classes { get; set; }
         public async Task OnGetAsync()
         {
-            if (_sevantID == 0)
-            {
-                var userId = _userManager.GetUserId(User);
-                ServantService service = new ServantService();
-                _sevantID = service.GetServantID(userId);
-            }
             using (HttpClient client = new HttpClient())
             {
-                string url = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
-                string req = string.Format("{0}?servantID={1}", url, _sevantID.ToString());
+                string jwtToken = await GetAPIToken();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                string req = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
                 HttpResponseMessage response = await client.GetAsync(req);
                 string responseData = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions

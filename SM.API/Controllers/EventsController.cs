@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ namespace SM.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class EventsController : ControllerBase
     {
 
@@ -17,21 +19,16 @@ namespace SM.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetEvents/{servantID}")]
-        public ActionResult<List<Event>> GetEvents(int servantID)
+        [HttpGet("GetEvents")]
+        public ActionResult<List<Event>> GetEvents()
         {
             try
             {
-                if (servantID <= 0)
-                {
-                    return BadRequest("Invalid servantID");
-                }
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    List<Event> events = eventHandler.GetEvents(servantID);
+                    List<Event> events = eventHandler.GetEvents(User.Identity.Name);
                     return Ok(events);
                 }
-
             }
             catch (Exception ex)
             {
@@ -82,13 +79,13 @@ namespace SM.API.Controllers
         }
 
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, int servantID, bool isException, string? notes)
+        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID,  bool isException, string? notes)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    var status = eventHandler.Register(memberCode, eventID, servantID, isException, notes);
+                    var status = eventHandler.Register(memberCode, eventID, User.Identity.Name, isException, notes);
                     return Ok(status);
                 }
 

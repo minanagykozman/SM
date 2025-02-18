@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.BAL;
 using SM.DAL.DataModel;
@@ -8,6 +9,7 @@ namespace SM.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class MeetingController : ControllerBase
     {
 
@@ -19,17 +21,14 @@ namespace SM.API.Controllers
         }
 
         [HttpGet("GetClasses")]
-        public ActionResult<List<Class>> GetServantClasses(int servantID)
+        public ActionResult<List<Class>> GetServantClasses()
         {
             try
             {
-                if (servantID <= 0)
-                {
-                    return BadRequest("Invalid servantID");
-                }
+                
                 using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
                 {
-                    List<Class> classes = classHandler.GetServantClasses(servantID);
+                    List<Class> classes = classHandler.GetServantClasses(User.Identity.Name);
                     return Ok(classes);
                 }
 
@@ -47,7 +46,7 @@ namespace SM.API.Controllers
             {
                 if (classID <= 0)
                 {
-                    return BadRequest("Invalid servantID");
+                    return BadRequest("Invalid class ID");
                 }
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
@@ -160,13 +159,13 @@ namespace SM.API.Controllers
             }
         }
         [HttpPost("TakeAttendance")]
-        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode, int servantID, bool forceRegister)
+        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode,   bool forceRegister)
         {
             try
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberCode, servantID, forceRegister);
+                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberCode, User.Identity.Name, forceRegister);
                     return Ok(cl);
                 }
 
@@ -184,7 +183,7 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberIDs, servantID);
+                    var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberIDs, User.Identity.Name);
                     return Ok(cl);
                 }
 

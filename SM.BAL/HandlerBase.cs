@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SM.DAL;
+﻿using SM.DAL;
 using SM.DAL.DataModel;
 using System;
 using System.Collections.Generic;
@@ -9,25 +8,12 @@ using System.Threading.Tasks;
 
 namespace SM.BAL
 {
-    public class ServantHandler : IDisposable
+    public class HandlerBase:IDisposable
     {
-        private AppDbContext _dbcontext;
-        public ServantHandler()
+        internal AppDbContext _dbcontext;
+        public HandlerBase()
         {
             _dbcontext = new AppDbContext();
-        }
-
-
-
-        public int? GetServantID(string userID)
-        {
-            var servant = _dbcontext.Servants.FirstOrDefault(s => s.UserID == userID);
-
-            if (servant == null)
-            {
-                return null;
-            }
-            return servant.ServantID;
         }
         public Servant GetServantByUsername(string username)
         {

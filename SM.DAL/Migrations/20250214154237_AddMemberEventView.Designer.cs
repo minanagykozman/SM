@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250214154237_AddMemberEventView")]
+    partial class AddMemberEventView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -611,86 +614,6 @@ namespace SM.DAL.Migrations
                     b.HasIndex("ServantID");
 
                     b.ToTable("MemberAids");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.MemberClasssAttendanceView", b =>
-                {
-                    b.Property<int>("MemberID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassOccurrenceID")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Baptised")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("Birthdate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("ClassID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClassName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("ClassOccurrenceEndDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("ClassOccurrenceStartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("varchar(1)");
-
-                    b.Property<string>("ImageReference")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsMainMember")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Mobile")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Nickname")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("Present")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int?>("ServantID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("TimeStamp")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("UNFileNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UNFirstName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UNLastName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UNPersonalNumber")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("MemberID", "ClassOccurrenceID");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("MemberClasssAttendanceView", (string)null);
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.MemberEventView", b =>
