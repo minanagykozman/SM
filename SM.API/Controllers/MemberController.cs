@@ -110,7 +110,7 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("GetMemberByCode")]
-        public ActionResult<Member> GetMemberByCode([FromBody] string memberCode)
+        public ActionResult<Member> GetMemberByCode(string memberCode)
         {
             try
             {
@@ -164,11 +164,11 @@ namespace SM.API.Controllers
             }
         }
 
-        public class  UpdateCardModel
+        public class UpdateCardModel
         {
             public string MemberCode { get; set; }
             public CardStatus CardStatus { get; set; }
-            
+
         }
 
     }

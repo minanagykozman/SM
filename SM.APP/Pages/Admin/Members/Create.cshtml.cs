@@ -59,6 +59,7 @@ namespace SM.APP.Pages.Admin.Members
             int seq = _context.Members.Select(m => m.Sequence).Max() + 1;
             Member.Code = string.Format("{0}{1}-{2}", Member.Birthdate.ToString("yy"), Member.Gender, seq.ToString("0000"));
             Member.Sequence = seq;
+            Member.CardStatus = string.IsNullOrEmpty(Member.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
             _context.Members.Add(Member);
             await _context.SaveChangesAsync();
 

@@ -49,7 +49,7 @@ namespace SM.APP.Pages.Admin.Members
             {
                 return Page();
             }
-
+            Member.CardStatus = string.IsNullOrEmpty(Member.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
             _context.Attach(Member).State = EntityState.Modified;
 
             try

@@ -44,15 +44,15 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>@Html.DisplayNameFor(model => model.Member[0].Code)</th>
-                            <th>@Html.DisplayNameFor(model => model.Member[0].FullName)</th>
-                            <th>@Html.DisplayNameFor(model => model.Member[0].UNFileNumber)</th>
-                            <th>@Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)</th>
-                            <th>@Html.DisplayNameFor(model => model.Member[0].CardStatus)</th>
+                            <th>@Html.DisplayNameFor(model => model.Members[0].Code)</th>
+                            <th>@Html.DisplayNameFor(model => model.Members[0].FullName)</th>
+                            <th>@Html.DisplayNameFor(model => model.Members[0].UNFileNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Members[0].UNPersonalNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Members[0].CardStatus)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.Member)
+                        @foreach (var item in Model.Members)
                         {
                             <tr>
                                 <td>@Html.DisplayFor(modelItem => item.Code)</td>
@@ -72,7 +72,7 @@
 
     <!-- Card Layout for Mobile -->
     <div class="d-md-none">
-        @foreach (var item in Model.Member)
+        @foreach (var item in Model.Members)
         {
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
@@ -87,11 +87,93 @@
     </div>
 </div>
 
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form method="post" id="registerForm">
+                <!-- Modal Header -->
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="myModalLabel">Member Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    @if (Model.Member == null)
+                    {
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="MemberStatus" name="MemberStatus" value="Member not found" readonly>
+                        </div>
+                    }
+
+                    @if (Model.Member != null)
+                    {
+                        <!-- Name & Age Row -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberName" name="MemberName" value="@Model.Member.FullName" readonly>
+                                    <label for="MemberName">Name</label>
+                                    <input type="hidden" name="MemberName" value="@Model.Member.FullName"> <!-- Hidden field -->
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="MemberCode" name="MemberCode" value="@Model.Member.Code" readonly>
+                                    <label for="MemberCode">Code</label>
+                                    <input type="hidden" name="MemberCode" value="@Model.Member.Code"> <!-- Hidden field -->
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    @if (Model.Member != null)
+                    {
+                        <button type="submit" id="submitBtn" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Update
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("SearchString").focus();
+        var isShowModal = @Model.ShowModal.ToString().ToLower();
+        var searchInput = document.getElementById("SearchString");
+        var cancelBtn = document.getElementById("btnCancel");
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function () {
+                searchInput.value = "";
+                searchInput.focus(); // Focus on search input when Cancel is clicked
+            });
+        }
+        // Handle Esc key press to close the modal and clear input
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                searchInput.value = "";
+                searchInput.focus();
+            }
+        });
 
-        const searchInput = document.getElementById("SearchString");
+        if (searchInput)
+        {
+            searchInput.focus();
+        }
+        if (isShowModal) {
+            var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+            myModal.show();
+        }
+
         const scanButton = document.getElementById("btnScanQR");
          const qrScannerContainer = document.getElementById("qrScannerContainer");
          const stopScanButton = document.getElementById("btnStopScan");
@@ -112,8 +194,9 @@
                      },
                      (decodedText) => {
                          searchInput.value = decodedText;
-                         html5QrCode.stop();
-                         qrScannerContainer.classList.add("d-none");
+                         document.getElementById('filterForm').submit();
+                         //html5QrCode.stop();
+                         //qrScannerContainer.classList.add("d-none");
                      },
                      (errorMessage) => {
                          console.warn("QR Code scan error: ", errorMessage);
