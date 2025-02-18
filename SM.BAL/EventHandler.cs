@@ -6,6 +6,13 @@ namespace SM.BAL
 {
     public class EventHandler : HandlerBase
     {
+        /// <summary>
+        /// Creates new event
+        /// </summary>
+        /// <param name="eventName"></param>
+        /// <param name="eventStartDate"></param>
+        /// <param name="eventEndDate"></param>
+        /// <param name="classIDs"></param>
         public void CreateEvent(string eventName, DateTime eventStartDate, DateTime eventEndDate, List<int> classIDs)
         {
             try
@@ -30,12 +37,13 @@ namespace SM.BAL
                 Logger.log.Error("", ex);
             }
         }
-
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
         {
             Event? ev = _dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
             Member? lmember = _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+                FirstOrDefault(m => m.Code.Contains(memberCode) 
+                || m.UNPersonalNumber == memberCode 
+                || (m.UNFileNumber == memberCode && m.IsMainMember));
             if (lmember == null)
             {
                 member = null;
@@ -99,14 +107,20 @@ namespace SM.BAL
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
             return _dbcontext.Events.Where(e => events.Contains(e.EventID)).ToList<Event>();
         }
-
-
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
             List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).OrderByDescending(ev => ev.TimeStamp).Select(er => er.Member).ToList<Member>();
             return members;
         }
-
+        public List<MemberEventView> GetEventMembers(int eventID, bool? registered, bool? attended)
+        {
+            List<MemberEventView> members = _dbcontext.MemberEventView.Where(
+                er => er.EventID == eventID
+                && (!registered.HasValue || er.Registered == registered.Value)
+                && (!attended.HasValue || er.Attended == attended.Value))
+                .OrderByDescending(ev => ev.TimeStamp).ToList();
+            return members;
+        }
         public RegistrationStatus Register(string memberCode, int eventID, string username, bool isException, string? notes)
         {
             var servant = GetServantByUsername(username);

@@ -83,8 +83,10 @@
                     <div class="form-floating">
                         <select asp-for="Member.CardStatus" class="form-select">
                             <option value="">Select Card Status</option>
-                            <option value="Missing Photo">Missing Photo</option>
+                            <option value="MissingPhoto">Missing Photo</option>
+                            <option value="ReadyToPrint">Ready To Print</option>
                             <option value="Printed">Printed</option>
+                            <option value="Delivered">Delivered</option>
                         </select>
                         <label asp-for="Member.CardStatus"></label>
                     </div>

@@ -78,8 +78,27 @@ namespace SM.API.Controllers
             }
         }
 
+        [HttpGet("GetEventMembers")]
+        public ActionResult<List<MemberEventView>> GetEventMembers(int eventID, bool? registered, bool? attended)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var members = eventHandler.GetEventMembers(eventID, registered, attended);
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID,  bool isException, string? notes)
+        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, bool isException, string? notes)
         {
             try
             {

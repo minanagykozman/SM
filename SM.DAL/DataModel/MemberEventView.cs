@@ -41,6 +41,7 @@ namespace SM.DAL.DataModel
         public bool? Attended { get; set; }
         public int? AttendanceServantID { get; set; }
         public DateTime? AttendanceTimeStamp { get; set; }
+        public string? Team { get; set; }
         public int Age
         {
             get

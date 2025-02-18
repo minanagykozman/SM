@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ namespace SM.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    //[Authorize]
     public class MemberController : ControllerBase
     {
 
@@ -71,6 +73,24 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("GetMembersByCardStatus")]
+        public ActionResult<List<Member>> GetMembersByCardStatus(CardStatus cardStatus)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    List<Member> members = memberHandler.GetMembersByCardStatus(cardStatus);
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         [HttpGet("GetMember")]
         public ActionResult<Member> GetMember(int memberID)
         {
@@ -89,7 +109,24 @@ namespace SM.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("GetMemberByCode")]
+        public ActionResult<Member> GetMemberByCode([FromBody] string memberCode)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    Member member = memberHandler.GetMemberByCodeOnly(memberCode);
+                    return Ok(member);
+                }
 
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         [HttpPost("UpdateMember")]
         public ActionResult<string> UpdateMember(Member member)
         {
@@ -107,6 +144,31 @@ namespace SM.API.Controllers
                 // Log the exception (optional)
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+        [HttpPost("UpdateMemberCard")]
+        public ActionResult<string> UpdateMemberCard([FromBody] UpdateCardModel model)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
+                {
+                    eventHandler.UpdateCardStatus(model.MemberCode, model.CardStatus);
+                    return Ok("Member updated");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        public class  UpdateCardModel
+        {
+            public string MemberCode { get; set; }
+            public CardStatus CardStatus { get; set; }
+            
         }
 
     }

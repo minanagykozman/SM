@@ -25,8 +25,14 @@ namespace SM.BAL
 
         public Member? GetMember(string memberCode)
         {
-            return _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+            return _dbcontext.Members.
+                FirstOrDefault(m => m.Code.Contains(memberCode)
+                || m.UNPersonalNumber == memberCode
+                || (m.UNFileNumber == memberCode && m.IsMainMember));
+        }
+        public Member? GetMemberByCodeOnly(string memberCode)
+        {
+            return _dbcontext.Members.FirstOrDefault(m => m.Code.Contains(memberCode));
         }
 
         public Member GetMember(int memberID)
@@ -46,6 +52,10 @@ namespace SM.BAL
 
                 throw;
             }
+        }
+        public List<Member> GetMembersByCardStatus(CardStatus status)
+        {
+            return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).ToList();
         }
         public List<Member> GetMembers(string memberCode, string firstName, string lastName)
         {
@@ -87,11 +97,23 @@ namespace SM.BAL
         public string GenerateCode(string gender, DateTime birthdate)
         {
             int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
-            return string.Format("{0}{1}-{2}", birthdate.ToString("yy"),gender,seq.ToString("0000"));
+            return string.Format("{0}{1}-{2}", birthdate.ToString("yy"), gender, seq.ToString("0000"));
         }
         public bool ValidateUNNumber(string unPersonalNo)
         {
             return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower());
+        }
+
+        public bool UpdateCardStatus(string memberCode, CardStatus cardStatus)
+        {
+            var member = GetMemberByCodeOnly(memberCode);
+            if (member == null)
+            {
+                return false;
+            }
+            member.CardStatus = cardStatus.ToString();
+            _dbcontext.SaveChanges();
+            return true;
         }
         public void Dispose()
         {

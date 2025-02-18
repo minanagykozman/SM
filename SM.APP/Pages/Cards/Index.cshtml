@@ -1,0 +1,134 @@
+﻿@page
+@model SM.APP.Pages.Cards.IndexModel
+
+@{
+    ViewData["Title"] = "Members Cards";
+}
+
+<div class="container my-4">
+    <!-- Search Form -->
+    <form method="get" id="filterForm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Members' Cards</h4>
+            <div class="form-floating">
+                <select id="dpCardStatus" asp-for="CardStatus" class="form-select" onchange="document.getElementById('filterForm').submit();">
+                    <option value="">Select Card Status</option>
+                    <option value="MissingPhoto">Missing Photo</option>
+                    <option value="ReadyToPrint">Ready To Print</option>
+                    <option value="Printed">Printed</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+                <label asp-for="CardStatus"></label>
+            </div>
+        </div>
+        <div class="mb-3 d-flex align-items-center">
+            <div class="form-floating flex-grow-1">
+                <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
+                <label asp-for="UserCode">Code</label>
+            </div>
+
+            <!-- Scan QR Code Button (only visible on mobile) -->
+            <button type="button" id="btnScanQR" class="btn btn-secondary ms-2 d-md-none">Scan QR</button>
+
+            <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Update</button>
+        </div>
+    </form>
+    <div id="qrScannerContainer" class="mt-3 d-none">
+        <div id="reader" style="width: 100%;"></div>
+        <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+    </div>
+    <!-- Table for Larger Screens -->
+    <div class="d-none d-md-block">
+        <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].Code)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].FullName)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].UNFileNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].UNPersonalNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Member[0].CardStatus)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Member)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Code)</td>
+                                <td>
+                                    <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => item.CardStatus)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Layout for Mobile -->
+    <div class="d-md-none">
+        @foreach (var item in Model.Member)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                    </h5>
+                    <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
+                    <p class="mb-1"><strong>Card Status:</strong> @Html.DisplayFor(modelItem => item.CardStatus)</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("SearchSrting").focus();
+
+
+        const scanButton = document.getElementById("btnScanQR");
+         const qrScannerContainer = document.getElementById("qrScannerContainer");
+         const stopScanButton = document.getElementById("btnStopScan");
+
+         let html5QrCode;
+
+         // Show QR scanner on mobile only
+         if (window.innerWidth <= 768) {
+             scanButton.addEventListener("click", function () {
+                 qrScannerContainer.classList.remove("d-none");
+
+                 html5QrCode = new Html5Qrcode("reader");
+                 html5QrCode.start(
+                     { facingMode: "environment" }, // Use back camera
+                     {
+                         fps: 10,
+                         qrbox: { width: 250, height: 250 }
+                     },
+                     (decodedText) => {
+                         searchInput.value = decodedText;
+                         html5QrCode.stop();
+                         qrScannerContainer.classList.add("d-none");
+                     },
+                     (errorMessage) => {
+                         console.warn("QR Code scan error: ", errorMessage);
+                     }
+                 ).catch((err) => {
+                     console.error("QR Code scanning failed: ", err);
+                 });
+             });
+                  // Stop scanning
+             stopScanButton.addEventListener("click", function () {
+                 if (html5QrCode) {
+                     html5QrCode.stop();
+                 }
+                 qrScannerContainer.classList.add("d-none");
+             });
+         }
+    });
+</script>

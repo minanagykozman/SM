@@ -26,4 +26,11 @@ namespace SM.DAL.DataModel
         Ready,
         Ok
     }
+    public enum CardStatus
+    {
+        MissingPhoto,
+        ReadyToPrint,
+        Printed,
+        Delivered
+    }
 }
