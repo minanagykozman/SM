@@ -65,7 +65,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header bg-light">
                     <h5 class="modal-title" id="myModalLabel">Member Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Status -->
@@ -125,6 +125,13 @@
         searchInput.focus();
         if (cancelBtn) {
             cancelBtn.addEventListener('click', function () {
+                searchInput.value = "";
+                searchInput.focus(); // Focus on search input when Cancel is clicked
+            });
+        }
+        var btnClose = document.getElementById("btnClose");
+        if (btnClose) {
+            btnClose.addEventListener('click', function () {
                 searchInput.value = "";
                 searchInput.focus(); // Focus on search input when Cancel is clicked
             });

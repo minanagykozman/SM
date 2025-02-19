@@ -14,33 +14,41 @@ namespace SM.APP.Pages.Events
     [Authorize(Roles = "Admin,Servant")]
     public class IndexModel : PageModelBase
     {
-        public IndexModel(UserManager<IdentityUser> userManager) : base(userManager)
+        public IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : base(userManager, logger)
         {
         }
 
         [BindProperty(SupportsGet = true)]
         public List<Event> Events { get; set; }
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            string jwtToken = await GetAPIToken();
-            using (HttpClient client = new HttpClient())
+            try
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-
-                string request = string.Format("{0}/Events/GetEvents", SMConfigurationManager.ApiBase);
-                HttpResponseMessage response = await client.GetAsync(request);
-                if (response.IsSuccessStatusCode)
+                string jwtToken = await GetAPIToken();
+                using (HttpClient client = new HttpClient())
                 {
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+
+                    string request = string.Format("{0}/Events/GetEvents", SMConfigurationManager.ApiBase);
+                    HttpResponseMessage response = await client.GetAsync(request);
+                    if (response.IsSuccessStatusCode)
                     {
-                        PropertyNameCaseInsensitive = true
-                    };
-                    Events = JsonSerializer.Deserialize<List<Event>>(responseData, options);
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        Events = JsonSerializer.Deserialize<List<Event>>(responseData, options);
+                    }
                 }
+                if (Events == null)
+                    Events = new List<Event>();
+                return Page();
             }
-            if (Events == null)
-                Events = new List<Event>();
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
     }
 }

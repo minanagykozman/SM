@@ -38,7 +38,7 @@ namespace SM.APP.Pages.Admin.Meeting
             _context.Meetings.Add(Meeting);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("");
         }
     }
 }

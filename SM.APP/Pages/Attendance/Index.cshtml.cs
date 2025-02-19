@@ -13,28 +13,36 @@ namespace SM.APP.Pages.Attendance
     public class IndexModel : PageModelBase
     {
 
-        public IndexModel(UserManager<IdentityUser> userManager) : base(userManager)
+        public IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : base(userManager, logger)
         {
 
         }
         [BindProperty(SupportsGet = true)]
         public List<Class> Classes { get; set; }
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            using (HttpClient client = new HttpClient())
+            try
             {
-                string jwtToken = await GetAPIToken();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                string req = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
-                HttpResponseMessage response = await client.GetAsync(req);
-                string responseData = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions
+                using (HttpClient client = new HttpClient())
                 {
-                    PropertyNameCaseInsensitive = true // Enable case insensitivity
-                };
-                Classes = JsonSerializer.Deserialize<List<Class>>(responseData, options);
-                if (Classes == null)
-                    Classes = new List<Class>();
+                    string jwtToken = await GetAPIToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                    string req = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
+                    HttpResponseMessage response = await client.GetAsync(req);
+                    string responseData = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true // Enable case insensitivity
+                    };
+                    Classes = JsonSerializer.Deserialize<List<Class>>(responseData, options);
+                    if (Classes == null)
+                        Classes = new List<Class>();
+                }
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
             }
         }
     }

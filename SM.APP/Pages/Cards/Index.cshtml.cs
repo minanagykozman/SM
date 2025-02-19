@@ -21,7 +21,7 @@ namespace SM.APP.Pages.Cards
     [Authorize(Roles = "Admin,Servant")]
     public class IndexModel : PageModelBase
     {
-        public IndexModel(UserManager<IdentityUser> userManager) : base(userManager)
+        public IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : base(userManager, logger)
         {
         }
         public bool ShowModal { get; set; } = false;
@@ -35,79 +35,94 @@ namespace SM.APP.Pages.Cards
         public IList<Member> Members { get; set; } = default!;
 
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            if (!string.IsNullOrEmpty(UserCode))
+            try
             {
-                using (HttpClient client = new HttpClient())
+                if (!string.IsNullOrEmpty(UserCode))
                 {
-                    string jwtToken = await GetAPIToken();
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    string url = string.Format("{0}/Member/GetMemberByCode", SMConfigurationManager.ApiBase);
-                    string req = string.Format("{0}?memberCode={1}", url, UserCode);
-                    HttpResponseMessage response = await client.GetAsync(req);
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions
+                    using (HttpClient client = new HttpClient())
                     {
-                        PropertyNameCaseInsensitive = true // Enable case insensitivity
-                    };
-                    if (!string.IsNullOrEmpty(responseData))
-                        Member = JsonSerializer.Deserialize<Member>(responseData, options);
-                    ShowModal = true;
+                        string jwtToken = await GetAPIToken();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                        string url = string.Format("{0}/Member/GetMemberByCode", SMConfigurationManager.ApiBase);
+                        string req = string.Format("{0}?memberCode={1}", url, UserCode);
+                        HttpResponseMessage response = await client.GetAsync(req);
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        if (!string.IsNullOrEmpty(responseData))
+                            Member = JsonSerializer.Deserialize<Member>(responseData, options);
+                        ShowModal = true;
+                    }
                 }
-            }
-            if (!string.IsNullOrEmpty(CardStatus))
-            {
-                using (HttpClient client = new HttpClient())
+                if (!string.IsNullOrEmpty(CardStatus))
                 {
-                    string jwtToken = await GetAPIToken();
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    string url = string.Format("{0}/Member/GetMembersByCardStatus", SMConfigurationManager.ApiBase);
-                    string req = string.Format("{0}?cardStatus={1}", url, CardStatus);
-                    HttpResponseMessage response = await client.GetAsync(req);
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions
+                    using (HttpClient client = new HttpClient())
                     {
-                        PropertyNameCaseInsensitive = true // Enable case insensitivity
-                    };
-                    Members = JsonSerializer.Deserialize<List<Member>>(responseData, options);
-                    if (Members == null)
-                        Members = new List<Member>();
-                }
+                        string jwtToken = await GetAPIToken();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                        string url = string.Format("{0}/Member/GetMembersByCardStatus", SMConfigurationManager.ApiBase);
+                        string req = string.Format("{0}?cardStatus={1}", url, CardStatus);
+                        HttpResponseMessage response = await client.GetAsync(req);
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        Members = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                        if (Members == null)
+                            Members = new List<Member>();
+                    }
 
-                UserCode = string.Empty;
+                    UserCode = string.Empty;
+                }
+                if (Members == null)
+                    Members = new List<Member>();
+                return Page();
             }
-            if (Members == null)
-                Members = new List<Member>();
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!string.IsNullOrEmpty(UserCode) && !string.IsNullOrEmpty(CardStatus))
+            try
             {
-                CardStatus cardStatus = (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
-                var requestData = new
+                if (!string.IsNullOrEmpty(UserCode) && !string.IsNullOrEmpty(CardStatus))
                 {
-                    memberCode = UserCode,
-                    cardStatus = cardStatus
-                };
-                string request = string.Format("{0}/Member/UpdateMemberCard", SMConfigurationManager.ApiBase);
-                string jwtToken = await GetAPIToken();
-                using (HttpClient client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-
-                    if (!response.IsSuccessStatusCode)
+                    CardStatus cardStatus = (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
+                    var requestData = new
                     {
-                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                        memberCode = UserCode,
+                        cardStatus = cardStatus
+                    };
+                    string request = string.Format("{0}/Member/UpdateMemberCard", SMConfigurationManager.ApiBase);
+                    string jwtToken = await GetAPIToken();
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                        var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+
+                        HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                        }
+                        UserCode = string.Empty;
                     }
-                    UserCode = string.Empty;
                 }
+                return RedirectToPage("", new { cardStatus = CardStatus });
             }
-            return RedirectToPage("", new { cardStatus = CardStatus });
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
     }
 }

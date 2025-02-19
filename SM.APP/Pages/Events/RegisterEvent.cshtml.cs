@@ -15,7 +15,7 @@ namespace SM.APP.Pages.Events
     public class RegisterEventModel : PageModelBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        public RegisterEventModel(UserManager<IdentityUser> userManager) : base(userManager)
+        public RegisterEventModel(UserManager<IdentityUser> userManager, ILogger<RegisterEventModel> logger) : base(userManager, logger)
         {
         }
 
@@ -35,38 +35,19 @@ namespace SM.APP.Pages.Events
         [BindProperty]
         public int EventID { get; set; }
 
-        public async Task OnGetAsync(int? eventID)
+        public async Task<IActionResult> OnGetAsync(int? eventID)
         {
-            if (eventID.HasValue)
+            try
             {
-                EventID = eventID.Value;
-                string jwtToken = await GetAPIToken();
-                using (HttpClient client = new HttpClient())
+                if (eventID.HasValue)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    string url = string.Format("{0}/Events/GetEventRegisteredMembers", SMConfigurationManager.ApiBase);
-                    string req = string.Format("{0}?eventID={1}", url, eventID.ToString());
-                    HttpResponseMessage response = await client.GetAsync(req);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseData = await response.Content.ReadAsStringAsync();
-                        var options = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true // Enable case insensitivity
-                        };
-                        EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
-                        RegisteredCount = EventMembers.Count();
-                    }
-                    if (EventMembers == null)
-                        EventMembers = new List<Member>();
-                }
-                if (!string.IsNullOrEmpty(UserCode))
-                {
+                    EventID = eventID.Value;
+                    string jwtToken = await GetAPIToken();
                     using (HttpClient client = new HttpClient())
                     {
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                        string url = string.Format("{0}/Events/CheckRegistrationStatus", SMConfigurationManager.ApiBase);
-                        string req = string.Format("{0}?memberCode={1}&eventID={2}", url, UserCode, eventID.ToString());
+                        string url = string.Format("{0}/Events/GetEventRegisteredMembers", SMConfigurationManager.ApiBase);
+                        string req = string.Format("{0}?eventID={1}", url, eventID.ToString());
                         HttpResponseMessage response = await client.GetAsync(req);
                         if (response.IsSuccessStatusCode)
                         {
@@ -75,13 +56,40 @@ namespace SM.APP.Pages.Events
                             {
                                 PropertyNameCaseInsensitive = true // Enable case insensitivity
                             };
-                            MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
-                            HttpContext.Session.SetString("MemberData", JsonSerializer.Serialize(MemberData));
-                            LoadData();
+                            EventMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                            RegisteredCount = EventMembers.Count();
                         }
+                        if (EventMembers == null)
+                            EventMembers = new List<Member>();
                     }
-                    UserCode = string.Empty;
+                    if (!string.IsNullOrEmpty(UserCode))
+                    {
+                        using (HttpClient client = new HttpClient())
+                        {
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                            string url = string.Format("{0}/Events/CheckRegistrationStatus", SMConfigurationManager.ApiBase);
+                            string req = string.Format("{0}?memberCode={1}&eventID={2}", url, UserCode, eventID.ToString());
+                            HttpResponseMessage response = await client.GetAsync(req);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string responseData = await response.Content.ReadAsStringAsync();
+                                var options = new JsonSerializerOptions
+                                {
+                                    PropertyNameCaseInsensitive = true // Enable case insensitivity
+                                };
+                                MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(responseData, options);
+                                HttpContext.Session.SetString("MemberData", JsonSerializer.Serialize(MemberData));
+                                LoadData();
+                            }
+                        }
+                        UserCode = string.Empty;
+                    }
                 }
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
             }
         }
 
@@ -121,42 +129,49 @@ namespace SM.APP.Pages.Events
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var sessionData = HttpContext.Session.GetString("MemberData");
-            if (!string.IsNullOrEmpty(sessionData))
+            try
             {
-                MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(sessionData);
-            }
-            if (MemberData != null)
-            {
-                string memberCode = MemberData.Member.Code;
-                int eventID = EventID;
-                bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
-                string notes = string.IsNullOrEmpty(Notes) ? string.Empty : Notes;
-                var requestData = new
+                var sessionData = HttpContext.Session.GetString("MemberData");
+                if (!string.IsNullOrEmpty(sessionData))
                 {
-                    memberCode,
-                    eventID,
-                    isException,
-                    notes
-                };
-                string url = string.Format("{0}/Events/Register", SMConfigurationManager.ApiBase);
-                string request = string.Format("{0}?memberCode={1}&eventID={2}&&isException={3}&notes={4}", url, memberCode, EventID, isException.ToString().ToLower(), notes);
-                string jwtToken = await GetAPIToken();
-                using (HttpClient client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
-                    }
-                    UserCode = string.Empty;
+                    MemberData = JsonSerializer.Deserialize<RegistrationStatusResponse>(sessionData);
                 }
+                if (MemberData != null)
+                {
+                    string memberCode = MemberData.Member.Code;
+                    int eventID = EventID;
+                    bool isException = MemberData.Status == RegistrationStatus.MemberNotEligible ? true : false;
+                    string notes = string.IsNullOrEmpty(Notes) ? string.Empty : Notes;
+                    var requestData = new
+                    {
+                        memberCode,
+                        eventID,
+                        isException,
+                        notes
+                    };
+                    string url = string.Format("{0}/Events/Register", SMConfigurationManager.ApiBase);
+                    string request = string.Format("{0}?memberCode={1}&eventID={2}&&isException={3}&notes={4}", url, memberCode, EventID, isException.ToString().ToLower(), notes);
+                    string jwtToken = await GetAPIToken();
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                        var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+
+                        HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                        }
+                        UserCode = string.Empty;
+                    }
+                }
+                return RedirectToPage("", new { eventID = EventID });
             }
-            return RedirectToPage("", new { eventID = EventID });
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
     }
     public class RegistrationStatusResponse
@@ -164,6 +179,6 @@ namespace SM.APP.Pages.Events
         public Member Member { get; set; }
         public RegistrationStatus Status { get; set; }
     }
-    
+
 
 }

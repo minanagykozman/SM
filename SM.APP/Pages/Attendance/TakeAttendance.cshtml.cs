@@ -13,7 +13,7 @@ namespace SM.APP.Pages.Attendance
     [Authorize(Roles = "Admin,Servant")]
     public class TakeAttendanceModel : PageModelBase
     {
-        public TakeAttendanceModel(UserManager<IdentityUser> userManager) : base(userManager)
+        public TakeAttendanceModel(UserManager<IdentityUser> userManager, ILogger<TakeAttendanceModel> logger) : base(userManager, logger)
         {
 
         }
@@ -29,83 +29,90 @@ namespace SM.APP.Pages.Attendance
         public MemberAttendanceResult? MemberData { get; set; }
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
 
-        public async Task OnGetAsync(int? classOccurenceID)
+        public async Task<IActionResult> OnGetAsync(int? classOccurenceID)
         {
-            if (classOccurenceID.HasValue)
+            try
             {
-                ClassOccurenceID = classOccurenceID.Value;
-                if (!string.IsNullOrEmpty(UserCode))
+                if (classOccurenceID.HasValue)
                 {
+                    ClassOccurenceID = classOccurenceID.Value;
+                    if (!string.IsNullOrEmpty(UserCode))
+                    {
+                        using (HttpClient client = new HttpClient())
+                        {
+                            string jwtToken = await GetAPIToken();
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                            string url = string.Format("{0}/Meeting/CheckAttendance", SMConfigurationManager.ApiBase);
+                            string req = string.Format("{0}?classOccurenceID={1}&memberCode={2}", url, classOccurenceID, UserCode);
+                            HttpResponseMessage response = await client.GetAsync(req);
+                            string responseData = await response.Content.ReadAsStringAsync();
+                            var options = new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true // Enable case insensitivity
+                            };
+                            if (!string.IsNullOrEmpty(responseData))
+                            {
+                                MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
+                                HttpContext.Session.SetString("MemberAttendanceData", JsonSerializer.Serialize(MemberData));
+                            }
+                        }
+                        if (MemberData != null)
+                        {
+                            if (MemberData.AttendanceStatus == AttendanceStatus.Ready)
+                            {
+                                StringContent jsonContent;
+                                string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, false, out jsonContent);
+                                using (HttpClient client = new HttpClient())
+                                {
+                                    string jwtToken = await GetAPIToken();
+                                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+                                    if (response.IsSuccessStatusCode)
+                                    {
+                                        string responseData = await response.Content.ReadAsStringAsync();
+                                    }
+                                    else
+                                    {
+                                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                                    }
+                                    UserCode = string.Empty;
+                                }
+
+                            }
+                            LoadData();
+                        }
+                        UserCode = string.Empty;
+                    }
                     using (HttpClient client = new HttpClient())
                     {
                         string jwtToken = await GetAPIToken();
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                        string url = string.Format("{0}/Meeting/CheckAttendance", SMConfigurationManager.ApiBase);
-                        string req = string.Format("{0}?classOccurenceID={1}&memberCode={2}", url, classOccurenceID, UserCode);
+                        string url = string.Format("{0}/Meeting/GetAttendedMembers", SMConfigurationManager.ApiBase);
+                        string req = string.Format("{0}?occurenceID={1}", url, ClassOccurenceID.ToString());
                         HttpResponseMessage response = await client.GetAsync(req);
                         string responseData = await response.Content.ReadAsStringAsync();
-                        var options = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true // Enable case insensitivity
-                        };
                         if (!string.IsNullOrEmpty(responseData))
                         {
-                            MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(responseData, options);
-                            HttpContext.Session.SetString("MemberAttendanceData", JsonSerializer.Serialize(MemberData));
-                        }
-                    }
-                    if (MemberData != null)
-                    {
-                        if (MemberData.AttendanceStatus == AttendanceStatus.Ready)
-                        {
-                            StringContent jsonContent;
-                            string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, false, out jsonContent);
-                            using (HttpClient client = new HttpClient())
+                            var options = new JsonSerializerOptions
                             {
-                                string jwtToken = await GetAPIToken();
-                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                                HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    string responseData = await response.Content.ReadAsStringAsync();
-                                }
-                                else
-                                {
-                                    throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
-                                }
-                                UserCode = string.Empty;
-                            }
-
+                                PropertyNameCaseInsensitive = true // Enable case insensitivity
+                            };
+                            ClassOccurenceMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
                         }
-                        LoadData();
+                        if (ClassOccurenceMembers == null)
+                            ClassOccurenceMembers = new List<Member>();
                     }
-                    UserCode = string.Empty;
                 }
-                using (HttpClient client = new HttpClient())
-                {
-                    string jwtToken = await GetAPIToken();
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    string url = string.Format("{0}/Meeting/GetAttendedMembers", SMConfigurationManager.ApiBase);
-                    string req = string.Format("{0}?occurenceID={1}", url, ClassOccurenceID.ToString());
-                    HttpResponseMessage response = await client.GetAsync(req);
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrEmpty(responseData))
-                    {
-                        var options = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true // Enable case insensitivity
-                        };
-                        ClassOccurenceMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
-                    }
-                    if (ClassOccurenceMembers == null)
-                        ClassOccurenceMembers = new List<Member>();
-                }
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
             }
         }
 
         private void LoadData()
         {
-
             switch (MemberData.AttendanceStatus)
             {
                 case AttendanceStatus.MemberNotFound:
@@ -136,37 +143,43 @@ namespace SM.APP.Pages.Attendance
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            var sessionData = HttpContext.Session.GetString("MemberAttendanceData");
-            if (!string.IsNullOrEmpty(sessionData))
+            try
             {
-                MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(sessionData);
-            }
-            if (MemberData != null)
-            {
-                StringContent jsonContent;
-                string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, true, out jsonContent);
-                using (HttpClient client = new HttpClient())
+                var sessionData = HttpContext.Session.GetString("MemberAttendanceData");
+                if (!string.IsNullOrEmpty(sessionData))
                 {
-                    string jwtToken = await GetAPIToken();
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseData = await response.Content.ReadAsStringAsync();
-                    }
-                    else
-                    {
-                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
-                    }
-                    UserCode = string.Empty;
+                    MemberData = JsonSerializer.Deserialize<MemberAttendanceResult>(sessionData);
                 }
+                if (MemberData != null)
+                {
+                    StringContent jsonContent;
+                    string request = TakeAttendanceString(MemberData.Member.Code, ClassOccurenceID, true, out jsonContent);
+                    using (HttpClient client = new HttpClient())
+                    {
+                        string jwtToken = await GetAPIToken();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                        HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseData = await response.Content.ReadAsStringAsync();
+                        }
+                        else
+                        {
+                            throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                        }
+                        UserCode = string.Empty;
+                    }
+                }
+                return RedirectToPage("", new { classOccurenceID = ClassOccurenceID });
             }
-            return RedirectToPage("", new { classOccurenceID = ClassOccurenceID });
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         private string TakeAttendanceString(string memberCode, int classOccuranceID, bool forceRegister, out StringContent jsonContent)
         {
-
             var requestData = new
             {
                 classOccuranceID,

@@ -31,11 +31,11 @@ namespace SM.APP.Pages.Admin.Class
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
+            //if (!ModelState.IsValid)
+            //{
+            //    return Page();
+            //}
+            Class.IsActive = true;
             _context.Classes.Add(Class);
             await _context.SaveChangesAsync();
 

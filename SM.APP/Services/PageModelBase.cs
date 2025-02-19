@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SM.APP.Services
@@ -6,9 +7,12 @@ namespace SM.APP.Services
     public class PageModelBase : PageModel
     {
         internal readonly UserManager<IdentityUser> _userManager;
-        public PageModelBase(UserManager<IdentityUser> userManager)
+        internal readonly ILogger<PageModelBase> _logger;
+
+        public PageModelBase(UserManager<IdentityUser> userManager, ILogger<PageModelBase> logger)
         {
             _userManager = userManager;
+            _logger = logger;
         }
         public async Task<string> GetAPIToken()
         {
@@ -20,6 +24,12 @@ namespace SM.APP.Services
                 jwtToken = AuthenticatorService.GenerateToken(user, roles);
             }
             return jwtToken;
+        }
+
+        public IActionResult HandleException(Exception ex)
+        {
+            _logger.LogError(ex, User.Identity.Name);
+            return RedirectToPage("/Error");
         }
     }
 }
