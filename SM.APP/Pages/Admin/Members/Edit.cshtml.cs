@@ -31,7 +31,7 @@ namespace SM.APP.Pages.Admin.Members
             {
                 return NotFound();
             }
-
+            
             var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
             if (member == null)
             {
@@ -49,7 +49,10 @@ namespace SM.APP.Pages.Admin.Members
             {
                 return Page();
             }
-            Member.CardStatus = string.IsNullOrEmpty(Member.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
+            DateTime utcNow = DateTime.UtcNow;
+            DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
+            Member.LastModifiedDate = utcPlus2;
             _context.Attach(Member).State = EntityState.Modified;
 
             try

@@ -60,6 +60,10 @@ namespace SM.APP.Pages.Admin.Members
             Member.Code = string.Format("{0}{1}-{2}", Member.Birthdate.ToString("yy"), Member.Gender, seq.ToString("0000"));
             Member.Sequence = seq;
             Member.CardStatus = string.IsNullOrEmpty(Member.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
+            DateTime utcNow = DateTime.UtcNow;
+            DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
+            Member.LastModifiedDate = utcPlus2;
             _context.Members.Add(Member);
             await _context.SaveChangesAsync();
 
