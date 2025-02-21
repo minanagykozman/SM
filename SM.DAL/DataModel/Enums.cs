@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,9 +29,15 @@ namespace SM.DAL.DataModel
     }
     public enum CardStatus
     {
+        [Display(Name = "Missing Photo")]
         MissingPhoto,
+        [Display(Name = "Ready to print")]
         ReadyToPrint,
+        [Display(Name = "Printed")]
         Printed,
-        Delivered
+        [Display(Name = "Delivered")]
+        Delivered,
+        [Display(Name = "Not Applicable")]
+        NotApplicable
     }
 }

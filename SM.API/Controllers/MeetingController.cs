@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SM.API.Services;
 using SM.BAL;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
@@ -10,22 +11,15 @@ namespace SM.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class MeetingController : ControllerBase
+    public class MeetingController(ILogger<MeetingController> logger) : SMControllerBase(logger)
     {
-
-        private readonly ILogger<MeetingController> _logger;
-
-        public MeetingController(ILogger<MeetingController> logger)
-        {
-            _logger = logger;
-        }
 
         [HttpGet("GetClasses")]
         public ActionResult<List<Class>> GetServantClasses()
         {
             try
             {
-                
+                ValidateServant();
                 using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
                 {
                     List<Class> classes = classHandler.GetServantClasses(User.Identity.Name);
@@ -35,8 +29,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("GetClassOccurences")]
@@ -57,8 +50,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("GetAttendedMembers")]
@@ -79,8 +71,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("CheckAttendance")]
@@ -100,8 +91,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("CreateClass")]
@@ -118,8 +108,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("CreateClassOccurences")]
@@ -136,8 +125,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("CreateClassOccurencesTimed")]
@@ -154,17 +142,17 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("TakeAttendance")]
-        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode,   bool forceRegister)
+        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode, bool forceRegister)
         {
             try
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
+                    ValidateServant();
                     var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberCode, User.Identity.Name, forceRegister);
                     return Ok(cl);
                 }
@@ -172,8 +160,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("TakeAttendanceBulk")]
@@ -183,6 +170,7 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
+                    ValidateServant();
                     var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberIDs, User.Identity.Name);
                     return Ok(cl);
                 }
@@ -190,8 +178,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         public class MemberAttendanceResult

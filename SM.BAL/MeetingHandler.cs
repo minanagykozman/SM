@@ -163,7 +163,7 @@ namespace SM.BAL
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = member.MemberID,
                     ServantID = servant.ServantID,
-                    TimeStamp = DateTime.Now
+                    TimeStamp = CurrentTime
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
             }
@@ -174,7 +174,7 @@ namespace SM.BAL
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = member.MemberID,
                     ServantID = servant.ServantID,
-                    TimeStamp = DateTime.Now
+                    TimeStamp = CurrentTime
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
             }
@@ -192,7 +192,7 @@ namespace SM.BAL
                     ClassOccurrenceID = classOccuranceID,
                     MemberID = memberID,
                     ServantID = servant.ServantID,
-                    TimeStamp = DateTime.Now
+                    TimeStamp = CurrentTime
                 };
                 _dbcontext.ClassAttendances.Add(classAttendance);
             }

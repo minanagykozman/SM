@@ -22,6 +22,16 @@ namespace SM.BAL
                 return null;
             return _dbcontext.Servants.FirstOrDefault(s => s.UserID == user.Id);
         }
+        public DateTime CurrentTime
+        {
+            get
+            {
+                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
+                DateTime utcNow = DateTime.UtcNow;
+                DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
+                return utcPlus2;
+            }
+        }
         public void Dispose()
         {
             if (_dbcontext != null)

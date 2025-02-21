@@ -9,14 +9,8 @@ using System.Threading.Tasks;
 
 namespace SM.BAL
 {
-    public class MemberHandler : IDisposable
+    public class MemberHandler : HandlerBase
     {
-        private AppDbContext _dbcontext;
-        public MemberHandler()
-        {
-            _dbcontext = new AppDbContext();
-        }
-
         public List<Member> GetFamilyByUNFileNumber(string unFileNumber)
         {
             var members = _dbcontext.Members.Where(m => m.UNFileNumber == unFileNumber).ToList<Member>();
@@ -55,7 +49,7 @@ namespace SM.BAL
         }
         public List<Member> GetMembersByCardStatus(CardStatus status)
         {
-            return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).ToList();
+            return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).OrderByDescending(m => m.LastModifiedDate).ToList();
         }
         public List<Member> GetMembers(string memberCode, string firstName, string lastName)
         {
@@ -112,13 +106,9 @@ namespace SM.BAL
                 return false;
             }
             member.CardStatus = cardStatus.ToString();
+            member.LastModifiedDate = CurrentTime;
             _dbcontext.SaveChanges();
             return true;
-        }
-        public void Dispose()
-        {
-            if (_dbcontext != null)
-                _dbcontext.Dispose();
         }
     }
 }

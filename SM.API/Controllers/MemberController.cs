@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SM.API.Services;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
 using static SM.BAL.EventHandler;
@@ -9,15 +10,9 @@ namespace SM.API.Controllers
     [ApiController]
     [Route("[controller]")]
     //[Authorize]
-    public class MemberController : ControllerBase
+    public class MemberController (ILogger<MemberController> logger): SMControllerBase(logger)
     {
 
-        private readonly ILogger<EventsController> _logger;
-
-        public MemberController(ILogger<EventsController> logger)
-        {
-            _logger = logger;
-        }
 
         [HttpGet("GetFamily")]
         public ActionResult<List<Member>> GetFamily(string unFileNumber)
@@ -33,8 +28,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("ValidateUNNumber")]
@@ -51,8 +45,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("SearchMembers")]
@@ -69,8 +62,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("GetMembersByCardStatus")]
@@ -87,8 +79,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("GetMember")]
@@ -105,8 +96,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpGet("GetMemberByCode")]
@@ -123,8 +113,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("UpdateMember")]
@@ -141,8 +130,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
         [HttpPost("UpdateMemberCard")]
@@ -159,8 +147,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 

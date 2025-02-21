@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using SM.API.Services;
 using SM.DAL;
 using System.Text;
@@ -11,12 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Retrieve the connection string from appsettings.json
 string connectionString = string.Empty;
+string loggerConnectionString = string.Empty;
 string secretKey = string.Empty;
 string issuer = string.Empty;
 string audience = string.Empty;
 if (!builder.Environment.IsDevelopment())
 {
     connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
+    loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB");
     secretKey = Environment.GetEnvironmentVariable("JWTSecretKey");
     issuer = Environment.GetEnvironmentVariable("JWTIssuer");
     audience = Environment.GetEnvironmentVariable("JWTAudience");
@@ -28,6 +31,7 @@ if (!builder.Environment.IsDevelopment())
 else
 {
     connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+    loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB");
     secretKey = builder.Configuration["JwtSettings:SecretKey"];
     issuer = builder.Configuration["JwtSettings:Issuer"];
     audience = builder.Configuration["JwtSettings:Audience"];
@@ -80,6 +84,17 @@ builder.Services.AddCors(options =>
                   .AllowCredentials();
         });
 });
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Error()
+    .WriteTo.Console()
+    .WriteTo.MySQL(
+        connectionString: loggerConnectionString,
+        tableName: "APILogs"
+    )
+    .CreateLogger();
+builder.Host.UseSerilog();
+
 // Add Swagger with JWT Authentication
 builder.Services.AddSwaggerGen(c =>
 {

@@ -50,9 +50,13 @@ namespace SM.APP.Pages.Attendance
                             }
                             else
                             {
-                                TodayClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date == DateTime.Now.Date).ToList();
-                                UpcomingClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date > DateTime.Now.Date).ToList();
-                                PastClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date < DateTime.Now.Date).ToList();
+                                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
+                                DateTime utcNow = DateTime.UtcNow;
+                                DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
+                                
+                                TodayClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date == utcPlus2.Date).ToList();
+                                //UpcomingClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date > utcPlus2.Date).ToList();
+                                PastClasses = Classes.Where(c => c.ClassOccurrenceStartDate.Date < utcPlus2.Date).ToList();
                             }
                         }
                     }

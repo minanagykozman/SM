@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
+@using SM.DAL.DataModel
 <div class="container mt-4">
     <h1 class="text-center">Edit Member</h1>
     <hr />
@@ -81,12 +81,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.CardStatus" class="form-select">
-                            <option value="">Select Card Status</option>
-                            <option value="MissingPhoto">Missing Photo</option>
-                            <option value="ReadyToPrint">Ready To Print</option>
-                            <option value="Printed">Printed</option>
-                            <option value="Delivered">Delivered</option>
+                        <select asp-for="Member.CardStatus" class="form-select" asp-items="Html.GetEnumSelectList<CardStatus>()">
                         </select>
                         <label asp-for="Member.CardStatus"></label>
                     </div>

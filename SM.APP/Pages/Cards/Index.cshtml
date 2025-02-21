@@ -4,19 +4,16 @@
 @{
     ViewData["Title"] = "Members Cards";
 }
-
+@using SM.DAL.DataModel
 <div class="container my-4">
     <!-- Search Form -->
     <form method="get" id="filterForm">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Members' Cards</h4>
             <div class="form-floating">
-                <select id="dpCardStatus" asp-for="CardStatus" class="form-select" onchange="document.getElementById('filterForm').submit();">
+                <select id="dpCardStatus" asp-for="CardStatus" asp-items="Html.GetEnumSelectList<CardStatus>()"
+                class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">Select Card Status</option>
-                    <option value="MissingPhoto">Missing Photo</option>
-                    <option value="ReadyToPrint">Ready To Print</option>
-                    <option value="Printed">Printed</option>
-                    <option value="Delivered">Delivered</option>
                 </select>
                 <label asp-for="CardStatus"></label>
             </div>
@@ -61,7 +58,7 @@
                                 </td>
                                 <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
                                 <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
-                                <td>@Html.DisplayFor(modelItem => item.CardStatus)</td>
+                                <td>@Html.DisplayFor(modelItem => item.CardStatusDisplay)</td>
                             </tr>
                         }
                     </tbody>
@@ -80,7 +77,7 @@
                         <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
                     </h5>
                     <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
-                    <p class="mb-1"><strong>Card Status:</strong> @Html.DisplayFor(modelItem => item.CardStatus)</p>
+                    <p class="mb-1"><strong>Card Status:</strong> @Html.DisplayFor(modelItem => item.CardStatusDisplay)</p>
                 </div>
             </div>
         }

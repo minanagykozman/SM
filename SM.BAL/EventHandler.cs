@@ -87,7 +87,7 @@ namespace SM.BAL
             }
             eventRegistration.Attended = true;
             eventRegistration.AttendanceServantID = servantID;
-            eventRegistration.AttendanceTimeStamp = DateTime.Now;
+            eventRegistration.AttendanceTimeStamp = CurrentTime;
             _dbcontext.SaveChanges();
 
             return RegistrationStatus.Ok;
@@ -140,7 +140,7 @@ namespace SM.BAL
                 MemberID = member.MemberID,
                 ServantID = servant.ServantID,
                 Notes = notes,
-                TimeStamp = DateTime.Now,
+                TimeStamp = CurrentTime,
                 IsException = isException
             });
             _dbcontext.SaveChanges();

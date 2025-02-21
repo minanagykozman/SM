@@ -44,6 +44,11 @@ namespace SM.DAL.DataModel
         public string? CardStatus { get; set; }
         public string? Notes { get; set; }
         public int Sequence { get; set; } = 0;
+        [Display(Name = "Last Modified")]
+        public DateTime? LastModifiedDate { get; set; }
+
+
+        [JsonIgnore]
         public int Age
         {
             get
@@ -60,11 +65,20 @@ namespace SM.DAL.DataModel
                 return age;
             }
         }
+        [JsonIgnore]
         public string FullName
         {
             get
             {
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
+            }
+        }
+        [JsonIgnore]
+        public CardStatus CardStatusDisplay
+        {
+            get
+            {
+                return (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
             }
         }
         [JsonIgnore]

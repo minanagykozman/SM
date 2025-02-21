@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SM.API.Services;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
 using static SM.BAL.EventHandler;
@@ -9,15 +10,8 @@ namespace SM.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class EventsController : ControllerBase
+    public class EventsController(ILogger<EventsController> logger) : SMControllerBase(logger)
     {
-
-        private readonly ILogger<EventsController> _logger;
-
-        public EventsController(ILogger<EventsController> logger)
-        {
-            _logger = logger;
-        }
 
         [HttpGet("GetEvents")]
         public ActionResult<List<Event>> GetEvents()
@@ -26,14 +20,14 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
+                    ValidateServant();
                     List<Event> events = eventHandler.GetEvents(User.Identity.Name);
                     return Ok(events);
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 
@@ -54,8 +48,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 
@@ -73,8 +66,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 
@@ -92,8 +84,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 
@@ -104,6 +95,7 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
+                    //ValidateServant();
                     var status = eventHandler.Register(memberCode, eventID, User.Identity.Name, isException, notes);
                     return Ok(status);
                 }
@@ -111,8 +103,7 @@ namespace SM.API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return HandleError(ex);
             }
         }
 
