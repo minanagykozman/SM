@@ -11,9 +11,14 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Members' Cards</h4>
             <div class="form-floating">
-                <select id="dpCardStatus" asp-for="CardStatus" asp-items="Html.GetEnumSelectList<CardStatus>()"
+                <select id="dpCardStatus" asp-for="CardStatus" 
                 class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">Select Card Status</option>
+                    <option value="MissingPhoto">Missing photo</option>
+                    <option value="ReadyToPrint">Ready to print</option>
+                    <option value="Printed">Printed</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="NotApplicable">Not applicable</option>
                 </select>
                 <label asp-for="CardStatus"></label>
             </div>
@@ -123,7 +128,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lblCardStatus" name="MemberCode" value="@Model.CardStatus" readonly>
+                                    <input type="text" class="form-control" id="lblCardStatus" name="MemberCardStatus" value="@Model.CardStatus" readonly>
                                     <label for="lblCardStatus">Update Card To</label>
                                 </div>
                             </div>
