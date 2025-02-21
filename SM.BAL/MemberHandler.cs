@@ -57,7 +57,7 @@ namespace SM.BAL
             if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
             {
                 var member = _dbcontext.Members.Include(m => m.ClassMembers).
-                    FirstOrDefault(m => m.Code == memberCode ||
+                    FirstOrDefault(m => m.Code.Contains(memberCode) ||
                     m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode);
 
                 if (member == null)

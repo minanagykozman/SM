@@ -74,11 +74,16 @@ namespace SM.DAL.DataModel
             }
         }
         [JsonIgnore]
-        public CardStatus CardStatusDisplay
+        public CardStatus? CardStatusDisplay
         {
             get
             {
-                return (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
+                try
+                {
+                    return (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
+                }
+                catch
+                { return null; }
             }
         }
         [JsonIgnore]
