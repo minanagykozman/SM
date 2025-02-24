@@ -7,7 +7,7 @@
 @using SM.DAL.DataModel
 <h2>Take Attendance</h2>
 <div class="container my-4">
-    <form method="get">
+    <form method="get" id="filterForm">
         <div class="mb-3 d-flex align-items-center">
             <input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
 
