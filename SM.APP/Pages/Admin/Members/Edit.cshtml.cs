@@ -1,82 +1,126 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using SM.APP.Services;
 using SM.DAL;
 using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Members
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class EditModel : PageModel
+    public class EditModel(UserManager<IdentityUser> userManager, ILogger<EditModel> logger) : PageModelBase(userManager, logger)
     {
-        private readonly SM.DAL.AppDbContext _context;
-
-        public EditModel(SM.DAL.AppDbContext context)
-        {
-            _context = context;
-        }
-
         [BindProperty]
         public Member Member { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                using (HttpClient client = new HttpClient())
+                {
+                    string jwtToken = await GetAPIToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                    string url = string.Format("{0}/Member/GetMember", SMConfigurationManager.ApiBase);
+                    string req = string.Format("{0}?memberID={1}", url, id);
+                    HttpResponseMessage response = await client.GetAsync(req);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseData = await response.Content.ReadAsStringAsync();
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
+                        };
+                        Member member = JsonSerializer.Deserialize<Member>(responseData, options);
+                        if (member == null)
+                        {
+                            return NotFound();
+                        }
+                        Member = member;
+                    }
+                }
+                return Page();
             }
-            
-            var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
-            if (member == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return HandleException(ex);
             }
-            Member = member;
-            return Page();
         }
 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
-            DateTime utcNow = DateTime.UtcNow;
-            DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
-            Member.LastModifiedDate = utcPlus2;
-            _context.Attach(Member).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                if (!ModelState.IsValid)
+                {
+                    return Page();
+                }
+
+
+                var requestData = new
+                {
+                    memberID = Member.MemberID,
+                    code = Member.Code,
+                    unFirstName = Member.UNFirstName,
+                    unLastName = Member.UNLastName,
+                    nickname = Member.Nickname,
+                    unFileNumber = Member.UNFileNumber,
+                    unPersonalNumber = Member.UNPersonalNumber,
+                    mobile = Member.Mobile,
+                    baptised = Member.Baptised,
+                    birthdate = Member.Birthdate,
+                    gender = Member.Gender,
+                    school = Member.School,
+                    work = Member.Work,
+                    isMainMember = Member.IsMainMember,
+                    isActive = Member.IsActive,
+                    imageReference = Member.ImageReference,
+                    cardStatus = Member.CardStatus,
+                    notes = Member.Notes,
+                    imageURL = Member.ImageURL,
+                    sequence = Member.Sequence
+                };
+                string request = string.Format("{0}/Member/UpdateMember", SMConfigurationManager.ApiBase);
+                using (HttpClient client = new HttpClient())
+                {
+                    string jwtToken = await GetAPIToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                    var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync(request, jsonContent);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                    }
+
+                }
+
+
+                return RedirectToPage("./Index", new { userCode = Member.Code });
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!MemberExists(Member.MemberID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return HandleException(ex);
             }
-
-            return RedirectToPage("./Index", new { userCode = Member.Code });
-        }
-
-        private bool MemberExists(int id)
-        {
-            return _context.Members.Any(e => e.MemberID == id);
         }
     }
 }

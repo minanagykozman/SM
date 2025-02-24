@@ -2,10 +2,13 @@
 using SM.DAL;
 using SM.DAL.DataModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SM.BAL
 {
@@ -19,6 +22,7 @@ namespace SM.BAL
 
         public Member? GetMember(string memberCode)
         {
+            memberCode = memberCode.Trim();
             return _dbcontext.Members.
                 FirstOrDefault(m => m.Code.Contains(memberCode)
                 || m.UNPersonalNumber == memberCode
@@ -26,37 +30,161 @@ namespace SM.BAL
         }
         public Member? GetMemberByCodeOnly(string memberCode)
         {
+            memberCode = memberCode.Trim();
             return _dbcontext.Members.FirstOrDefault(m => m.Code.Contains(memberCode));
         }
 
         public Member GetMember(int memberID)
         {
-            return _dbcontext.Members.FirstOrDefault(m => m.MemberID == memberID);
+            return _dbcontext.Members.First(m => m.MemberID == memberID);
         }
-        public void UpdateMember(Member member)
+        public void UpdateMember(Member member, string modifiedByUserName)
         {
-            _dbcontext.Attach(member).State = EntityState.Modified;
-
-            try
+            Servant servant = GetServantByUsername(modifiedByUserName);
+            Member originalMember = _dbcontext.Members.First(m => m.MemberID == member.MemberID);
+            Dictionary<string, string> auditTrail = new Dictionary<string, string>();
+            if (originalMember == null)
             {
-                _dbcontext.SaveChangesAsync();
+                throw new Exception("Member not found");
             }
-            catch (DbUpdateConcurrencyException)
+            bool isChanged = false;
+            if (member.Gender != originalMember.Gender)
             {
-
-                throw;
+                auditTrail.Add("Gender", string.Format("Old value: {0} new value:{1}", originalMember.Gender, member.Gender));
+                originalMember.Gender = member.Gender;
+                isChanged = true;
+            }
+            if (member.UNFirstName != originalMember.UNFirstName)
+            {
+                auditTrail.Add("UNFirstName", string.Format("Old value: {0} new value:{1}", originalMember.UNFirstName, member.UNFirstName));
+                originalMember.UNFirstName = member.UNFirstName;
+                isChanged = true;
+            }
+            if (member.UNLastName != originalMember.UNLastName)
+            {
+                auditTrail.Add("UNLastName", string.Format("Old value: {0} new value:{1}", originalMember.UNLastName, member.UNLastName));
+                originalMember.UNLastName = member.UNLastName;
+                isChanged = true;
+            }
+            if (member.UNFileNumber != originalMember.UNFileNumber)
+            {
+                auditTrail.Add("UNFileNumber", string.Format("Old value: {0} new value:{1}", originalMember.UNFileNumber, member.UNFileNumber));
+                originalMember.UNFileNumber = member.UNFileNumber;
+                isChanged = true;
+            }
+            if (member.UNPersonalNumber != originalMember.UNPersonalNumber)
+            {
+                auditTrail.Add("UNPersonalNumber", string.Format("Old value: {0} new value:{1}", originalMember.UNPersonalNumber, member.UNPersonalNumber));
+                originalMember.UNPersonalNumber = member.UNPersonalNumber;
+                isChanged = true;
+            }
+            if (member.Birthdate != originalMember.Birthdate)
+            {
+                auditTrail.Add("Birthdate", string.Format("Old value: {0} new value:{1}", originalMember.Birthdate.ToString("dd-MM-yyyy"), member.Birthdate.ToString("dd-MM-yyyy")));
+                originalMember.Birthdate = member.Birthdate;
+                isChanged = true;
+            }
+            if (member.Baptised != originalMember.Baptised)
+            {
+                auditTrail.Add("Baptised", string.Format("Old value: {0} new value:{1}", originalMember.Baptised, member.Baptised));
+                originalMember.Baptised = member.Baptised;
+                isChanged = true;
+            }
+            if (member.CardStatus != originalMember.CardStatus)
+            {
+                auditTrail.Add("CardStatus", string.Format("Old value: {0} new value:{1}", originalMember.CardStatus, member.CardStatus));
+                originalMember.CardStatus = member.CardStatus;
+                isChanged = true;
+            }
+            if (member.ImageReference != originalMember.ImageReference)
+            {
+                auditTrail.Add("ImageReference", string.Format("Old value: {0} new value:{1}", originalMember.ImageReference, member.ImageReference));
+                originalMember.ImageReference = member.ImageReference;
+                isChanged = true;
+            }
+            if (member.Mobile != originalMember.Mobile)
+            {
+                auditTrail.Add("Mobile", string.Format("Old value: {0} new value:{1}", originalMember.Mobile, member.Mobile));
+                originalMember.Mobile = member.Mobile;
+                isChanged = true;
+            }
+            if (member.Nickname != originalMember.Nickname)
+            {
+                auditTrail.Add("Nickname", string.Format("Old value: {0} new value:{1}", originalMember.Nickname, member.Nickname));
+                originalMember.Nickname = member.Nickname;
+                isChanged = true;
+            }
+            if (member.School != originalMember.School)
+            {
+                auditTrail.Add("School", string.Format("Old value: {0} new value:{1}", originalMember.School, member.School));
+                originalMember.School = member.School;
+                isChanged = true;
+            }
+            if (member.Work != originalMember.Work)
+            {
+                auditTrail.Add("Work", string.Format("Old value: {0} new value:{1}", originalMember.Work, member.Work));
+                originalMember.Work = member.Work;
+                isChanged = true;
+            }
+            if (member.Notes != originalMember.Notes)
+            {
+                auditTrail.Add("Notes", string.Format("Old value: {0} new value:{1}", originalMember.Notes, member.Notes));
+                originalMember.Notes = member.Notes;
+                isChanged = true;
+            }
+            if (isChanged)
+            {
+                originalMember.ModifiedBy = servant.ServantID;
+                originalMember.ModifiedAt = CurrentTime;
+                originalMember.ModifiedLog = JsonSerializer.Serialize(auditTrail);
+                _dbcontext.SaveChanges();
             }
         }
+
+        public string CreateMember(Member member, string modifiedByUserName)
+        {
+            Servant servant = GetServantByUsername(modifiedByUserName);
+            int sequence = 0;
+            Member newMember = new Member();
+            newMember.Gender = member.Gender;
+            newMember.UNFirstName = member.UNFirstName;
+            newMember.UNLastName = member.UNLastName;
+            newMember.UNFileNumber = member.UNFileNumber;
+            newMember.UNPersonalNumber = member.UNPersonalNumber;
+            newMember.Birthdate = member.Birthdate;
+            newMember.Baptised = member.Baptised;
+            newMember.ImageReference = member.ImageReference;
+            newMember.Mobile = member.Mobile;
+            newMember.Nickname = member.Nickname;
+            newMember.School = member.School;
+            newMember.Work = member.Work;
+            newMember.Notes = member.Notes;
+            newMember.CreatedBy = servant.ServantID;
+            newMember.CreatedAt = CurrentTime;
+            newMember.Code = GenerateCode(member.Gender, member.Birthdate, out sequence);
+            newMember.Sequence = sequence;
+            newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
+            newMember.IsActive = true;
+            newMember.IsMainMember = newMember.Age >= 20;
+            newMember.ModifiedLog = "Member created.";
+
+            _dbcontext.Members.Add(newMember);
+            _dbcontext.SaveChanges();
+            return newMember.Code;
+        }
+
+
         public List<Member> GetMembersByCardStatus(CardStatus status)
         {
-            return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).OrderByDescending(m => m.LastModifiedDate).ToList();
+            return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).OrderByDescending(m => m.ModifiedAt).ToList();
         }
         public List<Member> GetMembers(string memberCode, string firstName, string lastName)
         {
             List<Member> members = new List<Member>();
             if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
             {
-                var member = _dbcontext.Members.Include(m => m.ClassMembers).
+                memberCode = memberCode.Trim();
+                var member = _dbcontext.Members.
                     FirstOrDefault(m => m.Code.Contains(memberCode) ||
                     m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode);
 
@@ -88,9 +216,10 @@ namespace SM.BAL
 
         }
 
-        public string GenerateCode(string gender, DateTime birthdate)
+        public string GenerateCode(char gender, DateTime birthdate, out int sequence)
         {
             int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
+            sequence = seq;
             return string.Format("{0}{1}-{2}", birthdate.ToString("yy"), gender, seq.ToString("0000"));
         }
         public bool ValidateUNNumber(string unPersonalNo)
@@ -106,7 +235,7 @@ namespace SM.BAL
                 return false;
             }
             member.CardStatus = cardStatus.ToString();
-            member.LastModifiedDate = CurrentTime;
+            member.ModifiedAt = CurrentTime;
             _dbcontext.SaveChanges();
             return true;
         }

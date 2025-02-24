@@ -12,7 +12,7 @@ namespace SM.DAL.DataModel
     {
         public int MemberID { get; set; }
         [MaxLength(10)]
-        public string Code { get; set; } = string.Empty;
+        public string Code { get; set; }
         [Required]
         [Display(Name = "First name")]
         [MaxLength(50)]
@@ -23,7 +23,7 @@ namespace SM.DAL.DataModel
         public string? UNLastName { get; set; }
         public string? Nickname { get; set; }
         [Display(Name = "UN File Number")]
-        public string? UNFileNumber { get; set; }
+        public string UNFileNumber { get; set; }
         [Display(Name = "UN Number")]
         [MaxLength(50)]
         [Required]
@@ -43,11 +43,14 @@ namespace SM.DAL.DataModel
         [MaxLength(20)]
         public string? CardStatus { get; set; }
         public string? Notes { get; set; }
+        public string? ImageURL { get; set; } = null;
         public int Sequence { get; set; } = 0;
         [Display(Name = "Last Modified")]
-        public DateTime? LastModifiedDate { get; set; }
-
-
+        public DateTime? ModifiedAt { get; set; } = null;
+        public int? ModifiedBy { get; set; } = null;
+        public DateTime? CreatedAt { get; set; } = null;
+        public int? CreatedBy { get; set; } = null;
+        public string? ModifiedLog { get; set; } = null;
         [JsonIgnore]
         public int Age
         {

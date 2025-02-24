@@ -12,7 +12,7 @@
         <span class="badge bg-success px-3 py-2 fs-6">Registered @Model.RegisteredCount</span>
     </div>
 
-    <form method="get">
+    <form method="get" id="filterForm">
         <div class="mb-3 d-flex align-items-center">
             <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
             <div class="form-floating flex-grow-1">
@@ -62,10 +62,10 @@
                         {
                             <tr>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Code)
+                                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
                                 </td>
                                 <td>
-                                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.FullName)</a>
+                                    @Html.DisplayFor(modelItem => item.FullName)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.UNFileNumber)
@@ -93,9 +93,9 @@
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID">@Html.DisplayFor(modelItem => item.FullName)</a>
+                        @Html.DisplayFor(modelItem => item.FullName)
                     </h5>
-                    <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
+                    <p class="text-muted mb-1"><strong>Code:</strong> <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID">@Html.DisplayFor(modelItem => item.Code)</a></p>
                     <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
                     <p class="mb-1"><strong>Baptised:</strong> @Html.DisplayFor(modelItem => item.Baptised)</p>
@@ -255,8 +255,9 @@
                      },
                      (decodedText) => {
                          searchInput.value = decodedText;
-                         html5QrCode.stop();
-                         qrScannerContainer.classList.add("d-none");
+                         document.getElementById('filterForm').submit();
+                         //html5QrCode.stop();
+                         //qrScannerContainer.classList.add("d-none");
                      },
                      (errorMessage) => {
                          console.warn("QR Code scan error: ", errorMessage);

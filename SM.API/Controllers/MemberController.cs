@@ -10,7 +10,7 @@ namespace SM.API.Controllers
     [ApiController]
     [Route("[controller]")]
     //[Authorize]
-    public class MemberController (ILogger<MemberController> logger): SMControllerBase(logger)
+    public class MemberController(ILogger<MemberController> logger) : SMControllerBase(logger)
     {
 
 
@@ -117,14 +117,33 @@ namespace SM.API.Controllers
             }
         }
         [HttpPost("UpdateMember")]
-        public ActionResult<string> UpdateMember(Member member)
+        public ActionResult<string> UpdateMember([FromBody] Member member)
         {
             try
             {
                 using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
                 {
-                    eventHandler.UpdateMember(member);
+                    ValidateServant();
+                    eventHandler.UpdateMember(member, User.Identity.Name);
                     return Ok("Member updated");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("CreateMember")]
+        public ActionResult<string> CreateMember([FromBody] Member member)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
+                {
+                    ValidateServant();
+                    string code = eventHandler.CreateMember(member, User.Identity.Name);
+                    return Ok(code);
                 }
 
             }

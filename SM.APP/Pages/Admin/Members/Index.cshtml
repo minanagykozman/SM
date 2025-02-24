@@ -62,9 +62,9 @@
                         @foreach (var item in Model.Member)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(modelItem => item.Code)</td>
+                                <td><a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.Code)</a></td>
                                 <td>
-                                    <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                                    @Html.DisplayFor(modelItem => item.FullName)
                                 </td>
                                 <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
                                 <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
@@ -106,9 +106,13 @@
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.FullName)</a>
+                        @Html.DisplayFor(modelItem => item.FullName)
                     </h5>
-                    <p class="text-muted mb-1"><strong>Code:</strong> @Html.DisplayFor(modelItem => item.Code)</p>
+                    <p class="text-muted mb-1"><strong>Code:</strong>
+                        <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.Code)</a>
+                    </p>
+                    <p class="mb-1"><strong>UN No:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
+                    <p class="mb-1"><strong>UN File No:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
                     <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
                     <p class="mb-1"><strong>Card Status:</strong> @Html.DisplayFor(modelItem => item.CardStatusDisplay)</p>
