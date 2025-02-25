@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using SM.APP.Services;
 using SM.DAL.DataModel;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
-namespace SM.APP.Pages.Attendance
+namespace SM.APP.Pages.Classess
 {
     [Authorize(Roles = "Admin,Servant")]
     public class TakeAttendanceModel : PageModelBase

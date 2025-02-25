@@ -34,26 +34,36 @@
     <div class="d-none d-md-block">
         <div class="table-responsive">
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table table-hover align-middle">
-                    <thead class="table-dark">
+                <table class="table table-hover table-striped  align-middle" id="dataTable">
+                    <thead class="table-primary">
                         <tr>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].Code)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN No">
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].Age)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Age">
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Baptised">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].CardStatus)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Card Status">
                             </th>
                         </tr>
                     </thead>
@@ -79,6 +89,9 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Baptised)
                                 </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CardStatusDisplay)
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -86,22 +99,27 @@
             </div>
         </div>
     </div>
-    <!-- Card Layout for Mobile -->
-    <div class="d-md-none">
-        @foreach (var item in Model.EventMembers)
-        {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        @Html.DisplayFor(modelItem => item.FullName)
+    <!-- Mobile View -->
+    <div class="d-block d-md-none">
+        <div class="card p-2 mb-2 bg-light">
+            <h6 class="text-primary">Filter</h6>
+            <input type="text" class="form-control form-control-sm mobile-filter" placeholder="Search members...">
+        </div>
+
+        <div class="list-group" id="mobileList">
+            @foreach (var item in Model.EventMembers)
+            {
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <h5 class="mb-1 text-primary">
+                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
                     </h5>
-                    <p class="text-muted mb-1"><strong>Code:</strong> <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID">@Html.DisplayFor(modelItem => item.Code)</a></p>
-                    <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
+                    <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
-                    <p class="mb-1"><strong>Baptised:</strong> @Html.DisplayFor(modelItem => item.Baptised)</p>
+                    <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
+                    <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>
 <form method="post" id="registerForm">
@@ -113,7 +131,6 @@
                     <h5 class="modal-title" id="myModalLabel">Member Status</h5>
                     <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <!-- Modal Body -->
                 <div class="modal-body">
                     <!-- Status -->

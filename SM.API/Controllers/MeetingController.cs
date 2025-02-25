@@ -53,6 +53,27 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetClassMembers")]
+        public ActionResult<List<Member>> GetClassMembers(int classID)
+        {
+            try
+            {
+                if (classID <= 0)
+                {
+                    return BadRequest("Invalid class ID");
+                }
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    List<Member> classes = meetingHandler.GetClassMembers(classID);
+                    return Ok(classes);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpGet("GetAttendedMembers")]
         public ActionResult<List<Member>> GetAttendedMembers(int occurenceID)
         {

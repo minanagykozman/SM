@@ -163,7 +163,10 @@ namespace SM.BAL
             newMember.CreatedAt = CurrentTime;
             newMember.Code = GenerateCode(member.Gender, member.Birthdate, out sequence);
             newMember.Sequence = sequence;
-            newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
+            if ((CurrentTime.Year - newMember.Birthdate.Year) <= 5)
+                newMember.CardStatus = "NotApplicable";
+            else
+                newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
             newMember.IsActive = true;
             newMember.IsMainMember = newMember.Age >= 20;
             newMember.ModifiedLog = "Member created.";

@@ -39,10 +39,11 @@ namespace SM.BAL
         }
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
         {
+            memberCode = memberCode.Trim();
             Event? ev = _dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
             Member? lmember = _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code.Contains(memberCode) 
-                || m.UNPersonalNumber == memberCode 
+                FirstOrDefault(m => m.Code.Contains(memberCode)
+                || m.UNPersonalNumber == memberCode
                 || (m.UNFileNumber == memberCode && m.IsMainMember));
             if (lmember == null)
             {

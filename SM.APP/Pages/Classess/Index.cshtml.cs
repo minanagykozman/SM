@@ -7,7 +7,7 @@ using SM.DAL.DataModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace SM.APP.Pages.Attendance
+namespace SM.APP.Pages.Classess
 {
     [Authorize(Roles = "Admin,Servant")]
     public class IndexModel : PageModelBase

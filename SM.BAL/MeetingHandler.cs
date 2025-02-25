@@ -8,10 +8,10 @@ namespace SM.BAL
 {
     public class MeetingHandler : HandlerBase
     {
-        
+
         public List<Class> GetServantClasses(string username)
         {
-            var servant =GetServantByUsername(username);
+            var servant = GetServantByUsername(username);
             return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servant.ServantID)).ToList();
         }
         public List<ClassOccurrence> GetClassOccurences(int classID)
@@ -21,6 +21,10 @@ namespace SM.BAL
         public List<Member> GetAttendedMembers(int occurrenceID)
         {
             return _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == occurrenceID).OrderByDescending(c => c.TimeStamp).Select(c => c.Member).ToList();
+        }
+        public List<Member> GetClassMembers(int classID)
+        {
+            return _dbcontext.ClassMembers.Where(c => c.ClassID == classID).Select(c => c.Member).ToList();
         }
         public Class CreateClass(string className, int meetingID)
         {
@@ -42,9 +46,9 @@ namespace SM.BAL
                 return null;
             }
         }
-        public string  CreateClassOccurences(int classID)
+        public string CreateClassOccurences(int classID)
         {
-            Class? cl = _dbcontext.Classes.Include(c=>c.Meeting).FirstOrDefault(c => c.ClassID == classID);
+            Class? cl = _dbcontext.Classes.Include(c => c.Meeting).FirstOrDefault(c => c.ClassID == classID);
             if (cl == null)
             {
                 throw new ArgumentException("Class not found");
@@ -201,9 +205,9 @@ namespace SM.BAL
         }
         public AttendanceStatus CheckAteendance(int classOccuranceID, string memberCode, out Member member)
         {
-            
+            memberCode = memberCode.Trim();
             member = _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+                FirstOrDefault(m => m.Code.Contains(memberCode) || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
             if (member == null)
                 return AttendanceStatus.MemberNotFound;
             if (member.ClassMembers == null || member.ClassMembers.Count() == 0)
@@ -221,5 +225,5 @@ namespace SM.BAL
 
         }
     }
-    
+
 }

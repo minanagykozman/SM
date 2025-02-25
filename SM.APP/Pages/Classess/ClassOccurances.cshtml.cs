@@ -6,7 +6,7 @@ using SM.DAL.DataModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace SM.APP.Pages.Attendance
+namespace SM.APP.Pages.Classess
 {
     public class ClassOccurancesModel : PageModelBase
     {
