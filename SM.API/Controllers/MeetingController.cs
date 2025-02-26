@@ -54,7 +54,7 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("GetClassMembers")]
-        public ActionResult<List<Member>> GetClassMembers(int classID)
+        public ActionResult<List<ClassMemberExtended>> GetClassMembers(int classID)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace SM.API.Controllers
                 }
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    List<Member> classes = meetingHandler.GetClassMembers(classID);
+                    List<ClassMemberExtended> classes = meetingHandler.GetClassMembers(classID);
                     return Ok(classes);
                 }
 
@@ -123,6 +123,23 @@ namespace SM.API.Controllers
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
                     var cl = meetingHandler.CreateClass(className, meetingID);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("AutoAssignClassMembers")]
+        public ActionResult<string> AutoAssignClassMembers(int classID)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    var cl = meetingHandler.AutoAssignClassMembers(classID);
                     return Ok(cl);
                 }
 

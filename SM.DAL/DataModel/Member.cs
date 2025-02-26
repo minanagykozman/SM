@@ -69,6 +69,7 @@ namespace SM.DAL.DataModel
             }
         }
         [JsonIgnore]
+        [Display(Name = "Full Name")]
         public string FullName
         {
             get

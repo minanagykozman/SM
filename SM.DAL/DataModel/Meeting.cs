@@ -21,6 +21,7 @@ namespace SM.DAL.DataModel
         [Display(Name = "Age Group To")]
         [DataType(DataType.Date)]
         public DateTime AgeEndDate { get; set; }
+        public char Gender { get; set; }= 'A';
         [DataType(DataType.Date)]
         public DateTime? MeetingStartDate { get; set; }
         [DataType(DataType.Date)]

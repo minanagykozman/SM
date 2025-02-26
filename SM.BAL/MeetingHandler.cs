@@ -22,9 +22,24 @@ namespace SM.BAL
         {
             return _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == occurrenceID).OrderByDescending(c => c.TimeStamp).Select(c => c.Member).ToList();
         }
-        public List<Member> GetClassMembers(int classID)
+        public List<ClassMemberExtended> GetClassMembers(int classID)
         {
-            return _dbcontext.ClassMembers.Where(c => c.ClassID == classID).Select(c => c.Member).ToList();
+            int meetingsCount = _dbcontext.ClassOccurrences.Count(c => c.ClassID == classID && c.ClassOccurrenceStartDate <= CurrentTime);
+            List<ClassAttendance> attendance = _dbcontext.ClassAttendances.Include(c => c.ClassOccurrence).Where(c => c.ClassOccurrence.ClassID == classID && c.ClassOccurrence.ClassOccurrenceStartDate <= CurrentTime).ToList();
+            List<ClassMemberExtended> membersExtended = new List<ClassMemberExtended>();
+            var members = _dbcontext.ClassMembers.Where(c => c.ClassID == classID).Select(c => c.Member).ToList();
+            foreach (var member in members)
+            {
+                ClassMemberExtended exMember = new ClassMemberExtended(member);
+                var memberAttendance = attendance.Where(c => c.MemberID == exMember.MemberID).ToList();
+                if (memberAttendance != null && memberAttendance.Count > 0)
+                {
+                    exMember.LastPresentDate = memberAttendance.Max(c => c.ClassOccurrence.ClassOccurrenceStartDate);
+                    exMember.Attendance = string.Format("{0}/{1}", memberAttendance.Count.ToString("00"), meetingsCount);
+                }
+                membersExtended.Add(exMember);
+            }
+            return membersExtended;
         }
         public Class CreateClass(string className, int meetingID)
         {
@@ -223,6 +238,28 @@ namespace SM.BAL
 
             return AttendanceStatus.Ready;
 
+        }
+        public string AutoAssignClassMembers(int classID)
+        {
+            Class cl = _dbcontext.Classes.Include(c => c.Meeting).FirstOrDefault(c => c.ClassID == classID);
+            if (cl == null)
+                throw new Exception("Class not found");
+            List<int> members = _dbcontext.Members.Where(m => m.Birthdate <= cl.Meeting.AgeEndDate
+            && m.Birthdate >= cl.Meeting.AgeStartDate
+            && (cl.Meeting.Gender == 'A' || m.Gender == cl.Meeting.Gender)).Select(m => m.MemberID).ToList();
+            int counter = 0;
+            if (members != null)
+            {
+                foreach (int memberID in members)
+                {
+                    if (_dbcontext.ClassMembers.Any(cm => cm.ClassID == classID && cm.MemberID == memberID))
+                        continue;
+                    counter++;
+                    _dbcontext.ClassMembers.Add(new ClassMember { MemberID = memberID, ClassID = classID });
+                }
+                _dbcontext.SaveChanges();
+            }
+            return counter.ToString();
         }
     }
 

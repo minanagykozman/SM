@@ -11,7 +11,7 @@ namespace SM.APP.Pages.Classess
     public class ClassMembersModel(UserManager<IdentityUser> userManager, ILogger<ClassMembersModel> logger) : PageModelBase(userManager, logger)
     {
         [BindProperty(SupportsGet = true)]
-        public List<Member> ClassMembers { get; set; } = new List<Member>();
+        public List<ClassMemberExtended> ClassMembers { get; set; } = new List<ClassMemberExtended>();
         public async Task<IActionResult> OnGetAsync(int? classID)
         {
             try
@@ -33,9 +33,9 @@ namespace SM.APP.Pages.Classess
                     {
                         PropertyNameCaseInsensitive = true // Enable case insensitivity
                     };
-                    ClassMembers = JsonSerializer.Deserialize<List<Member>>(responseData, options);
+                    ClassMembers = JsonSerializer.Deserialize<List<ClassMemberExtended>>(responseData, options);
                     if (ClassMembers == null)
-                        ClassMembers = new List<Member>();
+                        ClassMembers = new List<ClassMemberExtended>();
                 }
                 return Page();
             }

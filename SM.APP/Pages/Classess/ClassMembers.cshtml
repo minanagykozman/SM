@@ -36,6 +36,16 @@
                         @Html.DisplayNameFor(model => model.ClassMembers[0].UNPersonalNumber)
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
                     </th>
+                    <th onclick="sortTable(5,this)">
+                        @Html.DisplayNameFor(model => model.ClassMembers[0].Attendance)
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
+                    </th>
+                    <th onclick="sortTable(6,this)">
+                        @Html.DisplayNameFor(model => model.ClassMembers[0].LastPresentDate)
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -52,6 +62,8 @@
                         <td>@Html.DisplayFor(modelItem => item.Age)</td>
                         <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
                         <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Attendance)</td>
+                        <td>@Html.DisplayFor(modelItem => item.LastPresentDate)</td>
                     </tr>
                 }
             </tbody>
@@ -77,6 +89,8 @@
                 <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
                 <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
                 <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
+                <p class="mb-1"><strong>Attendance:</strong> @Html.DisplayFor(modelItem => item.Attendance)</p>
+                <p class="mb-1"><strong>Last Present Date:</strong> @Html.DisplayFor(modelItem => item.LastPresentDate)</p>
             </div>
         }
     </div>
