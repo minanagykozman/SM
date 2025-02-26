@@ -4,32 +4,37 @@
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", function () {
     // Desktop Table Filtering
-    document.querySelectorAll(".filter-input").forEach(input => {
-        input.addEventListener("keyup", function () {
-            let colIndex = input.getAttribute("data-column");
-            let searchTerm = input.value.toLowerCase();
-            let rows = document.querySelectorAll("#dataTable tbody tr");
+    let filter = document.querySelectorAll(".filter-input");
+    if (filter) {
+        document.querySelectorAll(".filter-input").forEach(input => {
+            input.addEventListener("keyup", function () {
+                let colIndex = input.getAttribute("data-column");
+                let searchTerm = input.value.toLowerCase();
+                let rows = document.querySelectorAll("#dataTable tbody tr");
 
-            rows.forEach(row => {
-                let cell = row.cells[colIndex];
-                if (cell) {
-                    let text = cell.innerText.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? "" : "none";
-                }
+                rows.forEach(row => {
+                    let cell = row.cells[colIndex];
+                    if (cell) {
+                        let text = cell.innerText.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? "" : "none";
+                    }
+                });
             });
         });
-    });
-
+    }
     // Mobile List Filtering
-    document.querySelector(".mobile-filter").addEventListener("keyup", function () {
-        let searchTerm = this.value.toLowerCase();
-        let items = document.querySelectorAll("#mobileList .list-group-item");
+    let mobileFilter = document.querySelector(".mobile-filter");
+    if (mobileFilter) {
+        document.querySelector(".mobile-filter").addEventListener("keyup", function () {
+            let searchTerm = this.value.toLowerCase();
+            let items = document.querySelectorAll("#mobileList .list-group-item");
 
-        items.forEach(item => {
-            let text = item.innerText.toLowerCase();
-            item.style.display = text.includes(searchTerm) ? "" : "none";
+            items.forEach(item => {
+                let text = item.innerText.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? "" : "none";
+            });
         });
-    });
+    }
 });
 
 // Function to Sort Table Columns

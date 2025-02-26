@@ -70,8 +70,8 @@
             .HasIndex(m => m.Code).IsUnique();
             modelBuilder.Entity<Member>()
             .HasIndex(m => m.UNPersonalNumber).IsUnique();
-            //modelBuilder.Entity<Member>()
-            //.HasIndex(m => m.Sequence).IsUnique();
+            modelBuilder.Entity<Member>()
+            .HasIndex(m => m.Sequence).IsUnique();
 
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });

@@ -139,7 +139,7 @@
         let inputField = document.getElementById("UNPersonalNumber");
         let personalNumber = inputField.value.trim();
         let errorSpan = document.getElementById("UNPersonalNumberError");
-
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
         if (!personalNumber) {
             errorSpan.textContent = "Personal number is required.";
             return false;
