@@ -140,6 +140,7 @@
     </div>
 </div>
 <script>
+    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
         document.getElementById("SearchString").addEventListener("keypress", function (event) {
         if (event.key === "Enter") {  // Check if Enter key is pressed
             event.preventDefault();  // Prevent form submission if inside a form
@@ -221,7 +222,7 @@
 
     // Function to fetch attended members
     async function fetchEventAttendedMembers() {
-        const API_URL = "https://localhost:7247/Events/GetEventAttendedMembers"; // Replace with your actual API URL
+        const url = `${apiBaseUrl}/Events/GetEventAttendedMembers`;
 
         const eventID = document.querySelector('input[name="eventID"]').value;
         if (!eventID) {
@@ -231,7 +232,7 @@
         }
 
         try {
-            const response = await fetch(`${API_URL}?eventID=${eventID}`, {
+            const response = await fetch(`${url}?eventID=${eventID}`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -349,7 +350,8 @@
 
 
         const eventID = document.querySelector('input[name="eventID"]').value;
-        const apiUrl = `https://localhost:7247/Events/CheckAttendanceStatus?memberCode=${encodeURIComponent(searchValue)}&eventID=${eventID}`;
+        
+        const apiUrl = `${apiBaseUrl}/Events/CheckAttendanceStatus?memberCode=${encodeURIComponent(searchValue)}&eventID=${eventID}`;
             fetch(apiUrl, {
             method: "GET",
             credentials: "include",
@@ -421,7 +423,8 @@
 
         const eventID = document.querySelector('input[name="eventID"]').value; // Get eventID from hidden input
         const memberCode = document.querySelector('input[name="MemberCode"]').value;
-        const apiUrl = `https://localhost:7247/Events/TakeAttendance?memberCode=${encodeURIComponent(memberCode)}&eventID=${eventID}`;
+        
+        const apiUrl = `${apiBaseUrl}/Events/TakeAttendance?memberCode=${encodeURIComponent(memberCode)}&eventID=${eventID}`;
 
 
         fetch(apiUrl, {
