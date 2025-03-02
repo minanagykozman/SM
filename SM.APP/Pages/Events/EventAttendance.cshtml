@@ -200,8 +200,8 @@
                          searchInput.value = decodedText;
                          document.getElementById('btnCheck').click();
 
-                         //html5QrCode.stop();
-                         //qrScannerContainer.classList.add("d-none");
+                         html5QrCode.stop();
+                         qrScannerContainer.classList.add("d-none");
                      },
                      (errorMessage) => {
                          console.warn("QR Code scan error: ", errorMessage);
