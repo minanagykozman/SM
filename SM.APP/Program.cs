@@ -65,7 +65,7 @@ internal class Program
             options.AddPolicy("AllowAppAndApi",
                 policy =>
                 {
-                    policy.WithOrigins(issuer, audience)
+                    policy.WithOrigins(issuer)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
