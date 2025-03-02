@@ -135,7 +135,9 @@ namespace SM.APP.Areas.Identity.Pages.Account
                         HttpOnly = true, // Prevent JavaScript access
                         Secure = true, // Use only in HTTPS
                         SameSite = SameSiteMode.None,
-                        Expires = expirationTime
+                        Expires = expirationTime,
+                        Domain = ".stmosesservices.com",  // Use this if frontend and backend are on subdomains
+                        Path = "/"
                     });
 
                     return LocalRedirect(returnUrl);
