@@ -111,20 +111,31 @@ namespace SM.APP.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                //var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByNameAsync(Input.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+                var result = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    var user = await _userManager.FindByNameAsync(Input.Email);
+                    //var user = await _userManager.FindByNameAsync(Input.Email);
+                    var expirationTime = DateTime.UtcNow.AddMinutes(300);
                     var roles = await _userManager.GetRolesAsync(user);
-                    var token = AuthenticatorService.GenerateToken(user, roles);
+                    var token = AuthenticatorService.GenerateToken(user, roles, expirationTime);
+
+                    var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+                    await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, claimsPrincipal.Claims);
 
                     Response.Cookies.Append("AuthToken", token, new CookieOptions
                     {
                         HttpOnly = true, // Prevent JavaScript access
                         Secure = true, // Use only in HTTPS
                         SameSite = SameSiteMode.None,
-                        Expires = DateTime.UtcNow.AddMinutes(60)
+                        Expires = expirationTime
                     });
 
                     return LocalRedirect(returnUrl);

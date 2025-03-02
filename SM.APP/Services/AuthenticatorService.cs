@@ -8,7 +8,7 @@ namespace SM.APP.Services
 {
     public class AuthenticatorService
     {
-        public static string GenerateToken(IdentityUser user, IList<string> roles)
+        public static string GenerateToken(IdentityUser user, IList<string> roles,DateTime expirationTime)
         {
             var key = Encoding.UTF8.GetBytes(SMConfigurationManager.JWTSecret);
             var claims = new List<Claim>
@@ -25,7 +25,7 @@ namespace SM.APP.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = expirationTime,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
                 Issuer = SMConfigurationManager.JWTIssuer,
                 Audience = SMConfigurationManager.JWTAudience

@@ -20,7 +20,8 @@ namespace SM.APP.Pages.Admin.Authenticator
         {
             var user = await _userManager.GetUserAsync(User);
             var roles = await _userManager.GetRolesAsync(user);
-            Token = AuthenticatorService.GenerateToken(user, roles);
+            var expirationTime = DateTime.UtcNow.AddMinutes(300);
+            Token = AuthenticatorService.GenerateToken(user, roles,expirationTime);
         }
     }
 }

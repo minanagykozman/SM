@@ -51,6 +51,25 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("CheckAttendanceStatus")]
+        public ActionResult<RegistrationStatusResponse> CheckAttendanceStatus(string memberCode, int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    Member member;
+                    RegistrationStatus status = eventHandler.CheckEventAttendance(eventID, memberCode, out member);
+                    RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status };
+                    return Ok(response);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
 
         [HttpGet("GetEventRegisteredMembers")]
         public ActionResult<List<Member>> GetEventRegisteredMembers(int eventID)
@@ -60,6 +79,23 @@ namespace SM.API.Controllers
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     var members = eventHandler.GetEventRegisteredMembers(eventID);
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpGet("GetEventAttendedMembers")]
+        public ActionResult<List<Member>> GetEventAttendedMembers(int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var members = eventHandler.GetEventAttendedMembers(eventID);
                     return Ok(members);
                 }
 
@@ -95,8 +131,26 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    //ValidateServant();
+                    ValidateServant();
                     var status = eventHandler.Register(memberCode, eventID, User.Identity.Name, isException, notes);
+                    return Ok(status);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("TakeAttendance")]
+        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    var status = eventHandler.TakeEventAttendance(eventID,memberCode, User.Identity.Name);
                     return Ok(status);
                 }
 

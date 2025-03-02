@@ -68,8 +68,35 @@ namespace SM.BAL
                 return RegistrationStatus.MemberNotEligible;
             return RegistrationStatus.ReadyToRegister;
         }
-        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode, int servantID)
+        public RegistrationStatus CheckEventAttendance(int eventID, string memberCode,out Member member)
         {
+            memberCode = memberCode.Trim();
+            var lmember = _dbcontext.Members.Include(m => m.ClassMembers).
+                FirstOrDefault(m => m.Code.Contains( memberCode) || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+            member = lmember;
+            if (member == null)
+            {
+                return RegistrationStatus.MemeberNotFound;
+            }
+            var ev = _dbcontext.Events.FirstOrDefault(e => e.EventID == eventID);
+            if (ev == null)
+            {
+                return RegistrationStatus.EventNotFound;
+            }
+            var eventRegistration = _dbcontext.EventRegistrations.FirstOrDefault(e => e.EventID == eventID && e.MemberID == lmember.MemberID);
+            if (eventRegistration == null)
+            {
+                return RegistrationStatus.MemberNotRegistered;
+            }
+            if (eventRegistration.Attended.HasValue && eventRegistration.Attended == true)
+            {
+                return RegistrationStatus.MemberAlreadyAttended;
+            }
+            return RegistrationStatus.Ok;
+        }
+        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode, string userName)
+        {
+            var servant = GetServantByUsername(userName);
             var member = _dbcontext.Members.Include(m => m.ClassMembers).
                 FirstOrDefault(m => m.Code == memberCode || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
             if (member == null)
@@ -86,8 +113,12 @@ namespace SM.BAL
             {
                 return RegistrationStatus.MemberNotRegistered;
             }
+            if (eventRegistration.Attended.HasValue && eventRegistration.Attended == true)
+            {
+                return RegistrationStatus.MemberAlreadyAttended;
+            }
             eventRegistration.Attended = true;
-            eventRegistration.AttendanceServantID = servantID;
+            eventRegistration.AttendanceServantID = servant.ServantID;
             eventRegistration.AttendanceTimeStamp = CurrentTime;
             _dbcontext.SaveChanges();
 
@@ -111,6 +142,11 @@ namespace SM.BAL
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
             List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID).OrderByDescending(ev => ev.TimeStamp).Select(er => er.Member).ToList<Member>();
+            return members;
+        }
+        public List<Member> GetEventAttendedMembers(int eventID)
+        {
+            List<Member> members = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID && er.Attended == true).OrderByDescending(ev => ev.AttendanceTimeStamp).Select(er => er.Member).ToList<Member>();
             return members;
         }
         public List<MemberEventView> GetEventMembers(int eventID, bool? registered, bool? attended)
@@ -147,12 +183,6 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return RegistrationStatus.Ok;
 
-        }
-
-        public void Dispose()
-        {
-            if (_dbcontext != null)
-                _dbcontext.Dispose();
         }
     }
 }

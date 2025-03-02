@@ -78,4 +78,11 @@
     <PackageReference Include="Serilog.Sinks.MySql" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\Events\EventAttendance.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

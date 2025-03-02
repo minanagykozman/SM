@@ -1,0 +1,472 @@
+﻿@page
+@model SM.APP.Pages.Events.EventAttendanceModel
+@{
+    ViewData["Title"] = "Event Attendance";
+}
+@using SM.APP.Pages.Events;
+@using SM.DAL.DataModel;
+<div class="container my-4">
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Register Event</h4>
+        <span id="counter" class="badge bg-success px-3 py-2 fs-6">Attended: 0</span>
+    </div>
+
+    <div class="mb-3 d-flex align-items-center">
+        <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+        <div class="form-floating flex-grow-1">
+            <input class="form-control" id="SearchString" placeholder="Enter Code" />
+            <label>Code</label>
+        </div>
+        <!-- Scan QR Code Button (only visible on mobile) -->
+        <button type="button" id="btnScanQR" class="btn btn-secondary ms-2 d-md-none">Scan QR</button>
+
+        <button id="btnCheck" class="btn btn-primary ms-2">Check</button>
+    </div>
+    <div id="qrScannerContainer" class="mt-3 d-none">
+        <div id="reader" style="width: 100%;"></div>
+        <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+    </div>
+
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="myModalLabel">Member Status</h5>
+                    <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <input type="hidden" name="MemberCode" value="" />
+                    <!-- Status -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="MemberStatus" value="" readonly />
+                        <label for="MemberStatus">Status</label>
+                    </div>
+                    <div class="row g-3" id="MemberDataBody">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberCode" value="" readonly>
+                                <label for="MemberName">Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberName" value="" readonly>
+                                <label for="MemberName">Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberAge" value="" readonly>
+                                <label for="MemberAge">Age</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="CardStatus" value="" readonly>
+                                <label for="CardStatus">Card Status</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" id="submitBtn" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Present
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table for Larger Screens -->
+    <div class="d-none d-md-block">
+        <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover table-striped  align-middle" id="dataTable">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Code)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN No">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Age)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Age">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Baptised">
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.EventMembers[0].CardStatus)
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Card Status">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile View -->
+    <div class="d-block d-md-none">
+        <div class="card p-2 mb-2 bg-light">
+            <h6 class="text-primary">Filter</h6>
+            <input type="text" class="form-control form-control-sm mobile-filter" placeholder="Search members...">
+        </div>
+
+        <div class="list-group" id="mobileList">
+        </div>
+    </div>
+</div>
+<script>
+        document.getElementById("SearchString").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {  // Check if Enter key is pressed
+            event.preventDefault();  // Prevent form submission if inside a form
+            document.getElementById("btnCheck").click();  // Trigger button click
+        }
+    });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var searchInput = document.getElementById("SearchString");
+        var cancelBtn = document.getElementById("btnCancel");
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function () {
+                searchInput.value = "";
+                searchInput.focus(); // Focus on search input when Cancel is clicked
+            });
+        }
+        var btnClose = document.getElementById("btnClose");
+        if (btnClose) {
+            btnClose.addEventListener('click', function () {
+                searchInput.value = "";
+                searchInput.focus(); // Focus on search input when Cancel is clicked
+            });
+        }
+        // Handle Esc key press to close the modal and clear input
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                searchInput.value = "";
+                searchInput.focus();
+            }
+        });
+
+        if (searchInput)
+        {
+            searchInput.focus();
+        }
+        fetchEventAttendedMembers();
+
+        const scanButton = document.getElementById("btnScanQR");
+         const qrScannerContainer = document.getElementById("qrScannerContainer");
+         const stopScanButton = document.getElementById("btnStopScan");
+
+         let html5QrCode;
+
+         // Show QR scanner on mobile only
+         if (window.innerWidth <= 768) {
+             scanButton.addEventListener("click", function () {
+                 qrScannerContainer.classList.remove("d-none");
+
+                 html5QrCode = new Html5Qrcode("reader");
+                 html5QrCode.start(
+                     { facingMode: "environment" }, // Use back camera
+                     {
+                         fps: 10,
+                         qrbox: { width: 250, height: 250 }
+                     },
+                     (decodedText) => {
+                         searchInput.value = decodedText;
+                         document.getElementById('btnCheck').click();
+
+                         //html5QrCode.stop();
+                         //qrScannerContainer.classList.add("d-none");
+                     },
+                     (errorMessage) => {
+                         console.warn("QR Code scan error: ", errorMessage);
+                     }
+                 ).catch((err) => {
+                     console.error("QR Code scanning failed: ", err);
+                 });
+             });
+                  // Stop scanning
+             stopScanButton.addEventListener("click", function () {
+                 if (html5QrCode) {
+                     html5QrCode.stop();
+                 }
+                 qrScannerContainer.classList.add("d-none");
+             });
+         }
+    });
+
+    // Function to fetch attended members
+    async function fetchEventAttendedMembers() {
+        const API_URL = "https://localhost:7247/Events/GetEventAttendedMembers"; // Replace with your actual API URL
+
+        const eventID = document.querySelector('input[name="eventID"]').value;
+        if (!eventID) {
+            console.error("Event ID is missing");
+            showErrorMessage("Event ID is missing. Cannot fetch data.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}?eventID=${eventID}`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                handleHTTPError(response);
+                return;
+            }
+
+            const members = await response.json();
+
+            if (!Array.isArray(members) || members.length === 0) {
+                showErrorMessage("No members found for this event.");
+                return;
+            }
+
+            document.getElementById("counter").textContent = `Attended: ${members.length}`;
+            populateTable(members);
+        } catch (error) {
+            console.error("Network error:", error);
+            showErrorMessage("Failed to fetch data. Please try again later.");
+        }
+    }
+
+
+    function populateTable(members) {
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        const mobileList = document.getElementById("mobileList");
+        mobileList.innerHTML = ""; // Clear existing list items
+
+        members.forEach(member => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
+                <td>${member.fullName}</td>
+                <td>${member.unFileNumber}</td>
+                <td>${member.unPersonalNumber}</td>
+                <td>${member.age}</td>
+                <td>
+                <input type="checkbox" class="form-check-input" ${member.baptised ? "checked" : ""} disabled></td>
+                <td>${member.cardStatus}</td>
+            `;
+
+            tableBody.appendChild(row);
+
+            const listItem = document.createElement("div");
+        listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
+
+        listItem.innerHTML = `
+            <h5 class="mb-1 text-primary">
+                <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
+            </h5>
+            <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
+            <p class="mb-1"><strong>Age:</strong> ${member.age}</p>
+            <p class="mb-1"><strong>File Number:</strong> ${member.unFileNumber}</p>
+            <p class="mb-1"><strong>Personal Number:</strong> ${member.unPersonalNumber}</p>
+        `;
+
+        mobileList.appendChild(listItem);
+        });
+    }
+
+    function handleHTTPError(response) {
+        let errorMessage = `Error: ${response.status} ${response.statusText}`;
+
+        switch (response.status) {
+            case 400:
+                errorMessage = "Bad request. Please check the parameters.";
+                break;
+            case 401:
+                errorMessage = "Unauthorized. Please check your authentication token.";
+                break;
+            case 403:
+                errorMessage = "Forbidden. You do not have permission to access this resource.";
+                break;
+            case 404:
+                errorMessage = "Data not found. Please check the event ID.";
+                break;
+            case 500:
+                errorMessage = "Server error. Please try again later.";
+                break;
+        }
+
+        console.error(errorMessage);
+        showErrorMessage(errorMessage);
+    }
+
+    function showErrorMessage(message) {
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = `
+        <tr>
+            <td colspan="7" class="text-center">
+                <div class="alert alert-danger d-flex align-items-center justify-content-center p-2" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icon -->
+                    <span>${message}</span>
+                </div>
+            </td>
+        </tr>
+        `;
+    }
+
+        document.getElementById("btnCheck").addEventListener("click", function () {
+        const searchValue = document.getElementById("SearchString").value.trim();
+
+        if (!searchValue) {
+            alert("Please enter a search value.");
+            return;
+        }
+
+
+        const eventID = document.querySelector('input[name="eventID"]').value;
+        const apiUrl = `https://localhost:7247/Events/CheckAttendanceStatus?memberCode=${encodeURIComponent(searchValue)}&eventID=${eventID}`;
+            fetch(apiUrl, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            populateModal(data); // Function to fill modal with API response
+            showModal(); // Function to display the modal
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            alert("Failed to fetch data. Please try again.");
+        });
+
+    });
+
+    // Function to fill modal with API response
+    function populateModal(data) {
+        switch (data.status) {
+            case 0:
+                document.getElementById("MemberStatus").value = "Member not found";
+                $("#MemberDataBody").hide();
+                $("#submitBtn").hide();
+                break;
+            case 1:
+                document.getElementById("MemberStatus").value = "Event not found";
+                $("#MemberDataBody").hide();
+                $("#submitBtn").hide();
+                break;
+            case 5:
+                document.getElementById("MemberStatus").value = "OK";
+                document.getElementById("MemberCode").value =data.member.code;
+                document.getElementById("MemberName").value =data.member.fullName;
+                document.getElementById("MemberAge").value =data.member.age;
+                document.getElementById("CardStatus").value =data.member.cardStatus;
+                document.querySelector('input[name="MemberCode"]').value = data.member.code;
+                $("#MemberDataBody").show();
+                $("#submitBtn").show();
+                break;
+            case 7:
+                document.getElementById("MemberStatus").value = "Member not registered in this event!";
+                $("#MemberDataBody").show();
+                $("#submitBtn").hide();
+                document.getElementById("MemberName").value =data.member.fullName;
+                document.getElementById("MemberAge").value =data.member.age;
+                document.getElementById("CardStatus").value =data.member.cardStatus;
+                break;
+            case 8:
+                document.getElementById("MemberStatus").value = "Member already attedned!";
+                $("#MemberDataBody").show();
+                $("#submitBtn").hide();
+                document.getElementById("MemberName").value =data.member.fullName;
+                document.getElementById("MemberAge").value =data.member.age;
+                document.getElementById("CardStatus").value =data.member.cardStatus;
+                break;
+        }
+    }
+
+    // Function to show the modal using Bootstrap
+    function showModal() {
+        const modal = new bootstrap.Modal(document.getElementById("myModal"));
+        modal.show();
+    }
+
+        document.getElementById("submitBtn").addEventListener("click", function () {
+
+        const eventID = document.querySelector('input[name="eventID"]').value; // Get eventID from hidden input
+        const memberCode = document.querySelector('input[name="MemberCode"]').value;
+        const apiUrl = `https://localhost:7247/Events/TakeAttendance?memberCode=${encodeURIComponent(memberCode)}&eventID=${eventID}`;
+
+
+        fetch(apiUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({  memberCode: memberCode, eventID: eventID })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Success:", data);
+            fetchEventAttendedMembers();
+            closeModal(); // Close the modal after successful API call
+            var searchInput = document.getElementById("SearchString");
+            searchInput.value = "";
+            searchInput.focus();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to add member. Please try again.");
+        });
+    });
+
+    // Function to close the modal using Bootstrap
+    function closeModal() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("myModal"));
+        if (modal) modal.hide();
+    }
+
+        document.getElementById("myModal").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent default form submission
+
+            const submitBtn = document.getElementById("submitBtn");
+            if (submitBtn && window.getComputedStyle(submitBtn).display !== "none") {
+                submitBtn.click(); // Trigger the submit button click
+            } else {
+                document.getElementById("btnClose").click(); // Close the modal
+            }
+        }
+    });
+
+</script>
+
+
+

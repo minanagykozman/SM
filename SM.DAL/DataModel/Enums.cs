@@ -16,7 +16,8 @@ namespace SM.DAL.DataModel
         ReadyToRegister,
         Ok,
         Error,
-        MemberNotRegistered
+        MemberNotRegistered,
+        MemberAlreadyAttended
     }
     public enum AttendanceStatus
     {

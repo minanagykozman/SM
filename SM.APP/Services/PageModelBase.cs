@@ -21,7 +21,8 @@ namespace SM.APP.Services
             {
                 var user = await _userManager.FindByNameAsync(User.Identity.Name);
                 var roles = await _userManager.GetRolesAsync(user);
-                jwtToken = AuthenticatorService.GenerateToken(user, roles);
+                var expirationTime = DateTime.UtcNow.AddMinutes(300);
+                jwtToken = AuthenticatorService.GenerateToken(user, roles, expirationTime);
             }
             return jwtToken;
         }

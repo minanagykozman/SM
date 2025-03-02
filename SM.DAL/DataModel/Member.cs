@@ -51,7 +51,6 @@ namespace SM.DAL.DataModel
         public DateTime? CreatedAt { get; set; } = null;
         public int? CreatedBy { get; set; } = null;
         public string? ModifiedLog { get; set; } = null;
-        [JsonIgnore]
         public int Age
         {
             get
@@ -68,7 +67,6 @@ namespace SM.DAL.DataModel
                 return age;
             }
         }
-        [JsonIgnore]
         [Display(Name = "Full Name")]
         public string FullName
         {
@@ -77,7 +75,6 @@ namespace SM.DAL.DataModel
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
             }
         }
-        [JsonIgnore]
         public CardStatus? CardStatusDisplay
         {
             get
