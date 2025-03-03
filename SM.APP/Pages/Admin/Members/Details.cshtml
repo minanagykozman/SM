@@ -7,108 +7,176 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>Member</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.UNFirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.UNFirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Code)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Code)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.UNLastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.UNLastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Nickname)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Nickname)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.UNFileNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.UNFileNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.UNPersonalNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.UNPersonalNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Mobile)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Mobile)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Baptised)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Baptised)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Birthdate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Birthdate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Gender)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Gender)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.School)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.School)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Work)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Work)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.IsMainMember)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.IsMainMember)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.IsActive)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.IsActive)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.ImageReference)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.ImageReference)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Member.Notes)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Member.Notes)
-        </dd>
-    </dl>
+<!-- Bootstrap Nav Tabs -->
+<ul class="nav nav-tabs" id="memberTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
+            Member Info
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
+            Attendance
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
+            Events
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
+            Aids
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
+            Funds
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content mt-3" id="memberTabsContent">
+
+    <!-- Member Info Tab -->
+    <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
+        <div class="card shadow-lg p-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.UNPersonalNumber" class="form-control"
+                               id="UNPersonalNumber"
+                               placeholder="Enter Personal Number"
+                               onblur="validateUNPersonalNumber()" />
+                        <label asp-for="Member.UNPersonalNumber"></label>
+                    </div>
+                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" />
+                        <label asp-for="Member.UNFileNumber"></label>
+                    </div>
+                    <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
+                        <label asp-for="Member.UNFirstName"></label>
+                    </div>
+                    <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
+                        <label asp-for="Member.UNLastName"></label>
+                    </div>
+                    <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="Member.Gender" class="form-select">
+                            <option value="">Select Gender</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                        <label asp-for="Member.Gender"></label>
+                    </div>
+                    <span asp-validation-for="Member.Gender" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
+                        <label asp-for="Member.Birthdate"></label>
+                    </div>
+                    <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
+                        <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <label asp-for="Member.Mobile"></label>
+                    </div>
+                    <span asp-validation-for="Member.Mobile" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
+                        <label asp-for="Member.ImageReference"></label>
+                    </div>
+                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
+                        <label asp-for="Member.Nickname"></label>
+                    </div>
+                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
+                        <label asp-for="Member.School"></label>
+                    </div>
+                    <span asp-validation-for="Member.School" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
+                        <label asp-for="Member.Work"></label>
+                    </div>
+                    <span asp-validation-for="Member.Work" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                        <label asp-for="Member.Notes"></label>
+                    </div>
+                    <span asp-validation-for="Member.Notes" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+        <div class="card shadow-lg p-4">
+            <h5 class="mb-3">Attendance Records</h5>
+            <p>Attendance details will be displayed here.</p>
+        </div>
+    </div>
+
+    <!-- Events Tab -->
+    <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+        <div class="card shadow-lg p-4">
+            <h5 class="mb-3">Events Participated</h5>
+            <p>Member's events will be displayed here.</p>
+        </div>
+    </div>
+
+    <!-- Aids Tab -->
+    <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
+        <div class="card shadow-lg p-4">
+            <h5 class="mb-3">Aids Received</h5>
+            <p>Details about any aid received will be shown here.</p>
+        </div>
+    </div>
+
+    <!-- Funds Tab -->
+    <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
+        <div class="card shadow-lg p-4">
+            <h5 class="mb-3">Funds Contributions</h5>
+            <p>Funds contributions by the member will be listed here.</p>
+        </div>
+    </div>
 </div>
+
 <div>
     <a asp-page="./Edit" asp-route-id="@Model.Member.MemberID">Edit</a> |
     <a asp-page="./Index" asp-route-userCode="@Model.Member.Code">Back to List</a>

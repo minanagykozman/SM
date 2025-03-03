@@ -20,7 +20,7 @@ namespace SM.APP.Pages.Admin.Members
         {
             _context = context;
         }
-
+        [BindProperty]
         public Member Member { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
