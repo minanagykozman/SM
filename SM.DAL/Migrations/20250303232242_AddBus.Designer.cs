@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303232242_AddBus")]
+    partial class AddBus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -750,12 +753,6 @@ namespace SM.DAL.Migrations
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Bus")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("CardStatus")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -788,9 +785,6 @@ namespace SM.DAL.Migrations
 
                     b.Property<string>("RegistrationNotes")
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Sequence")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ServantID")
                         .HasColumnType("int");

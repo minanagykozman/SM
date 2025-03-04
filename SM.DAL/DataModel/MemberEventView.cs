@@ -23,6 +23,9 @@ namespace SM.DAL.DataModel
         public string? UNFileNumber { get; set; }
         [Display(Name = "UN Number")]
         public string? UNPersonalNumber { get; set; }
+        [Display(Name = "Card Status")]
+        public string? CardStatus { get; set; }
+        public int Sequence{ get; set; }
         public string? Mobile { get; set; }
         public bool Baptised { get; set; }
         [DataType(DataType.Date)]
@@ -42,6 +45,7 @@ namespace SM.DAL.DataModel
         public int? AttendanceServantID { get; set; }
         public DateTime? AttendanceTimeStamp { get; set; }
         public string? Team { get; set; }
+        public string? Bus { get; set; }
         public int Age
         {
             get

@@ -150,8 +150,25 @@ namespace SM.API.Controllers
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    var status = eventHandler.TakeEventAttendance(eventID,memberCode, User.Identity.Name);
+                    var status = eventHandler.TakeEventAttendance(eventID, memberCode, User.Identity.Name);
                     return Ok(status);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("DistributeMembers")]
+        public ActionResult<string> DistributeMembers([FromBody] DistributionParams param)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    eventHandler.DistributeMembers(param.EventID, param.Teams, param.Busses);
+                    return Ok("status");
                 }
 
             }
@@ -166,6 +183,13 @@ namespace SM.API.Controllers
         {
             public Member Member { get; set; }
             public RegistrationStatus Status { get; set; }
+        }
+
+        public class DistributionParams
+        {
+            public int EventID { get; set; }
+            public List<string> Teams { get; set; }
+            public List<string> Busses { get; set; }
         }
     }
 }

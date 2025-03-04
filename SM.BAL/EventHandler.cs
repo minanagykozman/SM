@@ -68,11 +68,11 @@ namespace SM.BAL
                 return RegistrationStatus.MemberNotEligible;
             return RegistrationStatus.ReadyToRegister;
         }
-        public RegistrationStatus CheckEventAttendance(int eventID, string memberCode,out Member member)
+        public RegistrationStatus CheckEventAttendance(int eventID, string memberCode, out Member member)
         {
             memberCode = memberCode.Trim();
             var lmember = _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code.Contains( memberCode) || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+                FirstOrDefault(m => m.Code.Contains(memberCode) || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
             member = lmember;
             if (member == null)
             {
@@ -183,6 +183,34 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return RegistrationStatus.Ok;
 
+        }
+        public void DistributeMembers(int eventID, List<string> teams, List<string> busses)
+        {
+            List<EventRegistration> registrations = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID).OrderBy(e => e.Member.Birthdate).ToList();
+            int teamCount = registrations.Count / teams.Count;
+            int busCount = registrations.Count / busses.Count;
+            int tempTeam = teamCount;
+            int tempBus = busCount;
+            int teamsCounter = 0;
+            int busCounter = 0;
+            foreach (EventRegistration registration in registrations)
+            {
+                if (tempTeam == 0 && (teamsCounter + 1) < teams.Count)
+                {
+                    teamsCounter++;
+                    tempTeam = teamCount;
+                }
+                if (tempBus == 0 && (busCounter + 1) < busses.Count)
+                {
+                    busCounter++;
+                    tempBus = busCount;
+                }
+                registration.Team = teams[teamsCounter];
+                registration.Bus = busses[busCounter];
+                tempBus--;
+                tempTeam--;
+            }
+            _dbcontext.SaveChanges();
         }
     }
 }

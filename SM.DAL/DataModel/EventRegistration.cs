@@ -10,7 +10,7 @@ namespace SM.DAL.DataModel
     public class EventRegistration
     {
         public int EventID { get; set; }
-        public Event Event { get; set; } = null!;
+        
         public int MemberID { get; set; }
         public int ServantID { get; set; }
         public DateTime TimeStamp { get; set; }
@@ -21,8 +21,11 @@ namespace SM.DAL.DataModel
         public DateTime? AttendanceTimeStamp { get; set; }
         [MaxLength(25)]
         public string? Team { get; set; } = null;
+        [MaxLength(25)]
+        public string? Bus { get; set; } = null;
         public virtual Member Member { get; set; } = null!;
         public virtual Servant Servant { get; set; } = null!;
+        public Event Event { get; set; } = null!;
     }
 
 }

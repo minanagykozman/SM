@@ -13,8 +13,22 @@
                 <div class="card p-3 shadow-sm">
                     <h5 class="card-title">@Html.DisplayFor(modelItem => item.EventName)</h5>
                     <div class="d-flex justify-content-between">
-                        <a asp-page="./RegisterEvent" asp-route-eventID="@item.EventID" class="btn btn-primary">Registration</a>
-                        <a asp-page="./EventAttendance" asp-route-eventID="@item.EventID" class="btn btn-success">Attendance</a>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="classActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="classActionsDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-page="./RegisterEvent" asp-route-eventID="@item.EventID">Registration</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-page="./EventAttendance" asp-route-eventID="@item.EventID">Attendance</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-page="./ListEventMembers" asp-route-eventID="@item.EventID">View Members</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
