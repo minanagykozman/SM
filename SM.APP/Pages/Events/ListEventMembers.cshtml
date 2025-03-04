@@ -120,9 +120,13 @@
                     <p class="mb-1">
                         <strong>Mobile:</strong>
                         @Html.DisplayFor(modelItem => item.Mobile)
-                        <a href="tel:@item.Mobile" class="ms-2">
-                            <i class="fas fa-phone-alt"></i>
-                        </a>
+
+                        @if (!string.IsNullOrEmpty(item.Mobile))
+                        {
+                            <a href="tel:@item.Mobile" class="ms-2">
+                                <i class="fas fa-phone-alt"></i>
+                            </a>
+                        }
                     </p>
                     <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
                     <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
