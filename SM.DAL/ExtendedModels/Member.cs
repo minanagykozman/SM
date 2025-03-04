@@ -31,9 +31,10 @@ namespace SM.DAL.DataModel
             this.ModifiedAt = member.ModifiedAt;
             this.ModifiedBy = member.ModifiedBy;
             this.Nickname = member.Nickname;
-            this.Work=member.Work;
+            this.Work = member.Work;
             this.CreatedBy = member.CreatedBy;
             this.School = member.School;
+            this.Sequence = member.Sequence;
         }
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? LastPresentDate { get; set; } = null;

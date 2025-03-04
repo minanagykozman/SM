@@ -36,15 +36,19 @@
                         @Html.DisplayNameFor(model => model.ClassMembers[0].UNPersonalNumber)
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
                     </th>
-                    <th onclick="sortTable(5,this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].Attendance)
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
+                    <th>
+                        @Html.DisplayNameFor(model => model.ClassMembers[0].Mobile)
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Mobile">
                     </th>
                     <th onclick="sortTable(6,this)">
+                        @Html.DisplayNameFor(model => model.ClassMembers[0].Attendance)
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Attendance">
+                    </th>
+                    <th onclick="sortTable(7,this)">
                         @Html.DisplayNameFor(model => model.ClassMembers[0].LastPresentDate)
                         <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="">
                     </th>
                 </tr>
             </thead>
@@ -62,6 +66,7 @@
                         <td>@Html.DisplayFor(modelItem => item.Age)</td>
                         <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
                         <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Mobile)</td>
                         <td>@Html.DisplayFor(modelItem => item.Attendance)</td>
                         <td>@Html.DisplayFor(modelItem => item.LastPresentDate)</td>
                     </tr>
