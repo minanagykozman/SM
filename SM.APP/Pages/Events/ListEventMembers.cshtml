@@ -117,7 +117,13 @@
                     </h5>
                     <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
-                    <p class="mb-1"><strong>Mobile:</strong> @Html.DisplayFor(modelItem => item.Mobile)</p>
+                    <p class="mb-1">
+                        <strong>Mobile:</strong>
+                        @Html.DisplayFor(modelItem => item.Mobile)
+                        <a href="tel:@item.Mobile" class="ms-2">
+                            <i class="fas fa-phone-alt"></i>
+                        </a>
+                    </p>
                     <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
                     <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
                 </div>
