@@ -6,25 +6,9 @@
 @using SM.APP.Pages.Classess
 @using SM.DAL.DataModel
 <h2>Take Attendance</h2>
-<div class="container my-4">
-    <form method="get" id="filterForm">
-        <div class="mb-3 d-flex align-items-center">
-            <input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
-
-            <div class="form-floating flex-grow-1">
-                <input asp-for="UserCode" class="form-control" id="SearchString" placeholder="Enter Code" />
-                <label asp-for="UserCode">Code</label>
-            </div>
-            <!-- Scan QR Code Button (only visible on mobile) -->
-            <button type="button" id="btnScanQR" class="btn btn-secondary ms-2 d-md-none">Scan QR</button>
-            <button id="btnCheck" type="submit" class="btn btn-primary ms-2">Check</button>
-        </div>
-    </form>
-    <div id="qrScannerContainer" class="mt-3 d-none">
-        <div id="reader" style="width: 100%;"></div>
-        <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
-    </div>
-</div>
+<input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
+<partial name="_SearchPartial" />
+<partial name="_ModalPartial" />
 <!-- Table for Larger Screens -->
 <div class="d-none d-md-block">
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -39,34 +23,9 @@
                         @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].FullName)
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
                     </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].UNFileNumber)
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ClassOccurenceMembers[0].UNPersonalNumber)
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN No">
-                    </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.ClassOccurenceMembers)
-                {
-                    <tr>
-                        <td>
-                            <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.UNFileNumber)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-                        </td>
-                    </tr>
-                }
             </tbody>
         </table>
     </div>
@@ -79,173 +38,187 @@
     </div>
 
     <div class="list-group" id="mobileList">
-        @foreach (var item in Model.ClassOccurenceMembers)
-        {
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-                <h5 class="mb-1 text-primary">
-                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
-                </h5>
-                <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
-                <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
-                <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
-                <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
-            </div>
-        }
     </div>
 </div>
-<form method="post" id="registerForm">
-    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="myModalLabel">Member Status</h5>
-                    <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Status -->
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="MemberStatus" value="@Model.MemberStatus" readonly>
-                        <label for="MemberStatus">Status</label>
-                    </div>
-
-                    @if (Model.MemberData != null && Model.MemberData.Member != null)
-                    {
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="MemberName" value="@Model.MemberData.Member.FullName" readonly>
-                                    <label for="MemberName">Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="MemberAge" value="@Model.MemberData.Member.Age" readonly>
-                                    <label for="MemberAge">Age</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="ImageReference" value="@Html.DisplayFor(modelItem => Model.MemberData.Member.CardStatusDisplay)" readonly>
-                                    <label for="MemberAge">Card Status</label>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i> Cancel
-                    </button>
-                    @if (Model.MemberData != null && Model.MemberData.Member != null &&
-                    Model.MemberData.AttendanceStatus == AttendanceStatus.NotRegisteredInClass)
-                    {
-                        <label>This will automatically add member in class</label>
-                        <button type="submit" id="submitBtn" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Present
-                        </button>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
 
 <script>
+    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
     document.addEventListener("DOMContentLoaded", function () {
-        var isShowModal = @Model.ShowModal.ToString().ToLower();
-        var searchInput = document.getElementById("SearchString");
-        var cancelBtn = document.getElementById("btnCancel");
-        searchInput.value = "";
-        searchInput.focus();
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', function () {
-                searchInput.value = "";
-                searchInput.focus(); // Focus on search input when Cancel is clicked
-            });
+        fetchAttendance();
+    });
+
+    // Function to fetch attended members
+    async function fetchAttendance() {
+        const url = `${apiBaseUrl}/Meeting/GetAttendedMembers`;
+        const occurenceID = document.querySelector('input[name="classOccurenceID"]').value;
+        if (!occurenceID) {
+            console.error("Event ID is missing");
+            showErrorMessage("Event ID is missing. Cannot fetch data.");
+            return;
         }
-        var btnClose = document.getElementById("btnClose");
-        if (btnClose) {
-            btnClose.addEventListener('click', function () {
-                searchInput.value = "";
-                searchInput.focus(); // Focus on search input when Cancel is clicked
+
+        try {
+            const response = await fetch(`${url}?occurenceID=${occurenceID}`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
             });
+
+            if (!response.ok) {
+                handleHTTPError(response);
+                return;
+            }
+
+            const members = await response.json();
+
+            if (!Array.isArray(members) || members.length === 0) {
+                showErrorMessage("No members found for this meeting.");
+                return;
+            }
+
+            //document.getElementById("counter").textContent = `Attended: ${members.length}`;
+            populateTable(members);
+        } catch (error) {
+            console.error("Network error:", error);
+            showErrorMessage("Failed to fetch data. Please try again later.");
         }
-        // Handle Esc key press to close the modal and clear input
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
+    }
+    function populateTable(members) {
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        const mobileList = document.getElementById("mobileList");
+        mobileList.innerHTML = ""; // Clear existing list items
+
+        members.forEach(member => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
+                <td>${member.fullName}</td>
+            `;
+
+            tableBody.appendChild(row);
+
+            const listItem = document.createElement("div");
+        listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
+
+        listItem.innerHTML = `
+            <h5 class="mb-1 text-primary">
+                <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
+            </h5>
+            <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
+        `;
+
+        mobileList.appendChild(listItem);
+        });
+    }
+    document.getElementById("btnCheck").addEventListener("click", function () {
+        const searchValue = document.getElementById("SearchString").value.trim();
+        if (!searchValue) {
+            alert("Please enter a search value.");
+            return;
+        }
+        const occurenceID = document.querySelector('input[name="classOccurenceID"]').value;
+
+        const apiUrl = `${apiBaseUrl}/Meeting/CheckAttendance?classOccurenceID=${occurenceID}&memberCode=${encodeURIComponent(searchValue)}`;
+            fetch(apiUrl, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            populateModal(data); // Function to fill modal with API response
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            alert("Failed to fetch data. Please try again.");
+        });
+
+    });
+
+    function populateModal(data) {
+        $("#divTeam").hide();
+        $("#divBus").hide();
+        switch (data.attendanceStatus) {
+            case 0:
+                document.getElementById("MemberStatus").value = "Member not registered in class";
+                document.getElementById("MemberCode").value =data.member.code;
+                document.getElementById("MemberName").value =data.member.fullName;
+                document.getElementById("MemberAge").value =data.member.age;
+                document.getElementById("CardStatus").value =data.member.cardStatus;
+                document.querySelector('input[name="MemberCode"]').value = data.member.code;
+                $("#MemberDataBody").show();
+                $("#submitBtn").show();
+                showModal();
+                break;
+            case 1:
+                document.getElementById("MemberStatus").value = "Member not found";
+                $("#MemberDataBody").hide();
+                $("#submitBtn").hide();
+                showModal();
+                break;
+            case 2:
+                document.getElementById("MemberStatus").value = "Meeting not found";
+                $("#MemberDataBody").hide();
+                $("#submitBtn").hide();
+                showModal();
+                break;
+            case 3:
+                document.getElementById("MemberStatus").value = "Member already attedned!";
+                $("#MemberDataBody").show();
+                $("#submitBtn").hide();
+                document.getElementById("MemberName").value =data.member.fullName;
+                document.getElementById("MemberCode").value =data.member.code;
+                document.getElementById("MemberAge").value =data.member.age;
+                document.getElementById("CardStatus").value =data.member.cardStatus;
+                showModal();
+                break;
+            case 4:
+            case 5:
+                document.querySelector('input[name="MemberCode"]').value = data.member.code;
+                takeAttendance(false);
+                var searchInput = document.getElementById("SearchString");
                 searchInput.value = "";
                 searchInput.focus();
-            }
-        });
-
-        if (searchInput)
-        {
-            searchInput.focus();
+                break;
         }
-        if (isShowModal) {
-            var myModal = new bootstrap.Modal(document.getElementById('myModal'));
-            myModal.show();
-        }
+    }
 
-        // Handle Enter key inside modal
-        document.getElementById('myModal').addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // Prevent default behavior
-                document.getElementById('submitBtn').click(); // Trigger submit button
-            }
-        });
-
-        // Allow Shift + Enter for new lines in textarea
-        document.getElementById('notes')?.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' && event.shiftKey) {
-                event.stopPropagation(); // Allow new line in textarea
-            }
-        });
-
-        // Ensure modal backdrop is removed when modal is closed
-        document.getElementById('myModal').addEventListener('hidden.bs.modal', function () {
-            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-        });
-
-        const scanButton = document.getElementById("btnScanQR");
-         const qrScannerContainer = document.getElementById("qrScannerContainer");
-         const stopScanButton = document.getElementById("btnStopScan");
-
-         let html5QrCode;
-
-         // Show QR scanner on mobile only
-         if (window.innerWidth <= 768) {
-             scanButton.addEventListener("click", function () {
-                 qrScannerContainer.classList.remove("d-none");
-
-                 html5QrCode = new Html5Qrcode("reader");
-                 html5QrCode.start(
-                     { facingMode: "environment" }, // Use back camera
-                     {
-                         fps: 10,
-                         qrbox: { width: 250, height: 250 }
-                     },
-                     (decodedText) => {
-                         searchInput.value = decodedText;
-                         document.getElementById('filterForm').submit();
-                         //html5QrCode.stop();
-                         //qrScannerContainer.classList.add("d-none");
-                     },
-                     (errorMessage) => {
-                         console.warn("QR Code scan error: ", errorMessage);
-                     }
-                 ).catch((err) => {
-                     console.error("QR Code scanning failed: ", err);
-                 });
-             });
-                  // Stop scanning
-             stopScanButton.addEventListener("click", function () {
-                 if (html5QrCode) {
-                     html5QrCode.stop();
-                 }
-                 qrScannerContainer.classList.add("d-none");
-             });
-         }
+    document.getElementById("submitBtn").addEventListener("click", function () {
+        takeAttendance(true);
+        var searchInput = document.getElementById("SearchString");
+        searchInput.value = "";
+        searchInput.focus();
+        closeModal();
     });
+
+    function takeAttendance(forceRegister)
+    {
+        const occurenceID = document.querySelector('input[name="classOccurenceID"]').value;
+        const memberCode = document.querySelector('input[name="MemberCode"]').value;
+        const apiUrl = `${apiBaseUrl}/Meeting/TakeAttendance?classOccurenceID=${occurenceID}&memberCode=${encodeURIComponent(memberCode)}&forceRegister=${forceRegister}`;
+        fetch(apiUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({  classOccuranceID:occurenceID, memberCode: memberCode, forceRegister: forceRegister })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Success:", data);
+            fetchAttendance();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to add member. Please try again.");
+        });
+    }
 </script>

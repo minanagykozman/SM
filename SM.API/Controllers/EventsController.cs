@@ -52,15 +52,15 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("CheckAttendanceStatus")]
-        public ActionResult<RegistrationStatusResponse> CheckAttendanceStatus(string memberCode, int eventID)
+        public ActionResult<EventAttendanceStatusResponse> CheckAttendanceStatus(string memberCode, int eventID)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    Member member;
+                    MemberEventView member;
                     RegistrationStatus status = eventHandler.CheckEventAttendance(eventID, memberCode, out member);
-                    RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status };
+                    EventAttendanceStatusResponse response = new EventAttendanceStatusResponse() { Member = member, Status = status };
                     return Ok(response);
                 }
 
@@ -184,7 +184,11 @@ namespace SM.API.Controllers
             public Member Member { get; set; }
             public RegistrationStatus Status { get; set; }
         }
-
+        public class EventAttendanceStatusResponse
+        {
+            public MemberEventView Member { get; set; }
+            public RegistrationStatus Status { get; set; }
+        }
         public class DistributionParams
         {
             public int EventID { get; set; }

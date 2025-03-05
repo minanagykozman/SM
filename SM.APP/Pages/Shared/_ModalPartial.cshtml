@@ -1,0 +1,68 @@
+﻿<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="myModalLabel">Member Status</h5>
+                <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <input type="hidden" name="MemberCode" value="" />
+                <!-- Status -->
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="MemberStatus" value="" readonly />
+                    <label for="MemberStatus">Status</label>
+                </div>
+                <div class="row g-3" id="MemberDataBody">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="MemberCode" value="" readonly>
+                            <label for="MemberName">Code</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="MemberName" value="" readonly>
+                            <label for="MemberName">Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="MemberAge" value="" readonly>
+                            <label for="MemberAge">Age</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="CardStatus" value="" readonly>
+                            <label for="CardStatus">Card Status</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="divBus">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="Bus" value="" readonly>
+                            <label for="CardStatus">Bus</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="divTeam">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="Team" value="" readonly>
+                            <label for="CardStatus">Team</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="submit" id="submitBtn" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Present
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

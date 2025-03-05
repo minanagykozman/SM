@@ -14,8 +14,8 @@ namespace SM.APP.Services
         {
             get
             {
-                if (_isDevelopment)
-                    return _configuration["AppSettings:API"] ?? string.Empty; 
+                if (IsDevelopment)
+                    return _configuration["AppSettings:API"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("ApiBase") ?? string.Empty;
             }
@@ -24,7 +24,7 @@ namespace SM.APP.Services
         {
             get
             {
-                if (_isDevelopment)
+                if (IsDevelopment)
                     return _configuration["JwtSettings:SecretKey"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("JWTSecretKey") ?? string.Empty;
@@ -34,7 +34,7 @@ namespace SM.APP.Services
         {
             get
             {
-                if (_isDevelopment)
+                if (IsDevelopment)
                     return _configuration["JwtSettings:Audience"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("JWTAudience") ?? string.Empty;
@@ -44,14 +44,13 @@ namespace SM.APP.Services
         {
             get
             {
-                if (_isDevelopment)
+                if (IsDevelopment)
                     return _configuration["JwtSettings:Issuer"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("JWTIssuer") ?? string.Empty;
             }
         }
-        static bool _isDevelopment
-
+        public static bool IsDevelopment
         {
             get
             {

@@ -129,17 +129,29 @@ namespace SM.APP.Areas.Identity.Pages.Account
 
                     var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
                     await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, claimsPrincipal.Claims);
-
-                    Response.Cookies.Append("AuthToken", token, new CookieOptions
+                    if (SMConfigurationManager.IsDevelopment)
                     {
-                        HttpOnly = true, // Prevent JavaScript access
-                        Secure = true, // Use only in HTTPS
-                        SameSite = SameSiteMode.None,
-                        Expires = expirationTime,
-                        Domain = ".stmosesservices.com",  // Use this if frontend and backend are on subdomains
-                        Path = "/"
-                    });
-
+                        Response.Cookies.Append("AuthToken", token, new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = expirationTime,
+                            Path = "/"
+                        });
+                    }
+                    else
+                    {
+                        Response.Cookies.Append("AuthToken", token, new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true,
+                            SameSite = SameSiteMode.None,
+                            Expires = expirationTime,
+                            Domain = ".stmosesservices.com",
+                            Path = "/"
+                        });
+                    }
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

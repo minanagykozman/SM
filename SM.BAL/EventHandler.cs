@@ -68,11 +68,13 @@ namespace SM.BAL
                 return RegistrationStatus.MemberNotEligible;
             return RegistrationStatus.ReadyToRegister;
         }
-        public RegistrationStatus CheckEventAttendance(int eventID, string memberCode, out Member member)
+        public RegistrationStatus CheckEventAttendance(int eventID, string memberCode, out MemberEventView member)
         {
             memberCode = memberCode.Trim();
-            var lmember = _dbcontext.Members.Include(m => m.ClassMembers).
-                FirstOrDefault(m => m.Code.Contains(memberCode) || m.UNPersonalNumber == memberCode || (m.UNFileNumber == memberCode && m.IsMainMember));
+            var lmember = _dbcontext.MemberEventView.
+                FirstOrDefault(m => m.Code.Contains(memberCode) 
+                || m.UNPersonalNumber == memberCode 
+                || (m.UNFileNumber == memberCode && m.IsMainMember));
             member = lmember;
             if (member == null)
             {
