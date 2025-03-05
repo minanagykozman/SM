@@ -54,45 +54,46 @@ document.addEventListener("DOMContentLoaded", function () {
         const qrScannerContainer = document.getElementById("qrScannerContainer");
         const stopScanButton = document.getElementById("btnStopScan");
         if (scanButton) {
-            let html5QrCode;
 
+            let html5QrCode;
+            scanButton.addEventListener("click", function () {
+                qrScannerContainer.classList.remove("d-none");
+
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" }, // Use back camera
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    (decodedText) => {
+                        searchInput.value = decodedText;
+                        document.getElementById('btnCheck').click();
+
+                        html5QrCode.stop();
+                        qrScannerContainer.classList.add("d-none");
+                    },
+                    (errorMessage) => {
+                        console.warn("QR Code scan error: ", errorMessage);
+                    }
+                ).catch((err) => {
+                    console.error("QR Code scanning failed: ", err);
+                });
+            });
+            // Stop scanning
+            stopScanButton.addEventListener("click", function () {
+                if (html5QrCode) {
+                    html5QrCode.stop();
+                }
+                qrScannerContainer.classList.add("d-none");
+            });
             // Show QR scanner on mobile only
             if (window.innerWidth <= 768) {
-                scanButton.addEventListener("click", function () {
-                    qrScannerContainer.classList.remove("d-none");
 
-                    html5QrCode = new Html5Qrcode("reader");
-                    html5QrCode.start(
-                        { facingMode: "environment" }, // Use back camera
-                        {
-                            fps: 10,
-                            qrbox: { width: 250, height: 250 }
-                        },
-                        (decodedText) => {
-                            searchInput.value = decodedText;
-                            document.getElementById('btnCheck').click();
-
-                            html5QrCode.stop();
-                            qrScannerContainer.classList.add("d-none");
-                        },
-                        (errorMessage) => {
-                            console.warn("QR Code scan error: ", errorMessage);
-                        }
-                    ).catch((err) => {
-                        console.error("QR Code scanning failed: ", err);
-                    });
-                });
-                // Stop scanning
-                stopScanButton.addEventListener("click", function () {
-                    if (html5QrCode) {
-                        html5QrCode.stop();
-                    }
-                    qrScannerContainer.classList.add("d-none");
-                });
             }
         }
     }
-    
+
 
     // Desktop Table Filtering
     let filter = document.querySelectorAll(".filter-input");

@@ -14,19 +14,10 @@ namespace SM.APP.Pages.Events
     [Authorize(Roles = "Admin,Servant")]
     public class EventAttendanceModel(UserManager<IdentityUser> userManager, ILogger<EventAttendanceModel> logger) : PageModelBase(userManager, logger)
     {
-        
         public List<MemberEventView> EventMembers { get; set; } = new List<MemberEventView>();
 
-        public async Task<IActionResult> OnGetAsync(int? eventID)
+        public void OnGet()
         {
-            try
-            {
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
         }
 
     }
