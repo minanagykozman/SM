@@ -159,7 +159,9 @@ namespace SM.API.Controllers
             {
                 using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
                 {
-                    eventHandler.UpdateCardStatus(model.MemberCode, model.CardStatus);
+                    CardStatus cardStatus = (CardStatus)Enum.Parse(typeof(CardStatus), model.CardStatus);
+
+                    eventHandler.UpdateCardStatus(model.MemberCode, cardStatus);
                     return Ok("Member updated");
                 }
 
@@ -173,7 +175,7 @@ namespace SM.API.Controllers
         public class UpdateCardModel
         {
             public string MemberCode { get; set; }
-            public CardStatus CardStatus { get; set; }
+            public string CardStatus { get; set; }
 
         }
 

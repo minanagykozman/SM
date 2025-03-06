@@ -20,7 +20,7 @@ namespace SM.BAL
             return members.OrderBy(m => m.Birthdate).ToList<Member>();
         }
 
-        
+
         public Member? GetMemberByCodeOnly(string memberCode)
         {
             memberCode = memberCode.Trim();
@@ -229,6 +229,10 @@ namespace SM.BAL
             if (member == null)
             {
                 return false;
+            }
+            if (member.CardStatus != "Delivered" && cardStatus == CardStatus.Delivered)
+            {
+                member.CardDeliveryCount++;
             }
             member.CardStatus = cardStatus.ToString();
             member.ModifiedAt = CurrentTime;

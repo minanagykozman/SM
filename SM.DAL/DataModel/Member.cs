@@ -42,6 +42,7 @@ namespace SM.DAL.DataModel
         [Display(Name = "Card Status")]
         [MaxLength(20)]
         public string? CardStatus { get; set; }
+        public int CardDeliveryCount { get; set; } = 0;
         public string? Notes { get; set; }
         public string? ImageURL { get; set; } = null;
         public int Sequence { get; set; } = 0;

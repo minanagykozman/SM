@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <input type="hidden" name="MemberCode" value="" />
                 <!-- Status -->
-                <div class="form-floating mb-3">
+                <div class="form-floating mb-3" id="divStatus">
                     <input type="text" class="form-control" id="MemberStatus" value="" readonly />
                     <label for="MemberStatus">Status</label>
                 </div>
@@ -18,7 +18,7 @@
                     <div class="col-md-6">
                         <div class="form-floating">
                             <input type="text" class="form-control" id="MemberCode" value="" readonly>
-                            <label for="MemberName">Code</label>
+                            <label for="MemberCode">Code</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -36,13 +36,13 @@
                     <div class="col-md-6" id="divCard">
                         <div class="form-floating" >
                             <input type="text" class="form-control" id="CardStatus" value="" readonly>
-                            <label for="CardStatus">Card Status</label>
+                            <label id="lblCard" for="CardStatus">Card Status</label>
                         </div>
                     </div>
                     <div class="col-md-6" id="divBus">
                         <div class="form-floating">
                             <input type="text" class="form-control" id="Bus" value="" readonly>
-                            <label for="CardStatus">Bus</label>
+                            <label id="lblBus" for="Bus">Bus</label>
                         </div>
                     </div>
                     <div class="col-md-6" id="divTeam">
