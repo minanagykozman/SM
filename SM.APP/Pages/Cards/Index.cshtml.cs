@@ -80,40 +80,5 @@ namespace SM.APP.Pages.Cards
             }
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(UserCode) && !string.IsNullOrEmpty(CardStatus))
-                {
-                    CardStatus cardStatus = (CardStatus)Enum.Parse(typeof(CardStatus), CardStatus);
-                    var requestData = new
-                    {
-                        memberCode = UserCode,
-                        cardStatus = cardStatus
-                    };
-                    string request = string.Format("{0}/Member/UpdateMemberCard", SMConfigurationManager.ApiBase);
-                    string jwtToken = await GetAPIToken();
-                    using (HttpClient client = new HttpClient())
-                    {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                        var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
-
-                        HttpResponseMessage response = await client.PostAsync(request, jsonContent);
-
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            throw new Exception($"Error calling API: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
-                        }
-                        UserCode = string.Empty;
-                    }
-                }
-                return RedirectToPage("", new { cardStatus = CardStatus });
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
     }
 }

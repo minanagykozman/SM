@@ -6,63 +6,73 @@
 }
 @using SM.DAL.DataModel
 <div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Members' Cards</h4>
-        <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
-        <div class="form-floating">
-            <select id="dpCardStatus" asp-for="CardStatus"
-                    class="form-select">
-                <option value="">Select Card Status</option>
-                <option value="MissingPhoto">Missing photo</option>
-                <option value="ReadyToPrint">Ready to print</option>
-                <option value="Printed">Printed</option>
-                <option value="Delivered">Delivered</option>
-                <option value="NotApplicable">Not applicable</option>
-            </select>
-            <label asp-for="CardStatus"></label>
-        </div>
-    </div>
-    <!-- Search Form -->
-    <partial name="_SearchPartial" />
-    <partial name="_ModalPartial" />
-    <!-- Table for Larger Screens -->
-    <div class="d-none d-md-block">
-        <div class="table-responsive">
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table table-hover align-middle" id="dataTable">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>
-                                Code
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
-                            </th>
-                            <th>
-                                Name
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
-                            </th>
-                            <th>
-                                UN File Number
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
-                            </th>
-                            <th>
-                                UN Personal Number
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN Number">
-                            </th>
-                            <th>
-                                Card Status
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search UN No">
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+    <div class="container">
+        <div class="row align-items-center mb-2">
+            <!-- Title and Counter in the same line -->
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Members' Cards</h4>
+                <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
             </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="form-floating">
+                    <select id="dpCardStatus" asp-for="CardStatus" class="form-select">
+                        <option value="">Select Card Status</option>
+                        <option value="MissingPhoto">Missing photo</option>
+                        <option value="ReadyToPrint">Ready to print</option>
+                        <option value="Printed">Printed</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="NotApplicable">Not applicable</option>
+                    </select>
+                    <label asp-for="CardStatus"></label>
+                </div>
+            </div>
+            <partial name="_SearchPartial" />
+        </div>
+        <div class="row g-3">
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle" id="dataTable">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>
+                                        Code
+                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
+                                    </th>
+                                    <th>
+                                        Name
+                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
+                                    </th>
+                                    <th>
+                                        UN File Number
+                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
+                                    </th>
+                                    <th>
+                                        UN Personal Number
+                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN Number">
+                                    </th>
+                                    <th>
+                                        Card Status
+                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search UN No">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile View -->
+            <partial name="_MobileViewPartial" />
         </div>
     </div>
 
-    <!-- Mobile View -->
-    <partial name="_MobileViewPartial" />
+    <partial name="_ModalPartial" />
+    
 </div>
 
 
@@ -188,7 +198,7 @@
             {
                 populateModal(null);
             }
-            
+
             showModal();
         } catch (error) {
             console.error("Network error:", error);
@@ -202,7 +212,7 @@
             $("#divBus").hide();
             $("#divStatus").hide();
             $("#divAge").hide();
-            
+
 
             document.getElementById("MemberCode").value =member.code;
             document.getElementById("MemberName").value =member.fullName;
