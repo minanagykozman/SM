@@ -59,15 +59,7 @@
         </div>
     </div>
     <!-- Mobile View -->
-    <div class="d-block d-md-none">
-        <div class="card p-2 mb-2 bg-light">
-            <h6 class="text-primary">Filter</h6>
-            <input type="text" class="form-control form-control-sm mobile-filter" placeholder="Search members...">
-        </div>
-
-        <div class="list-group" id="mobileList">
-        </div>
-    </div>
+    <partial name="_MobileViewPartial" />
 </div>
 <script>
     var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';

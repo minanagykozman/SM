@@ -58,13 +58,10 @@ namespace SM.API.Controllers
         {
             try
             {
-                if (classID <= 0)
-                {
-                    return BadRequest("Invalid class ID");
-                }
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    List<ClassMemberExtended> classes = meetingHandler.GetClassMembers(classID);
+                    ValidateServant();
+                    List<ClassMemberExtended> classes = meetingHandler.GetClassMembers(classID, User.Identity.Name);
                     return Ok(classes);
                 }
 
@@ -210,6 +207,42 @@ namespace SM.API.Controllers
                 {
                     ValidateServant();
                     var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberIDs, User.Identity.Name);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("AssignMemberServant")]
+        public ActionResult<string> AssignMemberServant(int classID, int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    ValidateServant();
+                    var cl = meetingHandler.AssignMemberToServant(memberID, classID, User.Identity.Name);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("UnAssignMemberServant")]
+        public ActionResult<string> UnAssignMemberServant(int classID, int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    ValidateServant();
+                    var cl = meetingHandler.UnAssignMemberServant(memberID, classID);
                     return Ok(cl);
                 }
 

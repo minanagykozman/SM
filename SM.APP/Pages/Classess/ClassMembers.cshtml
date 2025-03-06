@@ -6,7 +6,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Class Members</h4>
+    <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
 </div>
+<input type="hidden" name="classID" value="@ViewContext.HttpContext.Request.Query["classID"]" />
 <!-- Table for Larger Screens -->
 <div class="d-none d-md-block">
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -14,100 +16,205 @@
             <thead class="table-primary">
                 <tr>
                     <th onclick="sortBySequence(this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].Code)
+                        Code
                         <i class="fa-solid fa-sort"></i>
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
                     </th>
                     <th onclick="sortTable(1,this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].FullName)
+                        Name
                         <i class="fa-solid fa-sort"></i>
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
                     </th>
                     <th onclick="sortTable(2,this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].Age)
+                        Age
                         <i class="fa-solid fa-sort"></i>
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search Age">
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].UNFileNumber)
+                        UN File Number
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search File Number">
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].UNPersonalNumber)
+                        UN Number
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].Mobile)
+                        Mobile
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Mobile">
                     </th>
                     <th onclick="sortTable(6,this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].Attendance)
+                        Attendance
                         <i class="fa-solid fa-sort"></i>
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Attendance">
                     </th>
                     <th onclick="sortTable(7,this)">
-                        @Html.DisplayNameFor(model => model.ClassMembers[0].LastPresentDate)
+                        Last Present
                         <i class="fa-solid fa-sort"></i>
                         <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="">
                     </th>
+                    <th onclick="sortTable(8,this)">
+                        Servant
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search by servant">
+                    </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.ClassMembers)
-                {
-                    <tr>
-                        <td>
-                            <span class="sequence" style="display: none;">@item.Sequence</span>
-                            <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer" class="text-primary">
-                                @Html.DisplayFor(modelItem => item.Code)
-                            </a>
-                        </td>
-                        <td>@Html.DisplayFor(modelItem => item.FullName)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Age)</td>
-                        <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
-                        <td>@Html.DisplayFor(modelItem => item.UNPersonalNumber)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Mobile)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Attendance)</td>
-                        <td>@Html.DisplayFor(modelItem => item.LastPresentDate)</td>
-                    </tr>
-                }
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Mobile View -->
-<div class="d-block d-md-none">
-    <div class="card p-2 mb-2 bg-light">
-        <h6 class="text-primary">Filter</h6>
-        <input type="text" class="form-control form-control-sm mobile-filter" placeholder="Search members...">
-    </div>
+<partial name="_MobileViewPartial" />
 
-    <div class="list-group" id="mobileList">
-        @foreach (var item in Model.ClassMembers)
-        {
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-                <h5 class="mb-1 text-primary">
-                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
-                </h5>
-                <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
-                <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
-                <p class="mb-1">
-                    <strong>Mobile:</strong>
-                    @Html.DisplayFor(modelItem => item.Mobile)
+<script>
+    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchClassMembers();
+    });
 
-                    @if (!string.IsNullOrEmpty(item.Mobile))
-                    {
-                        <a href="tel:@item.Mobile" class="ms-2">
-                            <i class="fas fa-phone-alt"></i>
-                        </a>
-                    }
-                </p>
-                <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
-                <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
-                <p class="mb-1"><strong>Attendance:</strong> @Html.DisplayFor(modelItem => item.Attendance)</p>
-                <p class="mb-1"><strong>Last Present Date:</strong> @Html.DisplayFor(modelItem => item.LastPresentDate)</p>
-            </div>
+    // Function to fetch attended members
+    async function fetchClassMembers() {
+        const url = `${apiBaseUrl}/Meeting/GetClassMembers`;
+
+        const classID = document.querySelector('input[name="classID"]').value;
+        if (!classID) {
+            console.error("Class ID is missing");
+            showErrorMessage("Class ID is missing. Cannot fetch data.");
+            return;
         }
-    </div>
-</div>
+
+        try {
+            const response = await fetch(`${url}?classID=${classID}`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                handleHTTPError(response);
+                return;
+            }
+
+            const members = await response.json();
+
+            if (!Array.isArray(members) || members.length === 0) {
+                showErrorMessage("No members found for this aid.");
+                return;
+            }
+
+            document.getElementById("counter").textContent = `Members: ${members.length}`;
+            populateTable(members);
+        } catch (error) {
+            console.error("Network error:", error);
+            showErrorMessage("Failed to fetch data. Please try again later.");
+        }
+    }
+
+
+    function populateTable(members) {
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        const mobileList = document.getElementById("mobileList");
+        mobileList.innerHTML = ""; // Clear existing list items
+
+        members.forEach(member => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
+                <td>${member.fullName}</td>
+                <td>${member.age}</td>
+                <td>${member.unFileNumber}</td>
+                <td>${member.unPersonalNumber}</td>
+                <td>${member.mobile}</td>
+                <td>${member.attendance}</td>
+                <td>${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}</td>
+                <td>${member.servant}</td>
+                <td>
+                    <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"}"
+                    onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
+                    ${member.showAssign ? "Assign" : "Unassign"}
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+
+            const listItem = document.createElement("div");
+        listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
+
+                listItem.innerHTML = `
+        <h5 class="mb-1 text-primary">
+            <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
+        </h5>
+        <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
+        <p class="mb-1"><strong>Age:</strong> ${member.age}</p>
+
+        ${member.mobile ? `
+        <p class="mb-1">
+            <strong>Mobile:</strong> ${member.mobile}
+            <a href="tel:${member.mobile}" class="ms-2">
+                <i class="fas fa-phone-alt"></i>
+            </a>
+        </p>` : ""}
+
+        <p class="mb-1"><strong>Attendance:</strong> ${member.attendance}</p>
+        <p class="mb-1"><strong>Last Present Date:</strong>
+            ${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}
+        </p>
+        <p class="mb-1"><strong>Servant:</strong> ${member.servant}</p>
+
+        <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"}"
+        onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
+        ${member.showAssign ? "Assign" : "Unassign"}
+        </button>
+    `;
+        mobileList.appendChild(listItem);
+        });
+    }
+    function assignServant(memberID){
+        const classID = document.querySelector('input[name="classID"]').value;
+        const apiUrl = `${apiBaseUrl}/Meeting/AssignMemberServant?classID=${classID}&memberID=${memberID}`;
+        fetch(apiUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({  classID: classID, memberID: memberID })
+        })
+        .then(data => {
+            console.log("Success:", data);
+            fetchClassMembers();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to add member. Please try again.");
+        });
+    }
+    function unAssignServant(memberID){
+        const classID = document.querySelector('input[name="classID"]').value;
+        const apiUrl = `${apiBaseUrl}/Meeting/UnAssignMemberServant?classID=${classID}&memberID=${memberID}`;
+        fetch(apiUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({  classID: classID, memberID: memberID })
+        })
+        .then(data => {
+            console.log("Success:", data);
+            fetchClassMembers();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to add member. Please try again.");
+        });
+    }
+</script>

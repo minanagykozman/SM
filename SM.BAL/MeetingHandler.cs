@@ -22,20 +22,31 @@ namespace SM.BAL
         {
             return _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == occurrenceID).OrderByDescending(c => c.TimeStamp).Select(c => c.Member).ToList();
         }
-        public List<ClassMemberExtended> GetClassMembers(int classID)
+        public List<ClassMemberExtended> GetClassMembers(int classID, string username)
         {
+            Servant servant = GetServantByUsername(username);
             int meetingsCount = _dbcontext.ClassOccurrences.Count(c => c.ClassID == classID && c.ClassOccurrenceStartDate <= CurrentTime);
             List<ClassAttendance> attendance = _dbcontext.ClassAttendances.Include(c => c.ClassOccurrence).Where(c => c.ClassOccurrence.ClassID == classID && c.ClassOccurrence.ClassOccurrenceStartDate <= CurrentTime).ToList();
             List<ClassMemberExtended> membersExtended = new List<ClassMemberExtended>();
-            var members = _dbcontext.ClassMembers.Where(c => c.ClassID == classID).Select(c => c.Member).ToList();
+            var members = _dbcontext.ClassMembers.Include(c => c.Member).Include(c => c.Servant).Where(c => c.ClassID == classID).ToList();
             foreach (var member in members)
             {
-                ClassMemberExtended exMember = new ClassMemberExtended(member);
+                ClassMemberExtended exMember = new ClassMemberExtended(member.Member);
                 var memberAttendance = attendance.Where(c => c.MemberID == exMember.MemberID).ToList();
                 if (memberAttendance != null && memberAttendance.Count > 0)
                 {
                     exMember.LastPresentDate = memberAttendance.Max(c => c.ClassOccurrence.ClassOccurrenceStartDate);
                     exMember.Attendance = string.Format("{0}/{1}", memberAttendance.Count.ToString("00"), meetingsCount);
+                }
+                if (member.Servant != null)
+                {
+                    exMember.Servant = member.Servant.ServantName;
+                    exMember.ShowAssign = member.Servant.ServantID == servant.ServantID ? false : true;
+                }
+                else
+                {
+                    exMember.Servant = string.Empty;
+                    exMember.ShowAssign = true;
                 }
                 membersExtended.Add(exMember);
             }
@@ -60,6 +71,27 @@ namespace SM.BAL
                 Logger.log.Error("", ex);
                 return null;
             }
+        }
+        public string AssignMemberToServant(int memberID, int classID, string username)
+        {
+            Servant servant = GetServantByUsername(username);
+            ClassMember? cm = _dbcontext.ClassMembers.Where(c => c.ClassID == classID && c.MemberID == memberID).FirstOrDefault();
+            if (cm != null)
+            {
+                cm.ServantID = servant.ServantID;
+                _dbcontext.SaveChanges();
+            }
+            return "OK";
+        }
+        public string UnAssignMemberServant(int memberID, int classID)
+        {
+            ClassMember? cm = _dbcontext.ClassMembers.Where(c => c.ClassID == classID && c.MemberID == memberID).FirstOrDefault();
+            if (cm != null)
+            {
+                cm.ServantID = null;
+                _dbcontext.SaveChanges();
+            }
+            return "OK";
         }
         public string CreateClassOccurences(int classID)
         {
