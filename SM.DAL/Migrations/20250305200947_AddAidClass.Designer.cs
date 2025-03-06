@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305200947_AddAidClass")]
+    partial class AddAidClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,12 +275,12 @@ namespace SM.DAL.Migrations
                     b.Property<int>("AidID")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClassID")
+                    b.Property<int>("MemberID")
                         .HasColumnType("int");
 
-                    b.HasKey("AidID", "ClassID");
+                    b.HasKey("AidID", "MemberID");
 
-                    b.HasIndex("ClassID");
+                    b.HasIndex("MemberID");
 
                     b.ToTable("AidClasses");
                 });
@@ -922,15 +925,15 @@ namespace SM.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SM.DAL.DataModel.Class", "Class")
+                    b.HasOne("SM.DAL.DataModel.Member", "Member")
                         .WithMany()
-                        .HasForeignKey("ClassID")
+                        .HasForeignKey("MemberID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Aid");
 
-                    b.Navigation("Class");
+                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Class", b =>

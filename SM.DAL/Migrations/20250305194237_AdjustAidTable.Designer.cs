@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305194237_AdjustAidTable")]
+    partial class AdjustAidTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,21 +268,6 @@ namespace SM.DAL.Migrations
                     b.HasKey("AidID");
 
                     b.ToTable("Aids");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.AidClass", b =>
-                {
-                    b.Property<int>("AidID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AidID", "ClassID");
-
-                    b.HasIndex("ClassID");
-
-                    b.ToTable("AidClasses");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Class", b =>
@@ -912,25 +900,6 @@ namespace SM.DAL.Migrations
                     b.HasIndex("ServantID");
 
                     b.ToTable("ServantClasses");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.AidClass", b =>
-                {
-                    b.HasOne("SM.DAL.DataModel.Aid", "Aid")
-                        .WithMany()
-                        .HasForeignKey("AidID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SM.DAL.DataModel.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Aid");
-
-                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Class", b =>

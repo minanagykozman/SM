@@ -1,4 +1,5 @@
-﻿using SM.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using SM.DAL;
 using SM.DAL.DataModel;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,22 @@ namespace SM.BAL
             if (user == null)
                 return null;
             return _dbcontext.Servants.FirstOrDefault(s => s.UserID == user.Id);
+        }
+        public Member? GetMember(string memberCode)
+        {
+            memberCode = memberCode.Trim();
+            return _dbcontext.Members.
+                FirstOrDefault(m => m.Code.Contains(memberCode)
+                || m.UNPersonalNumber == memberCode
+                || (m.UNFileNumber == memberCode && m.IsMainMember));
+        }
+        public Member? GetMemberWithClasses(string memberCode)
+        {
+            memberCode = memberCode.Trim();
+            return _dbcontext.Members.Include(m=>m.ClassMembers).
+                FirstOrDefault(m => m.Code.Contains(memberCode)
+                || m.UNPersonalNumber == memberCode
+                || (m.UNFileNumber == memberCode && m.IsMainMember));
         }
         public DateTime CurrentTime
         {

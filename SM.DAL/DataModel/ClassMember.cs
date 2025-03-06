@@ -10,11 +10,14 @@ namespace SM.DAL.DataModel
     public class ClassMember
     {
         public int ClassID { get; set; }
-        [JsonIgnore]
-        public virtual Class Class { get; set; } = null!;
         public int MemberID { get; set; }
+        public int? ServantID { get; set; }
         [JsonIgnore]
         public virtual Member Member { get; set; } = null!;
+        [JsonIgnore]
+        public virtual Class Class { get; set; } = null!;
+        [JsonIgnore]
+        public virtual Servant Servant { get; set; } = null!;
     }
 
 }

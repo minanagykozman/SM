@@ -28,6 +28,15 @@ namespace SM.DAL.DataModel
         Ready,
         Ok
     }
+    public enum AidStatus
+    {
+        NotEligible,
+        MemberNotFound,
+        AidNotFound,
+        AlreadyTook,
+        Eligible,
+        OK
+    }
     public enum CardStatus
     {
         [Display(Name = "Missing Photo")]

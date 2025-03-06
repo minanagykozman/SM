@@ -20,14 +20,7 @@ namespace SM.BAL
             return members.OrderBy(m => m.Birthdate).ToList<Member>();
         }
 
-        public Member? GetMember(string memberCode)
-        {
-            memberCode = memberCode.Trim();
-            return _dbcontext.Members.
-                FirstOrDefault(m => m.Code.Contains(memberCode)
-                || m.UNPersonalNumber == memberCode
-                || (m.UNFileNumber == memberCode && m.IsMainMember));
-        }
+        
         public Member? GetMemberByCodeOnly(string memberCode)
         {
             memberCode = memberCode.Trim();

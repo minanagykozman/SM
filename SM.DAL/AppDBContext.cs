@@ -31,6 +31,7 @@
         public DbSet<Fund> Funds { get; set; }
         public DbSet<MemberEventView> MemberEventView { get; set; }
         public DbSet<MemberClasssAttendanceView> MemberClasssAttendanceView { get; set; }
+        public DbSet<AidClass> AidClasses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -62,6 +63,8 @@
 
             modelBuilder.Entity<EventRegistration>()
                 .HasKey(er => new { er.EventID, er.MemberID });
+            modelBuilder.Entity<AidClass>()
+                .HasKey(ac => new { ac.AidID, ac.ClassID });
 
 
             modelBuilder.Entity<MemberAid>()

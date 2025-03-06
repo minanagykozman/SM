@@ -1,22 +1,17 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json.Linq;
-using NuGet.Common;
 using SM.APP.Services;
 using SM.DAL.DataModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace SM.APP.Pages.Events
+namespace SM.APP.Pages.Aids
 {
-    [Authorize(Roles = "Admin,Servant")]
     public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
     {
-        
         [BindProperty(SupportsGet = true)]
-        public List<Event> Events { get; set; }
+        public List<Aid> Aids{ get; set; }
         public async Task<IActionResult> OnGetAsync()
         {
             try
@@ -26,7 +21,7 @@ namespace SM.APP.Pages.Events
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
-                    string request = string.Format("{0}/Events/GetEvents", SMConfigurationManager.ApiBase);
+                    string request = string.Format("{0}/Aids/GetAids", SMConfigurationManager.ApiBase);
                     HttpResponseMessage response = await client.GetAsync(request);
                     if (response.IsSuccessStatusCode)
                     {
@@ -35,11 +30,11 @@ namespace SM.APP.Pages.Events
                         {
                             PropertyNameCaseInsensitive = true
                         };
-                        Events = JsonSerializer.Deserialize<List<Event>>(responseData, options);
+                        Aids = JsonSerializer.Deserialize<List<Aid>>(responseData, options);
                     }
                 }
-                if (Events == null)
-                    Events = new List<Event>();
+                if (Aids == null)
+                    Aids = new List<Aid>();
                 return Page();
             }
             catch (Exception ex)
