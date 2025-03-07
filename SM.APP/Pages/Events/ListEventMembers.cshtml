@@ -60,6 +60,11 @@
                                 <i class="fa-solid fa-sort"></i>
                                 <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search Card Status">
                             </th>
+                            <th onclick="sortTable(9,this)">
+                                Attendance
+                                <i class="fa-solid fa-sort"></i>
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="9" placeholder="Search Attendance">
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,6 +98,20 @@
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Bus)
+                                </td>
+                                <td>
+                                    @if (item.Attended == true)
+                                    {
+                                        <span class="text-success">
+                                            <i class="bi bi-check-circle"></i> Present
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">
+                                            <i class="bi bi-x-circle"></i> Absent
+                                        </span>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -128,11 +147,24 @@
                             </a>
                         }
                     </p>
-                    <p class="mb-1"><strong>File Number:</strong> @Html.DisplayFor(modelItem => item.UNFileNumber)</p>
-                    <p class="mb-1"><strong>Personal Number:</strong> @Html.DisplayFor(modelItem => item.UNPersonalNumber)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
                     <p class="mb-1"><strong>Team:</strong> @Html.DisplayFor(modelItem => item.Team)</p>
                     <p class="mb-1"><strong>Bus:</strong> @Html.DisplayFor(modelItem => item.Bus)</p>
+                    <p class="mb-1">
+                        @if (item.Attended == true)
+                        {
+                            <span class="text-success">
+                                <i class="bi bi-check-circle"></i> Present
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">
+                                <i class="bi bi-x-circle"></i> Absent
+                            </span>
+                        }
+                    </p>
+
                 </div>
             }
         </div>
