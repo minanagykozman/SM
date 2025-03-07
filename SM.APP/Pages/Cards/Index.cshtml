@@ -17,7 +17,7 @@
         <div class="row g-3">
             <div class="col-12">
                 <div class="form-floating">
-                    <select id="dpCardStatus" asp-for="CardStatus" class="form-select">
+                    <select id="dpCardStatus" class="form-select">
                         <option value="">Select Card Status</option>
                         <option value="MissingPhoto">Missing photo</option>
                         <option value="ReadyToPrint">Ready to print</option>
@@ -25,7 +25,7 @@
                         <option value="Delivered">Delivered</option>
                         <option value="NotApplicable">Not applicable</option>
                     </select>
-                    <label asp-for="CardStatus"></label>
+                    <label >Card Status</label>
                 </div>
             </div>
             <partial name="_SearchPartial" />
