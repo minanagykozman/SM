@@ -142,6 +142,23 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpPost("CreateEvent")]
+        public ActionResult<int> CreateEvent([FromBody] EventParams eventParams)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var eventID = eventHandler.CreateEvent(eventParams.Event.EventName, eventParams.Event.EventStartDate, eventParams.Event.EventEndDate, eventParams.Classes);
+                    return Ok(eventID);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpPost("TakeAttendance")]
         public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID)
         {
@@ -194,6 +211,11 @@ namespace SM.API.Controllers
             public int EventID { get; set; }
             public List<string> Teams { get; set; }
             public List<string> Busses { get; set; }
+        }
+        public class EventParams
+        {
+            public Event Event { get; set; }
+            public List<int> Classes { get; set; }
         }
     }
 }

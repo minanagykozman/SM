@@ -13,7 +13,7 @@ namespace SM.BAL
         /// <param name="eventStartDate"></param>
         /// <param name="eventEndDate"></param>
         /// <param name="classIDs"></param>
-        public void CreateEvent(string eventName, DateTime eventStartDate, DateTime eventEndDate, List<int> classIDs)
+        public int CreateEvent(string eventName, DateTime eventStartDate, DateTime eventEndDate, List<int> classIDs)
         {
             try
             {
@@ -21,7 +21,8 @@ namespace SM.BAL
                 {
                     EventName = eventName,
                     EventStartDate = eventStartDate,
-                    EventEndDate = eventEndDate
+                    EventEndDate = eventEndDate,
+                    IsActive = true
                 };
                 _dbcontext.Events.Add(ev);
                 _dbcontext.SaveChanges();
@@ -31,10 +32,12 @@ namespace SM.BAL
                     _dbcontext.ClassEvents.Add(new ClassEvent() { ClassID = classID, EventID = ev.EventID });
                 }
                 _dbcontext.SaveChanges();
+                return ev.EventID;
             }
             catch (Exception ex)
             {
                 Logger.log.Error("", ex);
+                return 0;
             }
         }
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
@@ -72,8 +75,8 @@ namespace SM.BAL
         {
             memberCode = memberCode.Trim();
             var lmember = _dbcontext.MemberEventView.
-                FirstOrDefault(m => m.Code.Contains(memberCode) 
-                || m.UNPersonalNumber == memberCode 
+                FirstOrDefault(m => m.Code.Contains(memberCode)
+                || m.UNPersonalNumber == memberCode
                 || (m.UNFileNumber == memberCode && m.IsMainMember));
             member = lmember;
             if (member == null)
@@ -130,7 +133,7 @@ namespace SM.BAL
         {
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
-            return _dbcontext.Events.Where(e => events.Contains(e.EventID)).ToList<Event>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsActive).ToList<Event>();
         }
         public List<Event> GetEvents(string username)
         {
@@ -139,7 +142,7 @@ namespace SM.BAL
                 throw new Exception("Servant not found");
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
-            return _dbcontext.Events.Where(e => events.Contains(e.EventID)).ToList<Event>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsActive).ToList<Event>();
         }
         public List<Member> GetEventRegisteredMembers(int eventID)
         {
