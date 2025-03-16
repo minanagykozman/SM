@@ -13,10 +13,10 @@ namespace SM.APP.Pages.Classess
     public class TakeAttendanceModel(UserManager<IdentityUser> userManager, ILogger<TakeAttendanceModel> logger) : PageModelBase(userManager, logger)
     {
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
-
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            await GetAPIToken();
+            return Page();
         }
-
     }
 }

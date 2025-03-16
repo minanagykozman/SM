@@ -123,7 +123,7 @@ namespace SM.APP.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User logged in.");
                     //var user = await _userManager.FindByNameAsync(Input.Email);
-                    var expirationTime = DateTime.UtcNow.AddMinutes(300);
+                    var expirationTime = DateTime.UtcNow.AddMinutes(SMConfigurationManager.TokenExpiry);
                     var roles = await _userManager.GetRolesAsync(user);
                     var token = AuthenticatorService.GenerateToken(user, roles, expirationTime);
 

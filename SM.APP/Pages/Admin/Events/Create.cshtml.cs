@@ -12,8 +12,5 @@ namespace SM.APP.Pages.Admin.Events
     {
         [BindProperty]
         public Event Event { get; set; } = default!;
-        public void OnGet()
-        {
-        }
     }
 }

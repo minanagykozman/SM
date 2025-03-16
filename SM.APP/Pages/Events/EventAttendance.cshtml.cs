@@ -15,10 +15,10 @@ namespace SM.APP.Pages.Events
     public class EventAttendanceModel(UserManager<IdentityUser> userManager, ILogger<EventAttendanceModel> logger) : PageModelBase(userManager, logger)
     {
         public List<MemberEventView> EventMembers { get; set; } = new List<MemberEventView>();
-
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            await GetAPIToken();
+            return Page();
         }
-
     }
 }

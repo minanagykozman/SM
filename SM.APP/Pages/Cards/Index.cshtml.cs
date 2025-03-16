@@ -12,8 +12,10 @@ namespace SM.APP.Pages.Cards
     [Authorize(Roles = "Admin,Servant")]
     public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
     {
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            await GetAPIToken();
+            return Page();
         }
     }
 }

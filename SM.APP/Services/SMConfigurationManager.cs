@@ -4,11 +4,15 @@ namespace SM.APP.Services
 {
     public static class SMConfigurationManager
     {
-        private static IConfiguration _configuration;
+        private static IConfiguration _configuration = default!;
 
         public static void SetConfiguration(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+        public static int TokenExpiry
+        {
+            get { return 120; }
         }
         public static string ApiBase
         {

@@ -87,10 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 qrScannerContainer.classList.add("d-none");
             });
-            // Show QR scanner on mobile only
-            if (window.innerWidth <= 768) {
-
-            }
         }
     }
 

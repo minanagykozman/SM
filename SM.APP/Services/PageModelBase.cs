@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NuGet.Common;
 
 namespace SM.APP.Services
 {
@@ -13,7 +14,9 @@ namespace SM.APP.Services
         {
             _userManager = userManager;
             _logger = logger;
+            
         }
+        
         public async Task<string> GetAPIToken()
         {
             string jwtToken = Request.Cookies["AuthToken"];
@@ -21,8 +24,32 @@ namespace SM.APP.Services
             {
                 var user = await _userManager.FindByNameAsync(User.Identity.Name);
                 var roles = await _userManager.GetRolesAsync(user);
-                var expirationTime = DateTime.UtcNow.AddMinutes(300);
+                var expirationTime = DateTime.UtcNow.AddMinutes(SMConfigurationManager.TokenExpiry);
                 jwtToken = AuthenticatorService.GenerateToken(user, roles, expirationTime);
+
+                if (SMConfigurationManager.IsDevelopment)
+                {
+                    Response.Cookies.Append("AuthToken", jwtToken, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = expirationTime,
+                        Path = "/"
+                    });
+                }
+                else
+                {
+                    Response.Cookies.Append("AuthToken", jwtToken, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = expirationTime,
+                        Domain = ".stmosesservices.com",
+                        Path = "/"
+                    });
+                }
             }
             return jwtToken;
         }

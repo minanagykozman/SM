@@ -14,14 +14,10 @@ namespace SM.APP.Pages.Events
     [Authorize(Roles = "Admin,Servant")]
     public class RegisterEventModel(UserManager<IdentityUser> userManager, ILogger<RegisterEventModel> logger) : PageModelBase(userManager, logger)
     {
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-
+            await GetAPIToken();
+            return Page();
         }
-
-
-
     }
-
-
 }

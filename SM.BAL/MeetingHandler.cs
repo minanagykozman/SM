@@ -81,7 +81,7 @@ namespace SM.BAL
                 cm.ServantID = servant.ServantID;
                 _dbcontext.SaveChanges();
             }
-            return "OK";
+            return servant.ServantName;
         }
         public string UnAssignMemberServant(int memberID, int classID)
         {

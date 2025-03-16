@@ -143,12 +143,13 @@
                 <td>${member.mobile}</td>
                 <td>${member.attendance}</td>
                 <td>${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}</td>
-                <td>${member.servant}</td>
+                <td><span class="servant-name" data-member-id="${member.memberID}">${member.servant}</span></td>
                 <td>
-                    <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"}"
-                    onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
-                    ${member.showAssign ? "Assign" : "Unassign"}
-                    </button>
+                   <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"} assign-btn"
+                      data-member-id="${member.memberID}"
+                      onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
+                      ${member.showAssign ? "Assign" : "Unassign"}
+                   </button>
                 </td>
             `;
 
@@ -176,12 +177,14 @@
         <p class="mb-1"><strong>Last Present Date:</strong>
             ${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}
         </p>
-        <p class="mb-1"><strong>Servant:</strong> ${member.servant}</p>
+        <p class="mb-1"><strong>Servant: </strong><span class="servant-name" data-member-id="${member.memberID}">${member.servant}</span>
+        </p>
 
-        <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"}"
+            <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"} assign-btn"
+        data-member-id="${member.memberID}"
         onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
         ${member.showAssign ? "Assign" : "Unassign"}
-        </button>
+    </button>
     `;
         mobileList.appendChild(listItem);
         });
@@ -197,9 +200,15 @@
             },
             body: JSON.stringify({  classID: classID, memberID: memberID })
         })
+        .then(response => response.text())
         .then(data => {
-            console.log("Success:", data);
-            fetchClassMembers();
+            $('[data-member-id="' + memberID + '"]').text(data);
+            const $btn = $(`.assign-btn[data-member-id="${memberID}"]`);
+            $btn.removeClass("btn-success btn-danger"); 
+            $btn.addClass("btn-danger");
+            $btn.text("Unassign"); 
+            $btn.attr("onclick", `unAssignServant(${memberID})`);
+            //fetchClassMembers();
         })
         .catch(error => {
             console.error("Error:", error);
@@ -218,8 +227,13 @@
             body: JSON.stringify({  classID: classID, memberID: memberID })
         })
         .then(data => {
-            console.log("Success:", data);
-            fetchClassMembers();
+            $('[data-member-id="' + memberID + '"]').text('');
+            const $btn = $(`.assign-btn[data-member-id="${memberID}"]`);
+            $btn.removeClass("btn-success btn-danger");
+            $btn.addClass("btn-success");
+            $btn.text("Assign");
+            $btn.attr("onclick", `assignServant(${memberID})`);
+            //fetchClassMembers();
         })
         .catch(error => {
             console.error("Error:", error);
