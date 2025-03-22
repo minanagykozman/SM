@@ -8,11 +8,8 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Classess
 {
-    public class ClassOccurancesModel : PageModelBase
+    public class ClassOccurancesModel(UserManager<IdentityUser> userManager, ILogger<ClassOccurancesModel> logger) : PageModelBase(userManager, logger)
     {
-        public ClassOccurancesModel(UserManager<IdentityUser> userManager, ILogger<ClassOccurancesModel> logger) : base(userManager, logger)
-        {
-        }
         #region Properties
         [BindProperty(SupportsGet = true)]
         public List<ClassOccurrence> TodayClasses { get; set; }

@@ -5,34 +5,74 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Upcoming Events</h2>
-    <div class="row g-3">
-        @foreach (var item in Model.Events)
-        {
-            <div class="col-md-6 col-lg-4">
-                <div class="card p-3 shadow-sm">
-                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.EventName)</h5>
-                    <div class="d-flex justify-content-between">
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="classActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="classActionsDropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-page="./RegisterEvent" asp-route-eventID="@item.EventID">Registration</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-page="./EventAttendance" asp-route-eventID="@item.EventID">Attendance</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-page="./ListEventMembers" asp-route-eventID="@item.EventID">View Members</a>
-                                </li>
-                            </ul>
+    <h2 class="text-center mb-4">
+        <button class="btn btn-link text-decoration-none" data-bs-toggle="collapse" data-bs-target="#upcomingEvents" aria-expanded="true">
+            Upcoming Events<i class="bi bi-chevron-down"></i>
+        </button>
+    </h2>
+    <div id="upcomingEvents" class="collapse">
+        <div class="row g-3">
+            @foreach (var item in Model.UpcomingEvents)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.EventName)</h5>
+                        <div class="d-flex justify-content-between">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="classActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="classActionsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./RegisterEvent" asp-route-eventID="@item.EventID">Registration</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./EventAttendance" asp-route-eventID="@item.EventID">Attendance</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./ListEventMembers" asp-route-eventID="@item.EventID">View Members</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
-
+    <h2 class="text-center mb-4">
+        <button class="btn btn-link text-decoration-none" data-bs-toggle="collapse" data-bs-target="#pastEvents" aria-expanded="true">
+            Past Events<i class="bi bi-chevron-down"></i>
+        </button>
+    </h2>
+    <div id="pastEvents" class="collapse">
+        <div class="row g-3">
+            @foreach (var item in Model.PastEvents)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.EventName)</h5>
+                        <div class="d-flex justify-content-between">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="classActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="classActionsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./RegisterEvent" asp-route-eventID="@item.EventID">Registration</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./EventAttendance" asp-route-eventID="@item.EventID">Attendance</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="./ListEventMembers" asp-route-eventID="@item.EventID">View Members</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </div>

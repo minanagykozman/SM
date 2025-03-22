@@ -28,6 +28,10 @@
                                 Name
                                 <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
                             </th>
+                            <th>
+                                Timestamp
+                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search Timestamp">
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,12 +105,13 @@
         const mobileList = document.getElementById("mobileList");
         mobileList.innerHTML = ""; // Clear existing list items
 
-        members.forEach(member => {
+        members.forEach(memberAid => {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
-                <td>${member.fullName}</td>
+                <td><a href="/Admin/Members/Edit?id=${memberAid.member.memberID}" target="_blank" rel="noopener noreferrer">${memberAid.member.code}</a></td>
+                <td>${memberAid.member.fullName}</td>
+                <td>${memberAid.timeStamp}</td>
             `;
 
             tableBody.appendChild(row);
@@ -116,9 +121,10 @@
 
         listItem.innerHTML = `
             <h5 class="mb-1 text-primary">
-                <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
+                <a href="/Admin/Members/Edit?id=${memberAid.member.memberID}" target="_blank" rel="noopener noreferrer">${memberAid.member.code}</a>
             </h5>
-            <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
+            <p class="mb-1"><strong>Name:</strong> ${memberAid.member.fullName}</p>
+            <p class="mb-1"><strong>Time:</strong> ${memberAid.timeStamp}</p>
         `;
 
         mobileList.appendChild(listItem);

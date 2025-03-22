@@ -54,7 +54,7 @@ namespace SM.API.Controllers
 
 
         [HttpGet("GetAidMembers")]
-        public ActionResult<List<Member>> GetAidMembers(int aidID)
+        public ActionResult<List<MemberAid>> GetAidMembers(int aidID)
         {
             try
             {

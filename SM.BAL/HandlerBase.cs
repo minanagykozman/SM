@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SM.BAL
 {
-    public class HandlerBase:IDisposable
+    public class HandlerBase : IDisposable
     {
         internal AppDbContext _dbcontext;
         public HandlerBase()
@@ -34,7 +34,7 @@ namespace SM.BAL
         public Member? GetMemberWithClasses(string memberCode)
         {
             memberCode = memberCode.Trim();
-            return _dbcontext.Members.Include(m=>m.ClassMembers).
+            return _dbcontext.Members.Include(m => m.ClassMembers).
                 FirstOrDefault(m => m.Code.Contains(memberCode)
                 || m.UNPersonalNumber == memberCode
                 || (m.UNFileNumber == memberCode && m.IsMainMember));

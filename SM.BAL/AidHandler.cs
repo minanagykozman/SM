@@ -29,7 +29,7 @@ namespace SM.BAL
             return aidNew.AidID;
         }
 
-        public AidStatus CheckMemberStatus(int aidID, string memberCode,out Member member)
+        public AidStatus CheckMemberStatus(int aidID, string memberCode, out Member member)
         {
             Member? lmember = GetMember(memberCode);
             member = lmember;
@@ -84,9 +84,9 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return AidStatus.OK;
         }
-        public List<Member> GetAidMembers(int aidID)
+        public List<MemberAid> GetAidMembers(int aidID)
         {
-            List<Member> members = _dbcontext.MemberAids.Where(er => er.AidID == aidID ).OrderByDescending(ev => ev.TimeStamp).Select(er => er.Member).ToList();
+            List<MemberAid> members = _dbcontext.MemberAids.Include(ma => ma.Member).Where(er => er.AidID == aidID).OrderByDescending(ev => ev.TimeStamp).ToList();
             return members;
         }
         public List<Aid> GetAids(string username)

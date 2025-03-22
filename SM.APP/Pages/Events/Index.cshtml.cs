@@ -16,7 +16,8 @@ namespace SM.APP.Pages.Events
     {
         
         [BindProperty(SupportsGet = true)]
-        public List<Event> Events { get; set; }
+        public List<Event> UpcomingEvents { get; set; }
+        public List<Event> PastEvents { get; set; }
         public async Task<IActionResult> OnGetAsync()
         {
             try
@@ -35,11 +36,23 @@ namespace SM.APP.Pages.Events
                         {
                             PropertyNameCaseInsensitive = true
                         };
-                        Events = JsonSerializer.Deserialize<List<Event>>(responseData, options);
+                        var Events = JsonSerializer.Deserialize<List<Event>>(responseData, options);
+                        if (Events == null)
+                        {
+                            UpcomingEvents = new List<Event>();
+                            PastEvents = new List<Event>();
+                        }
+                        else
+                        {
+                            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); // Example for UTC+2
+                            DateTime utcNow = DateTime.UtcNow;
+                            DateTime utcPlus2 = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz);
+
+                            UpcomingEvents = Events.Where(c => c.EventEndDate.Date >= utcPlus2.Date).ToList();
+                            PastEvents = Events.Where(c => c.EventEndDate.Date < utcPlus2.Date).ToList();
+                        }
                     }
                 }
-                if (Events == null)
-                    Events = new List<Event>();
                 return Page();
             }
             catch (Exception ex)
