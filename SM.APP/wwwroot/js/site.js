@@ -241,9 +241,11 @@ function handleHTTPError(response) {
 
 function showErrorMessage(message) {
     const tableBody = document.querySelector("#dataTable tbody");
+    var columnCount = $("#dataTable tr:first td").length || $("#dataTable tr:first th").length;
+
     tableBody.innerHTML = `
         <tr>
-            <td colspan="7" class="text-center">
+            <td colspan="${columnCount}" class="text-center">
                 <div class="alert alert-danger d-flex align-items-center justify-content-center p-2" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icon -->
                     <span>${message}</span>
@@ -256,6 +258,30 @@ function showErrorMessage(message) {
     const listItem = document.createElement("div");
     listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
     listItem.innerHTML = `<div class="alert alert-danger d-flex align-items-center justify-content-center p-2" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icon -->
+                    <span>${message}</span>
+                </div>`;
+    mobileList.appendChild(listItem);
+}
+
+function showWarningMessage(message) {
+    const tableBody = document.querySelector("#dataTable tbody");
+    var columnCount = $("#dataTable tr:first td").length || $("#dataTable tr:first th").length;
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="${columnCount}" class="text-center">
+                <div class="alert alert-success d-flex align-items-center justify-content-center p-2" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icon -->
+                    <span>${message}</span>
+                </div>
+            </td>
+        </tr>
+        `;
+    const mobileList = document.getElementById("mobileList");
+    mobileList.innerHTML = ""; // Clear existing list items
+    const listItem = document.createElement("div");
+    listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
+    listItem.innerHTML = `<div class="alert alert-success d-flex align-items-center justify-content-center p-2" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icon -->
                     <span>${message}</span>
                 </div>`;

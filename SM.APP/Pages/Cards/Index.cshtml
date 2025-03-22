@@ -111,7 +111,7 @@
             const members = await response.json();
 
             if (!Array.isArray(members) || members.length === 0) {
-                showErrorMessage("No members found for this status.");
+                showWarningMessage("No members found for this status.");
                 return;
             }
 
