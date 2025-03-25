@@ -287,3 +287,11 @@ function showWarningMessage(message) {
                 </div>`;
     mobileList.appendChild(listItem);
 }
+function showLoading() {
+    const loadingIndicator = document.getElementById("loadingIndicator");
+    loadingIndicator.classList.remove("d-none");
+}
+function hideLoading() {
+    const loadingIndicator = document.getElementById("loadingIndicator");
+    loadingIndicator.classList.add("d-none");
+}

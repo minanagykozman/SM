@@ -185,17 +185,23 @@
     function populateModal(data) {
         switch (data.status) {
             case 0:
-                document.getElementById("MemberStatus").value = "Member not found or not registered";
+                document.getElementById("MemberStatusAlert").value = "Member not found or not registered";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 1:
-                document.getElementById("MemberStatus").value = "Event not found";
+                document.getElementById("MemberStatusAlert").value = "Event not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 5:
                 document.getElementById("MemberStatus").value = "Can attend";
+                $("#divStatus").show();
+                $("#divStatusAlert").hide();
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 document.getElementById("MemberAge").value =data.member.age;
@@ -209,7 +215,9 @@
                 $("#submitBtn").show();
                 break;
             case 7:
-                document.getElementById("MemberStatus").value = "Member not registered in this event!";
+                document.getElementById("MemberStatusAlert").value = "Member not registered in this event!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").hide();
                 document.getElementById("MemberCode").value =data.member.code;
@@ -220,7 +228,9 @@
                 $("#divBus").hide();
                 break;
             case 8:
-                document.getElementById("MemberStatus").value = "Member already attedned!";
+                document.getElementById("MemberStatusAlert").value = "Member already attedned!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").hide();
                 document.getElementById("MemberName").value =data.member.fullName;

@@ -12,8 +12,20 @@
                 <input type="hidden" name="MemberStatusCode" value="" />
                 <!-- Status -->
                 <div class="form-floating mb-3" id="divStatus">
-                    <input type="text" class="form-control" id="MemberStatus" value="" readonly />
-                    <label for="MemberStatus">Status</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-success text-white">
+                            <i class="bi bi-check-circle"></i>
+                        </span>
+                        <input type="text" class="form-control text-success fw-bold" id="MemberStatus" value="Can attend" readonly />
+                    </div>
+                </div>
+                <div class="form-floating mb-3" id="divStatusAlert">
+                    <div class="input-group">
+                        <span class="input-group-text bg-danger text-white">
+                            <i class="bi bi-x-circle"></i>
+                        </span>
+                        <input type="text" class="form-control text-danger fw-bold" id="MemberStatusAlert" value="Can attend" readonly />
+                    </div>
                 </div>
                 <div class="row g-3" id="MemberDataBody">
                     <div class="col-md-6">

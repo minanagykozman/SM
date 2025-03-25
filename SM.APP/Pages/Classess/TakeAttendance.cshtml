@@ -150,7 +150,9 @@
         $("#divBus").hide();
         switch (data.attendanceStatus) {
             case 0:
-                document.getElementById("MemberStatus").value = "Member not registered in class";
+                document.getElementById("MemberStatusAlert").value = "Member not registered in class";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 document.getElementById("MemberAge").value =data.member.age;
@@ -161,19 +163,25 @@
                 showModal();
                 break;
             case 1:
-                document.getElementById("MemberStatus").value = "Member not found";
+                document.getElementById("MemberStatusAlert").value = "Member not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 showModal();
                 break;
             case 2:
-                document.getElementById("MemberStatus").value = "Meeting not found";
+                document.getElementById("MemberStatusAlert").value = "Meeting not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 showModal();
                 break;
             case 3:
-                document.getElementById("MemberStatus").value = "Member already attedned!";
+                document.getElementById("MemberStatusAlert").value = "Member already attedned!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").hide();
                 document.getElementById("MemberName").value =data.member.fullName;

@@ -172,24 +172,33 @@
         $("#divCard").hide();
         switch (data.status) {
             case 0:
-                document.getElementById("MemberStatus").value = "Member not registered in this aid!";
+                document.getElementById("MemberStatusAlert").value = "Member not registered in this aid!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").show();
+                document.querySelector('input[name="MemberCode"]').value = data.member.code;
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 break;
             case 1:
-                document.getElementById("MemberStatus").value = "Member not found or not registered";
+                document.getElementById("MemberStatusAlert").value = "Member not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 2:
-                document.getElementById("MemberStatus").value = "Aid not found";
+                document.getElementById("MemberStatusAlert").value = "Aid not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 3:
-                document.getElementById("MemberStatus").value = "Member already took!";
+                document.getElementById("MemberStatusAlert").value = "Member already took!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").hide();
                 document.getElementById("MemberName").value =data.member.fullName;
@@ -197,6 +206,8 @@
                 break;
             case 4:
                 document.getElementById("MemberStatus").value = "Can take";
+                $("#divStatus").show();
+                $("#divStatusAlert").hide();
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 document.querySelector('input[name="MemberCode"]').value = data.member.code;

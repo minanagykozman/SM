@@ -183,17 +183,23 @@
         
         switch (data.status) {
             case 0:
-                document.getElementById("MemberStatus").value = "Member not found";
+                document.getElementById("MemberStatusAlert").value = "Member not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 1:
-                document.getElementById("MemberStatus").value = "Event not found";
+                document.getElementById("MemberStatusAlert").value = "Event not found";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").hide();
                 $("#submitBtn").hide();
                 break;
             case 2:
-                document.getElementById("MemberStatus").value = "Member not elligible";
+                document.getElementById("MemberStatusAlert").value = "Member not elligible";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 document.getElementById("MemberAge").value =data.member.age;
@@ -203,7 +209,9 @@
                 $("#submitBtn").show();
                 break;
              case 3:
-                document.getElementById("MemberStatus").value = "Member already registered!";
+                document.getElementById("MemberStatusAlert").value = "Member already registered!";
+                $("#divStatus").hide();
+                $("#divStatusAlert").show();
                 $("#MemberDataBody").show();
                 $("#submitBtn").hide();
                 document.getElementById("MemberName").value =data.member.fullName;
@@ -213,6 +221,8 @@
                 break;
             case 4:
                 document.getElementById("MemberStatus").value = "Can register";
+                $("#divStatus").show();
+                $("#divStatusAlert").hide();
                 document.getElementById("MemberCode").value =data.member.code;
                 document.getElementById("MemberName").value =data.member.fullName;
                 document.getElementById("MemberAge").value =data.member.age;

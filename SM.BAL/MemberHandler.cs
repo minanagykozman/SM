@@ -224,6 +224,7 @@ namespace SM.BAL
         }
 
         public bool UpdateCardStatus(string memberCode, CardStatus cardStatus)
+        
         {
             var member = GetMemberByCodeOnly(memberCode);
             if (member == null)

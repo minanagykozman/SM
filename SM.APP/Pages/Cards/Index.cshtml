@@ -25,11 +25,12 @@
                         <option value="Delivered">Delivered</option>
                         <option value="NotApplicable">Not applicable</option>
                     </select>
-                    <label >Card Status</label>
+                    <label>Card Status</label>
                 </div>
             </div>
             <partial name="_SearchPartial" />
         </div>
+        <partial name="_LoadingPartial" />
         <div class="row g-3">
             <div class="d-none d-md-block">
                 <div class="table-responsive">
@@ -72,7 +73,7 @@
     </div>
 
     <partial name="_ModalPartial" />
-    
+
 </div>
 
 
@@ -95,6 +96,7 @@
         const url = `${apiBaseUrl}/Member/GetMembersByCardStatus`;
 
         try {
+            showLoading();
             const response = await fetch(`${url}?cardStatus=${cardStatus}`, {
                 method: "GET",
                 credentials: "include",
@@ -120,6 +122,9 @@
         } catch (error) {
             console.error("Network error:", error);
             showErrorMessage("Failed to fetch data. Please try again later.");
+        }
+        finally {
+            hideLoading();
         }
     }
 
@@ -211,6 +216,7 @@
             $("#divTeam").hide();
             $("#divBus").hide();
             $("#divStatus").hide();
+            $("#divStatusAlert").hide();
             $("#divAge").hide();
 
 
