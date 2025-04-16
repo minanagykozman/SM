@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -24,6 +24,13 @@ namespace SM.APP.Pages.Admin.Members
     {
         [BindProperty]
         public Member Member { get; set; } = default!;
+
+        public List<EventRegistration> EventRegistrations { get; set; } = new();
+        public List<ClassMember> ClassMemberships { get; set; } = new();
+        public List<ClassAttendance> ClassAttendances { get; set; } = new();
+        public List<MemberAid> MemberAids { get; set; } = new();
+        public List<Fund> Funds { get; set; } = new();
+
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
