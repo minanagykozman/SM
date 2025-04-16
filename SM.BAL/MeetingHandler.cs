@@ -52,6 +52,8 @@ namespace SM.BAL
             }
             return membersExtended;
         }
+
+        
         public Class CreateClass(string className, int meetingID)
         {
             try

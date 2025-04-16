@@ -23,23 +23,23 @@ internal class Program
         string audience = string.Empty;
         if (!builder.Environment.IsDevelopment())
         {
-            connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
-            loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB");
-            secretKey = Environment.GetEnvironmentVariable("JWTSecretKey");
-            issuer = Environment.GetEnvironmentVariable("JWTIssuer");
-            audience = Environment.GetEnvironmentVariable("JWTAudience");
+            connectionString = Environment.GetEnvironmentVariable("DBConnectionString")!;
+            loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB")!;
+            secretKey = Environment.GetEnvironmentVariable("JWTSecretKey")!;
+            issuer = Environment.GetEnvironmentVariable("JWTIssuer")!;
+            audience = Environment.GetEnvironmentVariable("JWTAudience")!;
             builder.WebHost.UseKestrel(options =>
             {
-                options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
+                options.ListenAnyIP(5000); 
             });
         }
         else
         {
-            connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
-            loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB");
-            secretKey = builder.Configuration["JwtSettings:SecretKey"];
-            issuer = builder.Configuration["JwtSettings:Issuer"];
-            audience = builder.Configuration["JwtSettings:Audience"];
+            connectionString = builder.Configuration.GetConnectionString("DBConnectionString")!;
+            loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB")!;
+            secretKey = builder.Configuration["JwtSettings:SecretKey"]!;
+            issuer = builder.Configuration["JwtSettings:Issuer"]!;
+            audience = builder.Configuration["JwtSettings:Audience"]!;
         }
         // Register ApplicationDbContext with the MySQL connection string
         builder.Services.AddDbContext<AppDbContext>(options =>
@@ -96,6 +96,13 @@ internal class Program
             dbContext.Database.Migrate();
         }
 
+        //app.Use(async (context, next) =>
+        //{
+
+        //    context.Response.Headers.Add("Content-Security-Policy",
+        //        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self';");
+        //    await next();
+        //});
 
         app.UseCors("AllowAppAndApi");
 

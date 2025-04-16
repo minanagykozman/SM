@@ -21,6 +21,9 @@ namespace SM.DAL.DataModel
         [Display(Name = "Last name")]
         [MaxLength(100)]
         public string? UNLastName { get; set; }
+        [Display(Name = "Baptism name")]
+        [MaxLength(50)]
+        public string? BaptismName { get; set; }
         public string? Nickname { get; set; }
         [Display(Name = "UN File Number")]
         public string UNFileNumber { get; set; }
@@ -52,6 +55,7 @@ namespace SM.DAL.DataModel
         public DateTime? CreatedAt { get; set; } = null;
         public int? CreatedBy { get; set; } = null;
         public string? ModifiedLog { get; set; } = null;
+        public string? VisitationNotes { get; set; } = null;
         public int Age
         {
             get

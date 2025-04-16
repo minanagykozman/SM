@@ -32,6 +32,8 @@
         public DbSet<MemberEventView> MemberEventView { get; set; }
         public DbSet<MemberClasssAttendanceView> MemberClasssAttendanceView { get; set; }
         public DbSet<AidClass> AidClasses { get; set; }
+        public DbSet<Visitation> Visitations { get; set; }
+        public DbSet<MemberFund> MemberFunds { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -49,6 +51,12 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Visitation>()
+                .Property(u => u.VisitationID).ValueGeneratedOnAdd();
+            modelBuilder.Entity<MemberFund>().HasKey(u => u.FundID);
+            modelBuilder.Entity<MemberFund>()
+                .Property(u => u.FundID).ValueGeneratedOnAdd();
+
             modelBuilder.Entity<ClassMember>()
                 .HasKey(cm => new { cm.ClassID, cm.MemberID });
 

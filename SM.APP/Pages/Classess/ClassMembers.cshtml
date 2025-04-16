@@ -141,13 +141,43 @@
                 <td>${member.attendance}</td>
                 <td>${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}</td>
                 <td><span class="servant-name" data-member-id="${member.memberID}">${member.servant}</span></td>
-                <td>
-                   <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"} assign-btn"
-                      data-member-id="${member.memberID}"
-                      onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
-                      ${member.showAssign ? "Assign" : "Unassign"}
-                   </button>
-                </td>
+                    <td>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="dropdown-item assign-btn ${member.showAssign ? 'text-success' : 'text-danger'}"
+               href="#"
+               data-member-id="${member.memberID}"
+               onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
+              ${member.showAssign ? "Assign" : "Unassign"}
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item text-primary" href="#" onclick="assignToAnother(${member.memberID})">
+              Assign to another
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#" onclick="editUser(${member.memberID})">
+              Edit user
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#" onclick="updateVisitationNote(${member.memberID})">
+              Update visitation note
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#" onclick="addVisitation(${member.memberID})">
+              Add visitation
+            </a>
+          </li>
+        </ul>
+      </div>
+    </td>
             `;
 
             tableBody.appendChild(row);

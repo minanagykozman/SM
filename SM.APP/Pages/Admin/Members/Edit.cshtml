@@ -8,133 +8,439 @@
 <div class="container mt-4">
     <h1 class="text-center">Edit Member</h1>
     <hr />
-    <div class="card shadow-lg p-4">
-        <form method="post">
-            <input type="hidden" asp-for="Member.MemberID" />
-            <input type="hidden" asp-for="Member.IsActive" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="row g-3">
-                <div class="col-md-12">
-                    <div class="form-floating">
-                        <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
-                        <label asp-for="Member.Code"></label>
+
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary bg-gradient text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>Member Information
+                </h5>
+                <span class="badge bg-light text-dark">ID: @Model.Member.Code</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <input type="hidden" asp-for="Member.MemberID" />
+                <input type="hidden" asp-for="Member.IsActive" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
+                            <label asp-for="Member.Code"></label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" id="UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
-                        <label asp-for="Member.UNPersonalNumber"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.UNPersonalNumber" id="UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
+                            <label asp-for="Member.UNPersonalNumber"></label>
+                        </div>
+                        <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" class="form-control" placeholder="Enter File Number" />
-                        <label asp-for="Member.UNFileNumber"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.UNFileNumber" class="form-control" placeholder="Enter File Number" />
+                            <label asp-for="Member.UNFileNumber"></label>
+                        </div>
+                        <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
-                        <label asp-for="Member.UNFirstName"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
+                            <label asp-for="Member.UNFirstName"></label>
+                        </div>
+                        <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
-                        <label asp-for="Member.UNLastName"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
+                            <label asp-for="Member.UNLastName"></label>
+                        </div>
+                        <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select asp-for="Member.Gender" class="form-select">
-                            <option value="">Select Gender</option>
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                        </select>
-                        <label asp-for="Member.Gender"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select asp-for="Member.Gender" class="form-select">
+                                <option value="">Select Gender</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                            <label asp-for="Member.Gender"></label>
+                        </div>
+                        <span asp-validation-for="Member.Gender" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Gender" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
-                        <label asp-for="Member.Birthdate"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
+                            <label asp-for="Member.Birthdate"></label>
+                        </div>
+                        <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
-                        <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
+                            <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
-                        <label asp-for="Member.Mobile"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
+                            <label asp-for="Member.Mobile"></label>
+                        </div>
+                        <span asp-validation-for="Member.Mobile" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Mobile" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select asp-for="Member.CardStatus" class="form-select" >
-                            <option value="MissingPhoto">Missing photo</option>
-                            <option value="ReadyToPrint">Ready to print</option>
-                            <option value="Printed">Printed</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="NotApplicable">Not applicable</option>
-                        </select>
-                        <label asp-for="Member.CardStatus"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select asp-for="Member.CardStatus" class="form-select" >
+                                <option value="MissingPhoto">Missing photo</option>
+                                <option value="ReadyToPrint">Ready to print</option>
+                                <option value="Printed">Printed</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="NotApplicable">Not applicable</option>
+                            </select>
+                            <label asp-for="Member.CardStatus"></label>
+                        </div>
+                        <span asp-validation-for="Member.CardStatus" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.CardStatus" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
+                            <label asp-for="Member.ImageReference"></label>
+                        </div>
+                        <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
-                        <label asp-for="Member.Nickname"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
+                            <label asp-for="Member.Nickname"></label>
+                        </div>
+                        <span asp-validation-for="Member.Nickname" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
-                        <label asp-for="Member.School"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
+                            <label asp-for="Member.School"></label>
+                        </div>
+                        <span asp-validation-for="Member.School" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.School" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
-                        <label asp-for="Member.Work"></label>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
+                            <label asp-for="Member.Work"></label>
+                        </div>
+                        <span asp-validation-for="Member.Work" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-floating">
-                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
-                        <label asp-for="Member.Notes"></label>
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                            <label asp-for="Member.Notes"></label>
+                        </div>
+                        <span asp-validation-for="Member.Notes" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Member.Notes" class="text-danger"></span>
+
                 </div>
 
-            </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-page="Index" asp-route-userCode="@Model.Member.Code" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div class="d-flex justify-content-between mt-4">
-                <a asp-page="Index" asp-route-userCode="@Model.Member.Code" class="btn btn-outline-secondary">Back to List</a>
-                <button type="submit" class="btn btn-primary">Save</button>
+    <!-- Member Activity Tabs -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary bg-gradient text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2"></i>Member Details
+            </h5>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="memberActivityTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">
+                        <i class="bi bi-calendar-event me-1"></i>Events
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">
+                        <i class="bi bi-calendar-check me-1"></i>Classes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
+                        <i class="bi bi-person-check me-1"></i>Attendance
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
+                        <i class="bi bi-hospital me-1"></i>Aids
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
+                        <i class="bi bi-cash-coin me-1"></i>Funds
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content pt-3" id="memberActivityTabsContent">
+                <!-- Event Registrations Tab -->
+                <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Event Registrations</h5>
+                        <a href="/Admin/Events/RegisterMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Register for Event
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                    <th>Registration Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.EventRegistrations != null && Model.EventRegistrations.Any())
+                                {
+                                    @foreach (var reg in Model.EventRegistrations)
+                                    {
+                                        <tr>
+                                            <td>@(reg.Event?.EventName ?? "N/A")</td>
+                                            <td>@(reg.Event?.EventStartDate.ToShortDateString() ?? "N/A")</td>
+                                            <td>@reg.TimeStamp.ToShortDateString()</td>
+                                            <td>
+                                                 @* TODO: Apply the Correct Status *@
+                                                @if (reg.Attended == true)
+                                                {
+                                                    <span class="badge bg-success">Attended</span>
+                                                }
+                                                else if (reg.Attended == false)
+                                                {
+                                                    <span class="badge bg-danger">Absent</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No event registrations found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Classes Tab -->
+                <div class="tab-pane fade" id="classes" role="tabpanel" aria-labelledby="classes-tab">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Class Memberships</h5>
+                        <a href="/Admin/Classes/AddMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Add to Class
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Assigned By</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ClassMemberships != null && Model.ClassMemberships.Any())
+                                {
+                                    @foreach (var cls in Model.ClassMemberships)
+                                    {
+                                        <tr>
+                                            <td>@(cls.Class?.ClassName ?? "N/A")</td>
+                                            <td>@(cls.Servant?.ServantName ?? "-")</td>
+                                            <td>
+                                                 @* TODO: Apply the Correct Status *@
+
+                                                @if (cls.Class?.IsActive == true)
+                                                {
+                                                    <span class="badge bg-success">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No class memberships found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Attendance Tab -->
+                <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Class Attendance</h5>
+                        <div>
+                            <a href="/Admin/Members/AttendanceStats?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-bar-chart me-1"></i>View Statistics
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Recorded By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ClassAttendances != null && Model.ClassAttendances.Any())
+                                {
+                                    @foreach (var att in Model.ClassAttendances)
+                                    {
+                                        <tr>
+                                            <td>@(att.ClassOccurrence?.ClassOccurrenceName ?? "N/A")</td>
+                                            <td>@(att.ClassOccurrence?.ClassOccurrenceStartDate.ToShortDateString() ?? "N/A")</td>
+                                            <td>@att.TimeStamp.ToShortTimeString()</td>
+                                            <td>@(att.Servant?.ServantName ?? "-")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No attendance records found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Aids Tab -->
+                <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Aid Participation</h5>
+                        <a href="/Admin/Aids/AddMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Add to Aid
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Aid Name</th>
+                                    <th>Date</th>
+                                    <th>Added By</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.MemberAids != null && Model.MemberAids.Any())
+                                {
+                                    @foreach (var aid in Model.MemberAids)
+                                    {
+                                        <tr>
+                                            <td>@(aid.Aid?.AidName ?? "N/A")</td>
+                                            <td>@aid.TimeStamp.ToShortDateString()</td>
+                                            <td>@(aid.Servant?.ServantName ?? "-")</td>
+                                            <td>@(string.IsNullOrEmpty(aid.Notes) ? "-" : aid.Notes)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No aid participations found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Funds Tab -->
+                <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Fund Transactions</h5>
+                        <a href="/Admin/Funds/Add?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Add Transaction
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Aid</th>
+                                    <th>Recorded By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Funds != null && Model.Funds.Any())
+                                {
+                                    @foreach (var fund in Model.Funds)
+                                    {
+                                        <tr>
+                                            <td>@fund.TimeStamp.ToShortDateString()</td>
+                                            <td>@fund.Description</td>
+
+                                            @* TODO: Apply the Correct Category *@
+                                            <td>
+                                                @if (fund.Category == "Income")
+                                                {
+                                                    <span class="badge bg-success">Income</span>
+                                                }
+                                                else if (fund.Category == "Expense")
+                                                {
+                                                    <span class="badge bg-danger">Expense</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@fund.Category</span>
+                                                }
+                                            </td>
+                                            <td>@(fund.Aid?.AidName ?? "N/A")</td>
+                                            <td>@(fund.Servant?.ServantName ?? "-")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">No fund transactions found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 <script>

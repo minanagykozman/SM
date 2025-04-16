@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250401210626_AddVisitationDataModel")]
+    partial class AddVisitationDataModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -651,9 +654,6 @@ namespace SM.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("VisitationNotes")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Work")
                         .HasColumnType("longtext");
 
@@ -871,55 +871,6 @@ namespace SM.DAL.Migrations
                     b.ToView("MemberEventView", (string)null);
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MemberFund", b =>
-                {
-                    b.Property<int>("FundID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("FundID"));
-
-                    b.Property<decimal>("ApprovedAmount")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("ApprovedDescription")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ApproverID")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Delivered")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("FundCategory")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("MemberID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RequestDescription")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<decimal>("RequestedAmount")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<int>("ServantID")
-                        .HasColumnType("int");
-
-                    b.HasKey("FundID");
-
-                    b.HasIndex("ApproverID");
-
-                    b.HasIndex("MemberID");
-
-                    b.HasIndex("ServantID");
-
-                    b.ToTable("MemberFunds");
-                });
-
             modelBuilder.Entity("SM.DAL.DataModel.Servant", b =>
                 {
                     b.Property<int>("ServantID")
@@ -995,9 +946,6 @@ namespace SM.DAL.Migrations
 
                     b.Property<string>("Feedback")
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("MemberID")
                         .HasColumnType("int");
@@ -1210,33 +1158,6 @@ namespace SM.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Aid");
-
-                    b.Navigation("Member");
-
-                    b.Navigation("Servant");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.MemberFund", b =>
-                {
-                    b.HasOne("SM.DAL.DataModel.Servant", "Approver")
-                        .WithMany()
-                        .HasForeignKey("ApproverID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SM.DAL.DataModel.Member", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SM.DAL.DataModel.Servant", "Servant")
-                        .WithMany()
-                        .HasForeignKey("ServantID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Approver");
 
                     b.Navigation("Member");
 

@@ -172,6 +172,95 @@ namespace SM.API.Controllers
             }
         }
 
+        // Get member event registrations
+        [HttpGet("GetMemberEventRegistrations")]
+        public ActionResult<IEnumerable<EventRegistration>> GetMemberEventRegistrations(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var registrations = memberHandler.GetMemberEventRegistrations(memberID);
+                    return Ok(registrations);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        // Get member class memberships
+        [HttpGet("GetMemberClasses")]
+        public ActionResult<IEnumerable<MemberClassOverview>> GetMemberClasses(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var memberships = memberHandler.GetMemberClasses(memberID);
+                    return Ok(memberships);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        // Get member attendance history
+        [HttpGet("GetAttendanceHistory")]
+        public ActionResult<IEnumerable<ClassAttendance>> GetAttendanceHistory(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var attendances = memberHandler.GetAttendanceHistory(memberID);
+                    return Ok(attendances);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        // Get member aid participations
+        [HttpGet("GetMemberAids")]
+        public ActionResult<IEnumerable<MemberAid>> GetMemberAids(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var aids = memberHandler.GetMemberAids(memberID);
+                    return Ok(aids);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        // Get member fund transactions
+        [HttpGet("GetMemberFunds")]
+        public ActionResult<IEnumerable<Fund>> GetMemberFunds(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var funds = memberHandler.GetMemberFunds(memberID);
+                    return Ok(funds);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         public class UpdateCardModel
         {
             public string MemberCode { get; set; }

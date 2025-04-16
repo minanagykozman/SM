@@ -224,7 +224,7 @@ namespace SM.BAL
         }
 
         public bool UpdateCardStatus(string memberCode, CardStatus cardStatus)
-        
+
         {
             var member = GetMemberByCodeOnly(memberCode);
             if (member == null)
@@ -239,6 +239,161 @@ namespace SM.BAL
             member.ModifiedAt = CurrentTime;
             _dbcontext.SaveChanges();
             return true;
+        }
+        // Get member event registrations
+        public List<object> GetMemberEventRegistrations(int memberId)
+        {
+            return _dbcontext.EventRegistrations
+                .Include(e => e.Event)
+                .Include(e => e.Servant)
+                .Where(e => e.MemberID == memberId)
+                .OrderByDescending(e => e.Event.EventStartDate)
+                .Select(e => new
+                {
+                    e.EventID,
+                    e.MemberID,
+                    e.ServantID,
+                    e.TimeStamp,
+                    e.Attended,
+                    e.Notes,
+                    Event = new
+                    {
+                        e.Event.EventID,
+                        e.Event.EventName,
+                        e.Event.EventStartDate,
+                        e.Event.EventEndDate,
+                        e.Event.IsActive
+                    },
+                    Servant = new
+                    {
+                        e.Servant.ServantID,
+                        e.Servant.ServantName,
+                        e.Servant.Mobile1
+                    }
+                })
+                .ToList<object>();
+        }
+
+        // Get member classes
+        public List<ClassMember> GetMemberClasses(int memberId)
+        {
+            return _dbcontext.ClassMembers
+                .Include(c => c.Class)
+                    .ThenInclude(c => c.Meeting)
+                .Include(c => c.Servant)
+                .Where(c => c.MemberID == memberId)
+                .ToList();
+        }
+
+        public List<MemberClassOverview> GetMemberClassses(int memberID)
+        {
+            var memberClasses = _dbcontext.ClassMembers.Include(cm => cm.Class).Where(mc => mc.MemberID == memberID).ToList();
+            if (memberClasses == null)
+                return new List<MemberClassOverview>();
+
+            var memberAttendances = _dbcontext.ClassAttendances.Include(c => c.ClassOccurrence).Where(ca => ca.MemberID == memberID).ToList();
+            List<MemberClassOverview> membersExtended = new List<MemberClassOverview>();
+            foreach (var mc in memberClasses)
+            {
+                MemberClassOverview mco = new MemberClassOverview();
+                mco.ClassName = mc.Class.ClassName;
+                int occurrencesCount = _dbcontext.ClassOccurrences.Count(c => c.ClassID == mc.ClassID && c.ClassOccurrenceStartDate <= CurrentTime);
+                var memberAttendance = memberAttendances.Where(c => c.ClassOccurrence.ClassID == mc.ClassID).ToList();
+                if (memberAttendance != null && memberAttendance.Count > 0)
+                {
+                    mco.LastPresentDate = memberAttendance.Max(c => c.ClassOccurrence.ClassOccurrenceStartDate);
+                    mco.Attendance = string.Format("{0}/{1}", memberAttendance.Count.ToString("00"), occurrencesCount);
+                }
+                membersExtended.Add(mco);
+            }
+
+            return membersExtended;
+        }
+
+        // Get member attendance history
+        public List<ClassAttendance> GetAttendanceHistory(int memberId)
+        {
+            return _dbcontext.ClassAttendances
+                .Include(a => a.ClassOccurrence)
+                    .ThenInclude(co => co.Class)
+                .Include(a => a.Servant)
+                .Where(a => a.MemberID == memberId)
+                .OrderByDescending(a => a.ClassOccurrence.ClassOccurrenceStartDate)
+                .ToList();
+        }
+
+        // Get member aid participations
+        public List<object> GetMemberAids(int memberId)
+        {
+            return _dbcontext.MemberAids
+                .Include(a => a.Aid)
+                .Include(a => a.Servant)
+                .Where(a => a.MemberID == memberId)
+                .OrderByDescending(a => a.TimeStamp)
+                .Select(a => new
+                {
+                    a.AidID,
+                    a.MemberID,
+                    a.ServantID,
+                    a.TimeStamp,
+                    a.Notes,
+                    Aid = a.Aid == null ? null : new
+                    {
+                        a.Aid.AidID,
+                        a.Aid.AidName,
+                        a.Aid.AidDate,
+                        a.Aid.IsActive,
+                        a.Aid.ActualMembersCount,
+                        a.Aid.PlannedMembersCount,
+                        a.Aid.CostPerPerson,
+                        a.Aid.TotalCost,
+                        Components = a.Aid.Components
+                    },
+                    Servant = a.Servant == null ? null : new
+                    {
+                        a.Servant.ServantID,
+                        a.Servant.ServantName,
+                        a.Servant.Mobile1,
+                        a.Servant.Mobile2,
+                        a.Servant.IsActive
+                    }
+                })
+                .ToList<object>();
+        }
+
+        // Get member fund transactions
+        public List<object> GetMemberFunds(int memberId)
+        {
+            return _dbcontext.Funds
+                .Include(f => f.Aid)
+                .Include(f => f.Servant)
+                .Where(f => f.MemberID == memberId)
+                .OrderByDescending(f => f.TimeStamp)
+                .Select(f => new
+                {
+                    f.FundID,
+                    AidID = f.Aid != null ? f.Aid.AidID : 0,
+                    f.MemberID,
+                    f.ServantID,
+                    f.Description,
+                    f.Category,
+                    f.TimeStamp,
+                    f.Notes,
+                    Aid = f.Aid == null ? null : new
+                    {
+                        f.Aid.AidID,
+                        f.Aid.AidName,
+                        f.Aid.AidDate,
+                        f.Aid.IsActive
+                    },
+                    Servant = f.Servant == null ? null : new
+                    {
+                        f.Servant.ServantID,
+                        f.Servant.ServantName,
+                        f.Servant.Mobile1
+                    }
+                })
+                .ToList<object>();
         }
     }
 }
