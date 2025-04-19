@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -52,8 +52,7 @@ namespace SM.APP.Pages.Admin.Members
                         string responseData = await response.Content.ReadAsStringAsync();
                         var options = new JsonSerializerOptions
                         {
-                            PropertyNameCaseInsensitive = true,
-                            MaxDepth = 128
+                            PropertyNameCaseInsensitive = true // Enable case insensitivity
                         };
                         Member member = JsonSerializer.Deserialize<Member>(responseData, options);
                         if (member == null)
@@ -61,8 +60,6 @@ namespace SM.APP.Pages.Admin.Members
                             return NotFound();
                         }
                         Member = member;
-
-                        await LoadMemberActivities(id.Value, client, jwtToken, options);
                     }
                 }
                 return Page();
@@ -72,61 +69,7 @@ namespace SM.APP.Pages.Admin.Members
                 return HandleException(ex);
             }
         }
-        private async Task LoadMemberActivities(int memberId, HttpClient client, string jwtToken, JsonSerializerOptions options)
-        {
-            try
-            {
-                // Load event registrations
-                string eventUrl = $"{SMConfigurationManager.ApiBase}/Member/GetMemberEventRegistrations?memberID={memberId}";
-                var eventResponse = await client.GetAsync(eventUrl);
-                if (eventResponse.IsSuccessStatusCode)
-                {
-                    string responseData = await eventResponse.Content.ReadAsStringAsync();
-                    EventRegistrations = JsonSerializer.Deserialize<List<EventRegistration>>(responseData, options) ?? new();
-                }
 
-                // Load class memberships
-                string classUrl = $"{SMConfigurationManager.ApiBase}/Member/GetMemberClasses?memberID={memberId}";
-                var classResponse = await client.GetAsync(classUrl);
-                if (classResponse.IsSuccessStatusCode)
-                {
-                    string responseData = await classResponse.Content.ReadAsStringAsync();
-                    ClassMemberships = JsonSerializer.Deserialize<List<ClassMember>>(responseData, options) ?? new();
-                }
-
-                // Load attendance history
-                string attendanceUrl = $"{SMConfigurationManager.ApiBase}/Member/GetAttendanceHistory?memberID={memberId}";
-                var attendanceResponse = await client.GetAsync(attendanceUrl);
-                if (attendanceResponse.IsSuccessStatusCode)
-                {
-                    string responseData = await attendanceResponse.Content.ReadAsStringAsync();
-                    ClassAttendances = JsonSerializer.Deserialize<List<ClassAttendance>>(responseData, options) ?? new();
-                }
-
-                // Load aids (optional)
-                string aidUrl = $"{SMConfigurationManager.ApiBase}/Member/GetMemberAids?memberID={memberId}";
-                var aidResponse = await client.GetAsync(aidUrl);
-                if (aidResponse.IsSuccessStatusCode)
-                {
-                    string responseData = await aidResponse.Content.ReadAsStringAsync();
-                    MemberAids = JsonSerializer.Deserialize<List<MemberAid>>(responseData, options) ?? new();
-                }
-
-                // Load funds (optional)
-                string fundsUrl = $"{SMConfigurationManager.ApiBase}/Member/GetMemberFunds?memberID={memberId}";
-                var fundsResponse = await client.GetAsync(fundsUrl);
-                if (fundsResponse.IsSuccessStatusCode)
-                {
-                    string responseData = await fundsResponse.Content.ReadAsStringAsync();
-                    Funds = JsonSerializer.Deserialize<List<Fund>>(responseData, options) ?? new();
-                }
-            }
-            catch (Exception ex)
-            {
-                // ensuring the page still loads if some data can't be retrieved
-                Console.WriteLine($"Error loading member activities: {ex.Message}");
-            }
-        } 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
