@@ -3,14 +3,14 @@
 
 @{
     ViewData["Title"] = "Details";
+    ViewData["HideHeader"] = true;
 }
 
 <div class="modal-header">
     <h5 class="modal-title">
         <i class="bi bi-person-circle me-2"></i>Member Details
-        <span class="badge bg-light text-dark ms-2">ID: @Model.Member.Code</span>
+        <span class="badge bg-light text-dark ms-2">Code: @Model.Member.Code</span>
     </h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
 <div class="modal-body">
