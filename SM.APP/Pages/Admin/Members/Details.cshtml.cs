@@ -20,8 +20,14 @@ namespace SM.APP.Pages.Admin.Members
         {
             _context = context;
         }
-        [BindProperty]
-        public Member Member { get; set; } = default!;
+
+        public Member? Member { get; set; }
+
+        public List<EventRegistration> EventRegistrations { get; set; } = new();
+        public List<ClassMember> ClassMembers { get; set; } = new();
+        public List<MemberClassOverview> ClassAttendanceStats { get; set; } = new();
+        public List<MemberAid> MemberAids { get; set; } = new();
+        public List<Fund> Funds { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,15 +36,40 @@ namespace SM.APP.Pages.Admin.Members
                 return NotFound();
             }
 
-            var member = await _context.Members.FirstOrDefaultAsync(m => m.MemberID == id);
-            if (member == null)
+            Member = await _context.Members
+                .Include(m => m.EventRegistrations)
+                    .ThenInclude(er => er.Event)
+                .Include(m => m.ClassMembers)
+                    .ThenInclude(cm => cm.Class)
+                .Include(m => m.MemberAids)
+                    .ThenInclude(ma => ma.Aid)
+                .Include(m => m.MemberAids)
+                    .ThenInclude(ma => ma.Servant)
+                .Include(m => m.Funds)
+                    .ThenInclude(f => f.Aid)
+                .Include(m => m.Funds)
+                    .ThenInclude(f => f.Servant)
+                .FirstOrDefaultAsync(m => m.MemberID == id);
+
+            if (Member == null)
             {
                 return NotFound();
             }
-            else
+
+            // Set the collections from the loaded Member
+            EventRegistrations = Member.EventRegistrations.ToList();
+            ClassMembers = Member.ClassMembers.ToList();
+            MemberAids = Member.MemberAids.ToList();
+            Funds = Member.Funds.ToList();
+
+            // Get attendance statistics
+            List<MemberClassOverview> stats;
+            using (var memberHandler = new SM.BAL.MemberHandler())
             {
-                Member = member;
+                stats = memberHandler.GetMemberClassses(id.Value);
             }
+            ClassAttendanceStats = stats;
+
             return Page();
         }
     }

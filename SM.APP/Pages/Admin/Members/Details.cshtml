@@ -5,179 +5,526 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bi bi-person-circle me-2"></i>Member Details
+        <span class="badge bg-light text-dark ms-2">ID: @Model.Member.Code</span>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
 
-<!-- Bootstrap Nav Tabs -->
-<ul class="nav nav-tabs" id="memberTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
-            Member Info
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
-            Attendance
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
-            Events
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
-            Aids
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
-            Funds
-        </button>
-    </li>
-</ul>
+<div class="modal-body">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading member details...</p>
+    </div>
 
-<!-- Tab Content -->
-<div class="tab-content mt-3" id="memberTabsContent">
+    <!-- Content -->
+    <div id="modalContent">
+        <!-- Bootstrap Nav Tabs -->
+        <ul class="nav nav-tabs" id="memberTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
+                    <i class="bi bi-person me-1"></i>Member Info
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
+                    <i class="bi bi-calendar-event me-1"></i>Events
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
+                    <i class="bi bi-person-check me-1"></i>Attendance
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
+                    <i class="bi bi-hospital me-1"></i>Aids
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
+                    <i class="bi bi-cash-coin me-1"></i>Funds
+                </button>
+            </li>
+        </ul>
 
-    <!-- Member Info Tab -->
-    <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
-        <div class="card shadow-lg p-4">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" class="form-control"
-                               id="UNPersonalNumber"
-                               placeholder="Enter Personal Number"
-                               onblur="validateUNPersonalNumber()" />
-                        <label asp-for="Member.UNPersonalNumber"></label>
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="memberTabsContent">
+            <!-- Member Info Tab -->
+            <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
+                <div class="card shadow-lg p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.UNPersonalNumber" class="form-control" readonly />
+                                <label asp-for="Member.UNPersonalNumber"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.UNFileNumber" class="form-control" readonly />
+                                <label asp-for="Member.UNFileNumber"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.UNFirstName" class="form-control" readonly />
+                                <label asp-for="Member.UNFirstName"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.UNLastName" class="form-control" readonly />
+                                <label asp-for="Member.UNLastName"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.Gender" class="form-control" readonly />
+                                <label asp-for="Member.Gender"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" asp-for="Member.Birthdate" class="form-control" readonly />
+                                <label asp-for="Member.Birthdate"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" disabled />
+                                <label class="form-check-label">@Html.DisplayNameFor(model => model.Member.Baptised)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.Mobile" class="form-control" readonly />
+                                <label asp-for="Member.Mobile"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.CardStatus" class="form-control" readonly />
+                                <label asp-for="Member.CardStatus"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.ImageReference" class="form-control" readonly />
+                                <label asp-for="Member.ImageReference"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.Nickname" class="form-control" readonly />
+                                <label asp-for="Member.Nickname"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.School" class="form-control" readonly />
+                                <label asp-for="Member.School"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Member.Work" class="form-control" readonly />
+                                <label asp-for="Member.Work"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea asp-for="Member.Notes" class="form-control" readonly style="height: 100px;"></textarea>
+                                <label asp-for="Member.Notes"></label>
+                            </div>
+                        </div>
                     </div>
-                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" />
-                        <label asp-for="Member.UNFileNumber"></label>
+            </div>
+
+            <!-- Events Tab -->
+            <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+                <div class="tab-spinner text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
+                    <p class="mt-2 text-muted">Loading events...</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
-                        <label asp-for="Member.UNFirstName"></label>
+                <div class="tab-content">
+                    <div class="card shadow-lg p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Event Registrations</h5>
+                            <a href="/Admin/Events/RegisterMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Register for Event
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Registration Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.EventRegistrations != null && Model.EventRegistrations.Any())
+                                    {
+                                        @foreach (var reg in Model.EventRegistrations)
+                                        {
+                                            <tr>
+                                                <td>@(reg.Event?.EventName ?? "N/A")</td>
+                                                <td>@(reg.Event?.EventStartDate.ToShortDateString() ?? "N/A")</td>
+                                                <td>@reg.TimeStamp.ToShortDateString()</td>
+                                                <td>
+                                                    @if (reg.Attended == true)
+                                                    {
+                                                        <span class="badge bg-success">Attended</span>
+                                                    }
+                                                    else if (reg.Attended == false)
+                                                    {
+                                                        <span class="badge bg-danger">Absent</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning text-dark">Pending</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center">No event registrations found</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
-                        <label asp-for="Member.UNLastName"></label>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                <div class="tab-spinner text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
+                    <p class="mt-2 text-muted">Loading attendance...</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select asp-for="Member.Gender" class="form-select">
-                            <option value="">Select Gender</option>
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                        </select>
-                        <label asp-for="Member.Gender"></label>
+                <div class="tab-content">
+                    <div class="card shadow-lg p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Class Attendance Statistics</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Attendance</th>
+                                        <th>Last Present</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.ClassAttendanceStats != null && Model.ClassAttendanceStats.Any())
+                                    {
+                                        @foreach (var stat in Model.ClassAttendanceStats)
+                                        {
+                                            <tr>
+                                                <td>@stat.ClassName</td>
+                                                <td>
+                                                    <span class="badge bg-info">@stat.Attendance</span>
+                                                </td>
+                                                <td>@(stat.LastPresentDate?.ToShortDateString() ?? "Never")</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center">No attendance records found</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <span asp-validation-for="Member.Gender" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
-                        <label asp-for="Member.Birthdate"></label>
+            </div>
+
+            <!-- Aids Tab -->
+            <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
+                <div class="tab-spinner text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
+                    <p class="mt-2 text-muted">Loading aids...</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
-                        <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                <div class="tab-content">
+                    <div class="card shadow-lg p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Aid Participation</h5>
+                            <a href="/Admin/Aids/AddMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Add to Aid
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Aid Name</th>
+                                        <th>Date</th>
+                                        <th>Added By</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.MemberAids != null && Model.MemberAids.Any())
+                                    {
+                                        @foreach (var aid in Model.MemberAids)
+                                        {
+                                            <tr>
+                                                <td>@(aid.Aid?.AidName ?? "N/A")</td>
+                                                <td>@aid.TimeStamp.ToShortDateString()</td>
+                                                <td>@(aid.Servant?.ServantName ?? "-")</td>
+                                                <td>@(string.IsNullOrEmpty(aid.Notes) ? "-" : aid.Notes)</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center">No aid participations found</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
-                        <label asp-for="Member.Mobile"></label>
+            </div>
+
+            <!-- Funds Tab -->
+            <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
+                <div class="tab-spinner text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <span asp-validation-for="Member.Mobile" class="text-danger"></span>
+                    <p class="mt-2 text-muted">Loading funds...</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
+                <div class="tab-content">
+                    <div class="card shadow-lg p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Fund Transactions</h5>
+                            <a href="/Admin/Funds/Add?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Add Transaction
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Aid</th>
+                                        <th>Recorded By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Funds != null && Model.Funds.Any())
+                                    {
+                                        @foreach (var fund in Model.Funds)
+                                        {
+                                            <tr>
+                                                <td>@fund.TimeStamp.ToShortDateString()</td>
+                                                <td>@fund.Description</td>
+                                                <td>
+                                                    @if (fund.Category == "Income")
+                                                    {
+                                                        <span class="badge bg-success">Income</span>
+                                                    }
+                                                    else if (fund.Category == "Expense")
+                                                    {
+                                                        <span class="badge bg-danger">Expense</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">@fund.Category</span>
+                                                    }
+                                                </td>
+                                                <td>@(fund.Aid?.AidName ?? "N/A")</td>
+                                                <td>@(fund.Servant?.ServantName ?? "-")</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">No fund transactions found</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
-                        <label asp-for="Member.Nickname"></label>
-                    </div>
-                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
-                        <label asp-for="Member.School"></label>
-                    </div>
-                    <span asp-validation-for="Member.School" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
-                        <label asp-for="Member.Work"></label>
-                    </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-floating">
-                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
-                        <label asp-for="Member.Notes"></label>
-                    </div>
-                    <span asp-validation-for="Member.Notes" class="text-danger"></span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Attendance Tab -->
-    <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
-        <div class="card shadow-lg p-4">
-            <h5 class="mb-3">Attendance Records</h5>
-            <p>Attendance details will be displayed here.</p>
-        </div>
-    </div>
-
-    <!-- Events Tab -->
-    <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
-        <div class="card shadow-lg p-4">
-            <h5 class="mb-3">Events Participated</h5>
-            <p>Member's events will be displayed here.</p>
-        </div>
-    </div>
-
-    <!-- Aids Tab -->
-    <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
-        <div class="card shadow-lg p-4">
-            <h5 class="mb-3">Aids Received</h5>
-            <p>Details about any aid received will be shown here.</p>
-        </div>
-    </div>
-
-    <!-- Funds Tab -->
-    <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
-        <div class="card shadow-lg p-4">
-            <h5 class="mb-3">Funds Contributions</h5>
-            <p>Funds contributions by the member will be listed here.</p>
-        </div>
-    </div>
 </div>
 
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Member.MemberID">Edit</a> |
-    <a asp-page="./Index" asp-route-userCode="@Model.Member.Code">Back to List</a>
+<div class="modal-footer">
+    <a asp-page="./Edit" asp-route-id="@Model.Member.MemberID" class="btn btn-primary">
+        <i class="bi bi-pencil-square me-1"></i>Edit
+    </a>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 </div>
+
+<script>
+    // Function to show loading spinner
+    function showLoading() {
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('modalContent').style.display = 'none';
+    }
+
+    // Function to hide loading spinner
+    function hideLoading() {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('modalContent').style.display = 'block';
+    }
+
+    // Function to update the UI with loaded data
+    function updateUI(data) {
+        console.log('Received data:', data); // Debug log
+
+        // Update events tab
+        const eventsTable = document.querySelector('#events tbody');
+        if (data.events && data.events.length > 0) {
+            eventsTable.innerHTML = data.events.map(event => `
+                <tr>
+                    <td>${event.event?.eventName || 'N/A'}</td>
+                    <td>${event.event?.eventStartDate ? new Date(event.event.eventStartDate).toLocaleDateString() : 'N/A'}</td>
+                    <td>${new Date(event.timeStamp).toLocaleDateString()}</td>
+                    <td>
+                        ${event.attended === true ? '<span class="badge bg-success">Attended</span>' :
+                          event.attended === false ? '<span class="badge bg-danger">Absent</span>' :
+                          '<span class="badge bg-warning text-dark">Pending</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            eventsTable.innerHTML = '<tr><td colspan="4" class="text-center">No event registrations found</td></tr>';
+        }
+
+        // Update attendance tab
+        const attendanceTable = document.querySelector('#attendance tbody');
+        if (data.stats && data.stats.length > 0) {
+            attendanceTable.innerHTML = data.stats.map(stat => `
+                <tr>
+                    <td>${stat.className}</td>
+                    <td><span class="badge bg-info">${stat.attendance}</span></td>
+                    <td>${stat.lastPresentDate ? new Date(stat.lastPresentDate).toLocaleDateString() : 'Never'}</td>
+                </tr>
+            `).join('');
+        } else {
+            attendanceTable.innerHTML = '<tr><td colspan="3" class="text-center">No attendance records found</td></tr>';
+        }
+
+        // Update aids tab
+        const aidsTable = document.querySelector('#aids tbody');
+        if (data.aids && data.aids.length > 0) {
+            aidsTable.innerHTML = data.aids.map(aid => `
+                <tr>
+                    <td>${aid.aid?.aidName || 'N/A'}</td>
+                    <td>${new Date(aid.timeStamp).toLocaleDateString()}</td>
+                    <td>${aid.servant?.servantName || '-'}</td>
+                    <td>${aid.notes || '-'}</td>
+                </tr>
+            `).join('');
+        } else {
+            aidsTable.innerHTML = '<tr><td colspan="4" class="text-center">No aid participations found</td></tr>';
+        }
+
+        // Update funds tab
+        const fundsTable = document.querySelector('#funds tbody');
+        if (data.funds && data.funds.length > 0) {
+            fundsTable.innerHTML = data.funds.map(fund => `
+                <tr>
+                    <td>${new Date(fund.timeStamp).toLocaleDateString()}</td>
+                    <td>${fund.description}</td>
+                    <td>
+                        ${fund.category === 'Income' ? '<span class="badge bg-success">Income</span>' :
+                          fund.category === 'Expense' ? '<span class="badge bg-danger">Expense</span>' :
+                          `<span class="badge bg-secondary">${fund.category}</span>`}
+                    </td>
+                    <td>${fund.aid?.aidName || 'N/A'}</td>
+                    <td>${fund.servant?.servantName || '-'}</td>
+                </tr>
+            `).join('');
+        } else {
+            fundsTable.innerHTML = '<tr><td colspan="5" class="text-center">No fund transactions found</td></tr>';
+        }
+    }
+
+    // Initialize when the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the modal element
+        const modal = document.getElementById('memberDetailsModal');
+        
+        if (!modal) {
+            console.error('Modal element not found. Make sure the modal has id="memberDetailsModal"');
+            return;
+        }
+
+        // Show loading when modal is about to be shown
+        modal.addEventListener('show.bs.modal', function(event) {
+            showLoading();
+        });
+
+        // Load additional data when modal is shown
+        modal.addEventListener('shown.bs.modal', function(event) {
+            const memberId = event.relatedTarget.getAttribute('data-member-id');
+            
+            if (!memberId) {
+                console.error('Member ID not found in data-member-id attribute');
+                hideLoading();
+                return;
+            }
+
+            console.log('Loading data for member ID:', memberId); // Debug log
+            
+            // Fetch additional data
+            fetch(`/Admin/Members/Details?handler=AdditionalData&id=${memberId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data loaded successfully:', data); // Debug log
+                    updateUI(data);
+                    hideLoading();
+                })
+                .catch(error => {
+                    console.error('Error loading additional data:', error);
+                    // Show error message in each tab
+                    const tables = document.querySelectorAll('tbody');
+                    tables.forEach(table => {
+                        table.innerHTML = `<tr><td colspan="10" class="text-center text-danger">Error loading data: ${error.message}</td></tr>`;
+                    });
+                    hideLoading();
+                });
+        });
+    });
+</script>
