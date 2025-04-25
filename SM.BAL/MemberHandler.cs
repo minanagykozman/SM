@@ -182,7 +182,8 @@ namespace SM.BAL
                 memberCode = memberCode.Trim();
                 var member = _dbcontext.Members.
                     FirstOrDefault(m => m.Code.Contains(memberCode) ||
-                    m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode);
+                    m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode
+                    ||m.ImageReference==memberCode);
 
                 if (member == null)
                     return members;
