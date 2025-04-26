@@ -28,6 +28,7 @@ namespace SM.APP.Pages.Admin.Members
         public List<MemberClassOverview> ClassAttendanceStats { get; set; } = new();
         public List<MemberAid> MemberAids { get; set; } = new();
         public List<Fund> Funds { get; set; } = new();
+        public List<Member> FamilyMembers { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -69,6 +70,11 @@ namespace SM.APP.Pages.Admin.Members
                 stats = memberHandler.GetMemberClassses(id.Value);
             }
             ClassAttendanceStats = stats;
+
+            FamilyMembers = await _context.Members
+                .Where(m => m.UNFileNumber == Member.UNFileNumber && m.MemberID != Member.MemberID)
+                .OrderByDescending(m => m.Birthdate)
+                .ToListAsync();
 
             return Page();
         }
