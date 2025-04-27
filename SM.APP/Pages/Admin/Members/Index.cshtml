@@ -99,7 +99,7 @@
                             <tr>
                                 <td>
                                     <span class="sequence" style="display: none;">@item.Sequence</span>
-                                    <a asp-page="./Edit" asp-route-id="@item.MemberID" target="_blank">@Html.DisplayFor(modelItem => item.Code)</a>
+                                    <a href="#" class="view-member" data-id="@item.MemberID">@Html.DisplayFor(modelItem => item.Code)</a>
                                 </td>
                                 <td>@Html.DisplayFor(modelItem => item.FullName)</td>
                                 <td>@Html.DisplayFor(modelItem => item.UNFileNumber)</td>
@@ -129,7 +129,7 @@
             {
                 <div class="list-group-item list-group-item-action flex-column align-items-start">
                     <h5 class="mb-1 text-primary">
-                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
+                        <a href="#" class="view-member" data-id="@item.MemberID">@Html.DisplayFor(modelItem => item.Code)</a>
                     </h5>
                     <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
                     <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
@@ -143,8 +143,65 @@
     </div>
 </div>
 
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-labelledby="memberDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="memberDetailsModalLabel">Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="memberDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("SearchCode").focus();
+
+        // Handle member details modal
+        const memberDetailsModal = new bootstrap.Modal(document.getElementById('memberDetailsModal'));
+        const memberDetailsContent = document.getElementById('memberDetailsContent');
+
+        document.querySelectorAll('.view-member').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const memberId = this.getAttribute('data-id');
+                
+                // Show loading spinner
+                memberDetailsContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading member details...</p>
+                    </div>
+                `;
+                memberDetailsModal.show();
+                
+                // Load members data
+                fetch(`/Admin/Members/Details?id=${memberId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        memberDetailsContent.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error loading member details:', error);
+                        memberDetailsContent.innerHTML = `
+                            <div class="alert alert-danger">
+                                Error loading member details: ${error.message}
+                            </div>
+                        `;
+                    });
+            });
+        });
     });
 </script>
