@@ -6,13 +6,6 @@
     ViewData["HideHeader"] = true;
 }
 
-<div class="modal-header">
-    <h5 class="modal-title">
-        <i class="bi bi-person-circle me-2"></i>Member Details
-        <span class="badge bg-light text-dark ms-2">Code: @Model.Member.Code</span>
-    </h5>
-</div>
-
 <div class="modal-body">
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="text-center py-5" style="display: none;">
@@ -25,44 +18,55 @@
     <!-- Content -->
     <div id="modalContent">
         <!-- Bootstrap Nav Tabs -->
-        <ul class="nav nav-tabs" id="memberTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
-                    <i class="bi bi-person me-1"></i>Member Info
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
-                    <i class="bi bi-calendar-event me-1"></i>Events
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
-                    <i class="bi bi-person-check me-1"></i>Attendance
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
-                    <i class="bi bi-hospital me-1"></i>Aids
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
-                    <i class="bi bi-cash-coin me-1"></i>Funds
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button" role="tab" aria-controls="family" aria-selected="false">
-                    <i class="bi bi-people me-1"></i>Family
-                </button>
-            </li>
-        </ul>
+        <div class="container px-2 px-md-3">
+            <div class="d-flex overflow-auto flex-nowrap">
+                <ul class="nav nav-tabs flex-nowrap" id="memberTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
+                            <i class="bi bi-person me-1"></i>Member Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
+                            <i class="bi bi-calendar-event me-1"></i>Events
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
+                            <i class="bi bi-person-check me-1"></i>Attendance
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
+                            <i class="bi bi-hospital me-1"></i>Aids
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
+                            <i class="bi bi-cash-coin me-1"></i>Funds
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button" role="tab" aria-controls="family" aria-selected="false">
+                            <i class="bi bi-people me-1"></i>Family
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
 
         <!-- Tab Content -->
         <div class="tab-content mt-3" id="memberTabsContent">
             <!-- Member Info Tab -->
             <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
                 <div class="card shadow-lg p-4">
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
+                            <label asp-for="Member.Code"></label>
+                        </div>
+                    </div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-floating">
@@ -151,72 +155,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Events Tab -->
-            <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
-                <div class="tab-spinner text-center py-5" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2 text-muted">Loading events...</p>
-                </div>
-                <div class="tab-content">
-                    <div class="card shadow-lg p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <h5>Event Registrations</h5>
-                            <a href="/Admin/Events/RegisterMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-plus-circle me-1"></i>Register for Event
-                            </a>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Event</th>
-                                        <th>Date</th>
-                                        <th>Registration Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (Model.EventRegistrations != null && Model.EventRegistrations.Any())
-                                    {
-                                        @foreach (var reg in Model.EventRegistrations)
-                                        {
-                                            <tr>
-                                                <td>@(reg.Event?.EventName ?? "N/A")</td>
-                                                <td>@(reg.Event?.EventStartDate.ToShortDateString() ?? "N/A")</td>
-                                                <td>@reg.TimeStamp.ToShortDateString()</td>
-                                                <td>
-                                                    @if (reg.Attended == true)
-                                                    {
-                                                        <span class="badge bg-success">Attended</span>
-                                                    }
-                                                    else if (reg.Attended == false)
-                                                    {
-                                                        <span class="badge bg-danger">Absent</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-warning text-dark">Pending</span>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td colspan="4" class="text-center">No event registrations found</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Attendance Tab -->
             <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
                 <div class="tab-spinner text-center py-5" style="display: none;">
@@ -225,12 +163,12 @@
                     </div>
                     <p class="mt-2 text-muted">Loading attendance...</p>
                 </div>
+
                 <div class="tab-content">
                     <div class="card shadow-lg p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <h5>Class Attendance Statistics</h5>
-                        </div>
-                        <div class="table-responsive">
+
+                        <!-- Table: Desktop only -->
+                        <div class="table-responsive d-none d-md-block">
                             <table class="table table-hover table-striped">
                                 <thead class="table-light">
                                     <tr>
@@ -262,10 +200,141 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Cards: Mobile/Tablet only -->
+                        <div class="row g-3 d-block d-md-none">
+                            @if (Model.ClassAttendanceStats != null && Model.ClassAttendanceStats.Any())
+                            {
+                                @foreach (var stat in Model.ClassAttendanceStats)
+                                {
+                                    <div class="col-12">
+                                        <div class="card shadow-sm h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">@stat.ClassName</h6>
+                                                <p class="card-text mb-1"><strong>Attendance:</strong> <span class="badge bg-info">@stat.Attendance</span></p>
+                                                <p class="card-text"><strong>Last Present:</strong> @(stat.LastPresentDate?.ToShortDateString() ?? "Never")</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-center">
+                                    <div class="alert alert-info" role="alert">
+                                        No attendance records found
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
                     </div>
                 </div>
             </div>
+            <!-- Events Tab -->
+            <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+                <div class="tab-spinner text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading events...</p>
+                </div>
 
+                <div class="tab-content">
+                    <div class="card shadow-lg p-4">
+
+                        <!-- Table: Desktop only -->
+                        <div class="table-responsive d-none d-md-block">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Registration Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.EventRegistrations != null && Model.EventRegistrations.Any())
+                                    {
+                                        @foreach (var reg in Model.EventRegistrations)
+                                        {
+                                            <tr>
+                                                <td>@(reg.Event?.EventName ?? "N/A")</td>
+                                                <td>@(reg.Event?.EventStartDate.ToShortDateString() ?? "N/A")</td>
+                                                <td>@reg.TimeStamp.ToShortDateString()</td>
+                                                <td>
+                                                    @if (reg.Attended == true)
+                                                    {
+                                                        <span class="badge bg-success">Attended</span>
+                                                    }
+                                                    else if (reg.Attended == false)
+                                                    {
+                                                        <span class="badge bg-danger">Absent</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">Registered</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center">No event registrations found</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Cards: Mobile/Tablet only -->
+                        <div class="row g-3 d-block d-md-none">
+                            @if (Model.EventRegistrations != null && Model.EventRegistrations.Any())
+                            {
+                                @foreach (var reg in Model.EventRegistrations)
+                                {
+                                    <div class="col-12">
+                                        <div class="card shadow-sm h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">@($"{reg.Event?.EventName ?? "N/A"}")</h6>
+                                                <p class="card-text mb-1"><strong>Date:</strong> @(reg.Event?.EventStartDate.ToShortDateString() ?? "N/A")</p>
+                                                <p class="card-text mb-1"><strong>Registered On:</strong> @reg.TimeStamp.ToShortDateString()</p>
+                                                <p class="card-text">
+                                                    <strong>Status:</strong>
+                                                    @if (reg.Attended == true)
+                                                    {
+                                                        <span class="badge bg-success">Attended</span>
+                                                    }
+                                                    else if (reg.Attended == false)
+                                                    {
+                                                        <span class="badge bg-danger">Absent</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">Registered</span>
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-center">
+                                    <div class="alert alert-info" role="alert">
+                                        No event registrations found
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             <!-- Aids Tab -->
             <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
                 <div class="tab-spinner text-center py-5" style="display: none;">
@@ -274,15 +343,12 @@
                     </div>
                     <p class="mt-2 text-muted">Loading aids...</p>
                 </div>
+
                 <div class="tab-content">
                     <div class="card shadow-lg p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <h5>Aid Participation</h5>
-                            <a href="/Admin/Aids/AddMember?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-plus-circle me-1"></i>Add to Aid
-                            </a>
-                        </div>
-                        <div class="table-responsive">
+
+                        <!-- Table: Desktop only -->
+                        <div class="table-responsive d-none d-md-block">
                             <table class="table table-hover table-striped">
                                 <thead class="table-light">
                                     <tr>
@@ -314,10 +380,38 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Cards: Mobile/Tablet only -->
+                        <div class="row g-3 d-block d-md-none">
+                            @if (Model.MemberAids != null && Model.MemberAids.Any())
+                            {
+                                @foreach (var aid in Model.MemberAids)
+                                {
+                                    <div class="col-12">
+                                        <div class="card shadow-sm h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">@($"{aid.Aid?.AidName ?? "N/A"}")</h6>
+                                                <p class="card-text mb-1"><strong>Date:</strong> @aid.TimeStamp.ToShortDateString()</p>
+                                                <p class="card-text mb-1"><strong>Added By:</strong> @(aid.Servant?.ServantName ?? "-")</p>
+                                                <p class="card-text"><strong>Notes:</strong> @(string.IsNullOrEmpty(aid.Notes) ? "-" : aid.Notes)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-center">
+                                    <div class="alert alert-info" role="alert">
+                                        No aid participations found
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
                     </div>
                 </div>
             </div>
-
             <!-- Funds Tab -->
             <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
                 <div class="tab-spinner text-center py-5" style="display: none;">
@@ -326,15 +420,20 @@
                     </div>
                     <p class="mt-2 text-muted">Loading funds...</p>
                 </div>
+
                 <div class="tab-content">
                     <div class="card shadow-lg p-4">
+
+                        <!-- Top header with title and button -->
                         <div class="d-flex justify-content-between mb-3">
                             <h5>Fund Transactions</h5>
                             <a href="/Admin/Funds/Add?memberId=@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-plus-circle me-1"></i>Add Transaction
                             </a>
                         </div>
-                        <div class="table-responsive">
+
+                        <!-- Table: Desktop only -->
+                        <div class="table-responsive d-none d-md-block">
                             <table class="table table-hover table-striped">
                                 <thead class="table-light">
                                     <tr>
@@ -381,55 +480,117 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Cards: Mobile/Tablet only -->
+                        <div class="row g-3 d-block d-md-none">
+                            @if (Model.Funds != null && Model.Funds.Any())
+                            {
+                                @foreach (var fund in Model.Funds)
+                                {
+                                    <div class="col-12">
+                                        <div class="card shadow-sm h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">@fund.Description</h6>
+                                                <p class="card-text mb-1"><strong>Date:</strong> @fund.TimeStamp.ToShortDateString()</p>
+                                                <p class="card-text mb-1">
+                                                    <strong>Category:</strong>
+                                                    @if (fund.Category == "Income")
+                                                    {
+                                                        <span class="badge bg-success">Income</span>
+                                                    }
+                                                    else if (fund.Category == "Expense")
+                                                    {
+                                                        <span class="badge bg-danger">Expense</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">@fund.Category</span>
+                                                    }
+                                                </p>
+                                                <p class="card-text mb-1"><strong>Aid:</strong> @(fund.Aid?.AidName ?? "N/A")</p>
+                                                <p class="card-text"><strong>Recorded By:</strong> @(fund.Servant?.ServantName ?? "-")</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-center">
+                                    <div class="alert alert-info" role="alert">
+                                        No fund transactions found
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
                     </div>
+                </div>
+            </div>
+            <!-- Family Tab -->
+            <div class="tab-pane fade" id="family" role="tabpanel" aria-labelledby="family-tab">
+                <!-- Table: Visible only on desktop (md and above) -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Code</th>
+                                <th>Full Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.FamilyMembers != null && Model.FamilyMembers.Any())
+                            {
+                                @foreach (var member in Model.FamilyMembers.OrderByDescending(m => m.Age))
+                                {
+                                    <tr>
+                                        <td>@member.Code</td>
+                                        <td>@($"{member.UNFirstName} {member.UNLastName}")</td>
+                                        <td>@member.Age</td>
+                                        <td>@member.Gender</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">No family members found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Cards: Visible only on mobile and tablet (below md) -->
+                <div class="row g-3 d-block d-md-none">
+                    @if (Model.FamilyMembers != null && Model.FamilyMembers.Any())
+                    {
+                        @foreach (var member in Model.FamilyMembers.OrderByDescending(m => m.Age))
+                        {
+                            <div class="col-12">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@($"{member.UNFirstName} {member.UNLastName}")</h5>
+                                        <p class="card-text mb-1"><strong>Code:</strong> @member.Code</p>
+                                        <p class="card-text mb-1"><strong>Age:</strong> @member.Age</p>
+                                        <p class="card-text"><strong>Gender:</strong> @member.Gender</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12 text-center">
+                            <div class="alert alert-info" role="alert">
+                                No family members found
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
 
-            <!-- Family Tab -->
-            <div class="tab-pane fade" id="family" role="tabpanel" aria-labelledby="family-tab">
-                <div class="tab-spinner text-center py-5" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2 text-muted">Loading family members...</p>
-                </div>
-                <div class="tab-content">
-                    <div class="card shadow-lg p-4">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Full Name</th>
-                                        <th>Age</th>
-                                        <th>Gender</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (Model.FamilyMembers != null && Model.FamilyMembers.Any())
-                                    {
-                                        @foreach (var member in Model.FamilyMembers.OrderByDescending(m => m.Age))
-                                        {
-                                            <tr>
-                                                <td>@member.Code</td>
-                                                <td>@($"{member.UNFirstName} {member.UNLastName}")</td>
-                                                <td>@member.Age</td>
-                                                <td>@member.Gender</td>
-                                            </tr>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td colspan="4" class="text-center">No family members found</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -546,7 +707,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Get the modal element
         const modal = document.getElementById('memberDetailsModal');
-        
+
         if (!modal) {
             console.error('Modal element not found. Make sure the modal has id="memberDetailsModal"');
             return;
@@ -560,7 +721,7 @@
         // Load additional data when modal is shown
         modal.addEventListener('shown.bs.modal', function(event) {
             const memberId = event.relatedTarget.getAttribute('data-member-id');
-            
+
             if (!memberId) {
                 console.error('Member ID not found in data-member-id attribute');
                 hideLoading();
@@ -568,7 +729,7 @@
             }
 
             console.log('Loading data for member ID:', memberId); // Debug log
-            
+
             // Fetch additional data
             fetch(`/Admin/Members/Details?handler=AdditionalData&id=${memberId}`)
                 .then(response => {
