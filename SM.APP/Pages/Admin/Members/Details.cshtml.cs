@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using SM.DAL;
 using SM.DAL.DataModel;
+using SM.BAL;
 
 namespace SM.APP.Pages.Admin.Members
 {
@@ -37,44 +32,55 @@ namespace SM.APP.Pages.Admin.Members
                 return NotFound();
             }
 
-            Member = await _context.Members
-                .Include(m => m.EventRegistrations)
-                    .ThenInclude(er => er.Event)
-                .Include(m => m.ClassMembers)
-                    .ThenInclude(cm => cm.Class)
-                .Include(m => m.MemberAids)
-                    .ThenInclude(ma => ma.Aid)
-                .Include(m => m.MemberAids)
-                    .ThenInclude(ma => ma.Servant)
-                .Include(m => m.Funds)
-                    .ThenInclude(f => f.Aid)
-                .Include(m => m.Funds)
-                    .ThenInclude(f => f.Servant)
-                .FirstOrDefaultAsync(m => m.MemberID == id);
-
-            if (Member == null)
+            using (var memberHandler = new MemberHandler())
             {
-                return NotFound();
+                // Get member details
+                Member = memberHandler.GetMember(id.Value);
+                if (Member == null)
+                {
+                    return NotFound();
+                }
+
+                // Get event registrations
+                var eventRegistrations = memberHandler.GetMemberEventRegistrations(id.Value);
+                if (eventRegistrations != null)
+                {
+                    EventRegistrations = eventRegistrations.Cast<EventRegistration>().ToList();
+                }
+
+                // Get class memberships
+                var classMembers = memberHandler.GetMemberClasses(id.Value);
+                if (classMembers != null)
+                {
+                    ClassMembers = classMembers.Cast<ClassMember>().ToList();
+                }
+
+                // Get attendance statistics
+                var attendanceStats = memberHandler.GetMemberClassses(id.Value);
+                if (attendanceStats != null)
+                {
+                    ClassAttendanceStats = attendanceStats.Cast<MemberClassOverview>().ToList();
+                }
+
+                // Get member aids
+                var memberAids = memberHandler.GetMemberAids(id.Value);
+                if (memberAids != null)
+                {
+                    MemberAids = memberAids.Cast<MemberAid>().ToList();
+                }
+
+                // Get member funds
+                var memberFunds = memberHandler.GetMemberFunds(id.Value);
+                if (memberFunds != null)
+                {
+                    Funds = memberFunds.Cast<Fund>().ToList();
+                }
+
+                var familyMembers = memberHandler.GetFamilyByUNFileNumber(Member.UNFileNumber);
+                FamilyMembers = familyMembers?
+                    .Where(m => m?.MemberID != Member.MemberID)
+                    .ToList() ?? new List<Member>();
             }
-
-            // Set the collections from the loaded Member
-            EventRegistrations = Member.EventRegistrations.ToList();
-            ClassMembers = Member.ClassMembers.ToList();
-            MemberAids = Member.MemberAids.ToList();
-            Funds = Member.Funds.ToList();
-
-            // Get attendance statistics
-            List<MemberClassOverview> stats;
-            using (var memberHandler = new SM.BAL.MemberHandler())
-            {
-                stats = memberHandler.GetMemberClassses(id.Value);
-            }
-            ClassAttendanceStats = stats;
-
-            FamilyMembers = await _context.Members
-                .Where(m => m.UNFileNumber == Member.UNFileNumber && m.MemberID != Member.MemberID)
-                .OrderByDescending(m => m.Birthdate)
-                .ToListAsync();
 
             return Page();
         }
