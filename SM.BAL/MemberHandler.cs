@@ -245,6 +245,7 @@ namespace SM.BAL
         public List<EventRegistration> GetMemberEventRegistrations(int memberId)
         {
             return _dbcontext.EventRegistrations
+                .Include(e=>e.Event)
                 .Where(e => e.MemberID == memberId)
                 .OrderByDescending(e => e.Event.EventStartDate)
                 .ToList();
