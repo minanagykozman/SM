@@ -299,77 +299,24 @@ namespace SM.BAL
         }
 
         // Get member aid participations
-        public List<object> GetMemberAids(int memberId)
+        public List<MemberAid> GetMemberAids(int memberId)
         {
             return _dbcontext.MemberAids
                 .Include(a => a.Aid)
                 .Include(a => a.Servant)
                 .Where(a => a.MemberID == memberId)
                 .OrderByDescending(a => a.TimeStamp)
-                .Select(a => new
-                {
-                    a.AidID,
-                    a.MemberID,
-                    a.ServantID,
-                    a.TimeStamp,
-                    a.Notes,
-                    Aid = a.Aid == null ? null : new
-                    {
-                        a.Aid.AidID,
-                        a.Aid.AidName,
-                        a.Aid.AidDate,
-                        a.Aid.IsActive,
-                        a.Aid.ActualMembersCount,
-                        a.Aid.PlannedMembersCount,
-                        a.Aid.CostPerPerson,
-                        a.Aid.TotalCost,
-                        Components = a.Aid.Components
-                    },
-                    Servant = a.Servant == null ? null : new
-                    {
-                        a.Servant.ServantID,
-                        a.Servant.ServantName,
-                        a.Servant.Mobile1,
-                        a.Servant.Mobile2,
-                        a.Servant.IsActive
-                    }
-                })
-                .ToList<object>();
+                .ToList();
         }
 
         // Get member fund transactions
-        public List<object> GetMemberFunds(int memberId)
+        public List<MemberFund> GetMemberFunds(int memberId)
         {
-            return _dbcontext.Funds
-                .Include(f => f.Aid)
+            return _dbcontext.MemberFunds
                 .Include(f => f.Servant)
                 .Where(f => f.MemberID == memberId)
-                .OrderByDescending(f => f.TimeStamp)
-                .Select(f => new
-                {
-                    f.FundID,
-                    AidID = f.Aid != null ? f.Aid.AidID : 0,
-                    f.MemberID,
-                    f.ServantID,
-                    f.Description,
-                    f.Category,
-                    f.TimeStamp,
-                    f.Notes,
-                    Aid = f.Aid == null ? null : new
-                    {
-                        f.Aid.AidID,
-                        f.Aid.AidName,
-                        f.Aid.AidDate,
-                        f.Aid.IsActive
-                    },
-                    Servant = f.Servant == null ? null : new
-                    {
-                        f.Servant.ServantID,
-                        f.Servant.ServantName,
-                        f.Servant.Mobile1
-                    }
-                })
-                .ToList<object>();
+                .OrderByDescending(f => f.RequestDate)
+                .ToList();
         }
     }
 }

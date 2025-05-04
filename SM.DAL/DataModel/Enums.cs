@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace SM.DAL.DataModel
 {
+    public enum FundStatus
+    {
+        Open,
+        Approved,
+        Rejected,
+        Closed
+    }
     public enum RegistrationStatus
     {
         MemeberNotFound,

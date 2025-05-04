@@ -440,8 +440,7 @@
                                         <th>Date</th>
                                         <th>Description</th>
                                         <th>Category</th>
-                                        <th>Aid</th>
-                                        <th>Recorded By</th>
+                                        <th>Approved By</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -450,24 +449,10 @@
                                         @foreach (var fund in Model.Funds)
                                         {
                                             <tr>
-                                                <td>@fund.TimeStamp.ToShortDateString()</td>
-                                                <td>@fund.Description</td>
-                                                <td>
-                                                    @if (fund.Category == "Income")
-                                                    {
-                                                        <span class="badge bg-success">Income</span>
-                                                    }
-                                                    else if (fund.Category == "Expense")
-                                                    {
-                                                        <span class="badge bg-danger">Expense</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-secondary">@fund.Category</span>
-                                                    }
-                                                </td>
-                                                <td>@(fund.Aid?.AidName ?? "N/A")</td>
-                                                <td>@(fund.Servant?.ServantName ?? "-")</td>
+                                                <td>@fund.RequestDate.ToShortDateString()</td>
+                                                <td>@fund.RequestDescription</td>
+                                                <td>@fund.FundCategory</td>
+                                                <td>@(fund.Approver?.ServantName ?? "-")</td>
                                             </tr>
                                         }
                                     }
@@ -490,25 +475,12 @@
                                     <div class="col-12">
                                         <div class="card shadow-sm h-100">
                                             <div class="card-body">
-                                                <h6 class="card-title">@fund.Description</h6>
-                                                <p class="card-text mb-1"><strong>Date:</strong> @fund.TimeStamp.ToShortDateString()</p>
+                                                <h6 class="card-title">@fund.RequestDescription</h6>
+                                                <p class="card-text mb-1"><strong>Date:</strong> @fund.RequestDate.ToShortDateString()</p>
                                                 <p class="card-text mb-1">
-                                                    <strong>Category:</strong>
-                                                    @if (fund.Category == "Income")
-                                                    {
-                                                        <span class="badge bg-success">Income</span>
-                                                    }
-                                                    else if (fund.Category == "Expense")
-                                                    {
-                                                        <span class="badge bg-danger">Expense</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-secondary">@fund.Category</span>
-                                                    }
+                                                    <strong>Category:</strong>@fund.FundCategory
                                                 </p>
-                                                <p class="card-text mb-1"><strong>Aid:</strong> @(fund.Aid?.AidName ?? "N/A")</p>
-                                                <p class="card-text"><strong>Recorded By:</strong> @(fund.Servant?.ServantName ?? "-")</p>
+                                                <p class="card-text"><strong>Approved By:</strong> @(fund.Approver?.ServantName ?? "-")</p>
                                             </div>
                                         </div>
                                     </div>

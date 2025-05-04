@@ -246,7 +246,7 @@ namespace SM.API.Controllers
 
         // Get member fund transactions
         [HttpGet("GetMemberFunds")]
-        public ActionResult<IEnumerable<Fund>> GetMemberFunds(int memberID)
+        public ActionResult<IEnumerable<MemberFund>> GetMemberFunds(int memberID)
         {
             try
             {

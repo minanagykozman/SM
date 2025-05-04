@@ -17,7 +17,7 @@ namespace SM.DAL.DataModel
         public ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
         public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
         public ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
-        public ICollection<Fund> Funds { get; set; } = new List<Fund>();
+        public ICollection<MemberFund> Funds { get; set; } = new List<MemberFund>();
     }
 
 }

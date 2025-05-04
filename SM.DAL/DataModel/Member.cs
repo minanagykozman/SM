@@ -99,7 +99,7 @@ namespace SM.DAL.DataModel
         [JsonIgnore]
         public virtual ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
         [JsonIgnore]
-        public virtual ICollection<Fund> Funds { get; set; } = new List<Fund>();
+        public virtual ICollection<MemberFund> Funds { get; set; } = new List<MemberFund>();
     }
 
 }

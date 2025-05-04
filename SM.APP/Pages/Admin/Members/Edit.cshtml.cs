@@ -29,7 +29,7 @@ namespace SM.APP.Pages.Admin.Members
         public List<ClassMember> ClassMemberships { get; set; } = new();
         public List<ClassAttendance> ClassAttendances { get; set; } = new();
         public List<MemberAid> MemberAids { get; set; } = new();
-        public List<Fund> Funds { get; set; } = new();
+
 
 
         public async Task<IActionResult> OnGetAsync(int? id)

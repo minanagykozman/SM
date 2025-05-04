@@ -17,7 +17,7 @@ namespace SM.APP.Pages.Admin.Members
         public List<ClassMember> ClassMembers { get; set; } = new();
         public List<MemberClassOverview> ClassAttendanceStats { get; set; } = new();
         public List<MemberAid> MemberAids { get; set; } = new();
-        public List<Fund> Funds { get; set; } = new();
+        public List<MemberFund> Funds { get; set; } = new();
         public List<Member> FamilyMembers { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -63,14 +63,14 @@ namespace SM.APP.Pages.Admin.Members
                     var memberAids = memberHandler.GetMemberAids(id.Value);
                     if (memberAids != null)
                     {
-                        MemberAids = memberAids.Cast<MemberAid>().ToList();
+                        MemberAids = memberAids;
                     }
 
                     // Get member funds
                     var memberFunds = memberHandler.GetMemberFunds(id.Value);
                     if (memberFunds != null)
                     {
-                        Funds = memberFunds.Cast<Fund>().ToList();
+                        Funds = memberFunds;
                     }
 
                     var familyMembers = memberHandler.GetFamilyByUNFileNumber(Member.UNFileNumber);

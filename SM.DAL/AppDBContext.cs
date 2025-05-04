@@ -28,7 +28,6 @@
         public DbSet<EventRegistration> EventRegistrations { get; set; }
         public DbSet<Aid> Aids { get; set; }
         public DbSet<MemberAid> MemberAids { get; set; }
-        public DbSet<Fund> Funds { get; set; }
         public DbSet<MemberEventView> MemberEventView { get; set; }
         public DbSet<MemberClasssAttendanceView> MemberClasssAttendanceView { get; set; }
         public DbSet<AidClass> AidClasses { get; set; }
@@ -89,6 +88,9 @@
             modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
             modelBuilder.Entity<MemberEventView>().ToView("MemberEventView").HasKey(v => new { v.MemberID, v.EventID });
             modelBuilder.Entity<MemberClasssAttendanceView>().ToView("MemberClasssAttendanceView").HasKey(v => new { v.MemberID, v.ClassOccurrenceID });
+
+            modelBuilder.Entity<MemberFund>().HasOne(m => m.Approver)
+                .WithMany().HasForeignKey("ApproverID");
 
             #region Seed Data
             // Seed roles
