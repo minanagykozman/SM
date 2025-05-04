@@ -3,19 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SM.DAL.DataModel;
 using SM.BAL;
+using SM.APP.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace SM.APP.Pages.Admin.Members
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class DetailsModel : PageModel
+    public class DetailsModel(UserManager<IdentityUser> userManager, ILogger<DetailsModel> logger) : PageModelBase(userManager, logger)
     {
-        private readonly SM.DAL.AppDbContext _context;
-
-        public DetailsModel(SM.DAL.AppDbContext context)
-        {
-            _context = context;
-        }
-
         public Member? Member { get; set; }
 
         public List<EventRegistration> EventRegistrations { get; set; } = new();
@@ -88,7 +83,7 @@ namespace SM.APP.Pages.Admin.Members
             }
             catch (Exception ex)
             {
-                return Page();
+                return HandleException(ex);
             }
         }
     }
