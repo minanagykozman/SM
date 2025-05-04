@@ -27,62 +27,69 @@ namespace SM.APP.Pages.Admin.Members
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
-
-            using (var memberHandler = new MemberHandler())
-            {
-                // Get member details
-                Member = memberHandler.GetMember(id.Value);
-                if (Member == null)
+                if (id == null)
                 {
                     return NotFound();
                 }
 
-                // Get event registrations
-                var eventRegistrations = memberHandler.GetMemberEventRegistrations(id.Value);
-                if (eventRegistrations != null)
+                using (var memberHandler = new MemberHandler())
                 {
-                    EventRegistrations = eventRegistrations.Cast<EventRegistration>().ToList();
+                    // Get member details
+                    Member = memberHandler.GetMember(id.Value);
+                    if (Member == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Get event registrations
+                    var eventRegistrations = memberHandler.GetMemberEventRegistrations(id.Value);
+                    if (eventRegistrations != null)
+                    {
+                        EventRegistrations = eventRegistrations.Cast<EventRegistration>().ToList();
+                    }
+
+                    // Get class memberships
+                    var classMembers = memberHandler.GetMemberClasses(id.Value);
+                    if (classMembers != null)
+                    {
+                        ClassMembers = classMembers.Cast<ClassMember>().ToList();
+                    }
+
+                    // Get attendance statistics
+                    var attendanceStats = memberHandler.GetMemberClassses(id.Value);
+                    if (attendanceStats != null)
+                    {
+                        ClassAttendanceStats = attendanceStats.Cast<MemberClassOverview>().ToList();
+                    }
+
+                    // Get member aids
+                    var memberAids = memberHandler.GetMemberAids(id.Value);
+                    if (memberAids != null)
+                    {
+                        MemberAids = memberAids.Cast<MemberAid>().ToList();
+                    }
+
+                    // Get member funds
+                    var memberFunds = memberHandler.GetMemberFunds(id.Value);
+                    if (memberFunds != null)
+                    {
+                        Funds = memberFunds.Cast<Fund>().ToList();
+                    }
+
+                    var familyMembers = memberHandler.GetFamilyByUNFileNumber(Member.UNFileNumber);
+                    FamilyMembers = familyMembers?
+                        .Where(m => m?.MemberID != Member.MemberID)
+                        .ToList() ?? new List<Member>();
                 }
 
-                // Get class memberships
-                var classMembers = memberHandler.GetMemberClasses(id.Value);
-                if (classMembers != null)
-                {
-                    ClassMembers = classMembers.Cast<ClassMember>().ToList();
-                }
-
-                // Get attendance statistics
-                var attendanceStats = memberHandler.GetMemberClassses(id.Value);
-                if (attendanceStats != null)
-                {
-                    ClassAttendanceStats = attendanceStats.Cast<MemberClassOverview>().ToList();
-                }
-
-                // Get member aids
-                var memberAids = memberHandler.GetMemberAids(id.Value);
-                if (memberAids != null)
-                {
-                    MemberAids = memberAids.Cast<MemberAid>().ToList();
-                }
-
-                // Get member funds
-                var memberFunds = memberHandler.GetMemberFunds(id.Value);
-                if (memberFunds != null)
-                {
-                    Funds = memberFunds.Cast<Fund>().ToList();
-                }
-
-                var familyMembers = memberHandler.GetFamilyByUNFileNumber(Member.UNFileNumber);
-                FamilyMembers = familyMembers?
-                    .Where(m => m?.MemberID != Member.MemberID)
-                    .ToList() ?? new List<Member>();
+                return Page();
             }
-
-            return Page();
+            catch (Exception ex)
+            {
+                return Page();
+            }
         }
     }
 }

@@ -242,37 +242,12 @@ namespace SM.BAL
             return true;
         }
         // Get member event registrations
-        public List<object> GetMemberEventRegistrations(int memberId)
+        public List<EventRegistration> GetMemberEventRegistrations(int memberId)
         {
             return _dbcontext.EventRegistrations
-                .Include(e => e.Event)
-                .Include(e => e.Servant)
                 .Where(e => e.MemberID == memberId)
                 .OrderByDescending(e => e.Event.EventStartDate)
-                .Select(e => new
-                {
-                    e.EventID,
-                    e.MemberID,
-                    e.ServantID,
-                    e.TimeStamp,
-                    e.Attended,
-                    e.Notes,
-                    Event = new
-                    {
-                        e.Event.EventID,
-                        e.Event.EventName,
-                        e.Event.EventStartDate,
-                        e.Event.EventEndDate,
-                        e.Event.IsActive
-                    },
-                    Servant = new
-                    {
-                        e.Servant.ServantID,
-                        e.Servant.ServantName,
-                        e.Servant.Mobile1
-                    }
-                })
-                .ToList<object>();
+                .ToList();
         }
 
         // Get member classes
