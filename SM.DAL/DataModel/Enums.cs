@@ -12,7 +12,7 @@ namespace SM.DAL.DataModel
         Open,
         Approved,
         Rejected,
-        Closed
+        Delivered
     }
     public enum RegistrationStatus
     {
