@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250530002634_MakeApproverIDNullable")]
+    partial class MakeApproverIDNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,9 +259,6 @@ namespace SM.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<int>("PlannedMembersCount")
                         .HasColumnType("int");
 
@@ -283,38 +283,6 @@ namespace SM.DAL.Migrations
                     b.HasIndex("ClassID");
 
                     b.ToTable("AidClasses");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.AuditTrail", b =>
-                {
-                    b.Property<int>("AuditTrailID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AuditTrailID"));
-
-                    b.Property<string>("AiditTrail")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EntityID")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ServantName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("AuditTrailID");
-
-                    b.ToTable("AuditTrail");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Class", b =>
@@ -443,9 +411,6 @@ namespace SM.DAL.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("EventID");
@@ -603,9 +568,6 @@ namespace SM.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("IsMainMember")
                         .HasColumnType("tinyint(1)");
 
@@ -625,9 +587,6 @@ namespace SM.DAL.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("S3ImageKey")
                         .HasColumnType("longtext");
 
                     b.Property<string>("School")
@@ -1033,7 +992,7 @@ namespace SM.DAL.Migrations
             modelBuilder.Entity("SM.DAL.DataModel.AidClass", b =>
                 {
                     b.HasOne("SM.DAL.DataModel.Aid", "Aid")
-                        .WithMany("AidClasses")
+                        .WithMany()
                         .HasForeignKey("AidID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1267,8 +1226,6 @@ namespace SM.DAL.Migrations
 
             modelBuilder.Entity("SM.DAL.DataModel.Aid", b =>
                 {
-                    b.Navigation("AidClasses");
-
                     b.Navigation("MemberAids");
                 });
 

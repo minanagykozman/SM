@@ -141,7 +141,7 @@ namespace SM.BAL
                     Status = FundStatus.Open,
                     RequestDate = CurrentTime,
                     ApproverNotes = request.ApproverNotes ?? string.Empty,
-                    ApproverID = 0, // Default value for no approver yet
+                    ApproverID = null, // No approver initially
                     ApprovedAmount = 0 // Default value
                 };
 
