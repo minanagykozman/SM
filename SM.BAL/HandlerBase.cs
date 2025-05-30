@@ -39,6 +39,21 @@ namespace SM.BAL
                 || m.UNPersonalNumber == memberCode
                 || (m.UNFileNumber == memberCode && m.IsMainMember));
         }
+        public bool IsAdmin(string username)
+        {
+            if (string.IsNullOrEmpty(username)) return false;
+
+            var normalizedUsername = username.ToUpperInvariant();
+            
+            var isAdmin = _dbcontext.Users
+                .Where(u => u.NormalizedUserName == normalizedUsername)
+                .Join(_dbcontext.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => ur)
+                .Join(_dbcontext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.NormalizedName)
+                .Any(roleName => roleName == "ADMIN");
+
+            return isAdmin;
+        }
+
         public DateTime CurrentTime
         {
             get
