@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Retrieve the connection string from appsettings.json
 string connectionString = string.Empty;
 string loggerConnectionString = string.Empty;
+string hangfireConnectionString = string.Empty;
 string secretKey = string.Empty;
 string issuer = string.Empty;
 string audience = string.Empty;
 if (!builder.Environment.IsDevelopment())
 {
-    connectionString = Environment.GetEnvironmentVariable("DBConnectionString");
-    loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB");
-    secretKey = Environment.GetEnvironmentVariable("JWTSecretKey");
-    issuer = Environment.GetEnvironmentVariable("JWTIssuer");
-    audience = Environment.GetEnvironmentVariable("JWTAudience");
+    connectionString = Environment.GetEnvironmentVariable("DBConnectionString")!;
+    loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB")!;
+    hangfireConnectionString = Environment.GetEnvironmentVariable("HangFireDB")!;
+    secretKey = Environment.GetEnvironmentVariable("JWTSecretKey")!;
+    issuer = Environment.GetEnvironmentVariable("JWTIssuer")!;
+    audience = Environment.GetEnvironmentVariable("JWTAudience")!;
     builder.WebHost.UseKestrel(options =>
     {
         options.ListenAnyIP(5000); // HTTP (Only for internal communication with Nginx)
@@ -30,11 +34,12 @@ if (!builder.Environment.IsDevelopment())
 }
 else
 {
-    connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
-    loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB");
-    secretKey = builder.Configuration["JwtSettings:SecretKey"];
-    issuer = builder.Configuration["JwtSettings:Issuer"];
-    audience = builder.Configuration["JwtSettings:Audience"];
+    connectionString = builder.Configuration.GetConnectionString("DBConnectionString")!;
+    loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB")!;
+    hangfireConnectionString = builder.Configuration.GetConnectionString("HangFireDB")!;
+    secretKey = builder.Configuration["JwtSettings:SecretKey"]!;
+    issuer = builder.Configuration["JwtSettings:Issuer"]!;
+    audience = builder.Configuration["JwtSettings:Audience"]!;
 }
 
 // Register ApplicationDbContext with the MySQL connection string
@@ -126,6 +131,16 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+builder.Services.AddHangfire(
+    configuration => configuration.UseStorage(new MySqlStorage(hangfireConnectionString, new MySqlStorageOptions
+    {
+        TablesPrefix = "Hangfire"
+    })));
+builder.Services.AddHangfireServer();
+builder.Services.AddScoped<Jobs>();
+builder.Services.AddHostedService<JobScheduler>();
+
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -144,6 +159,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -155,5 +171,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseHangfireDashboard("/hangfire");
 
 app.Run();

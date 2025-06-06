@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SM.API.Services;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
+using static SM.API.Controllers.EventsController;
 using static SM.BAL.EventHandler;
 
 namespace SM.API.Controllers
@@ -30,8 +31,6 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
-
         [HttpGet("CheckMemberStatus")]
         public ActionResult<AidStatusResponse> CheckMemberStatus(string memberCode, int aidID)
         {
@@ -51,8 +50,6 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
-
         [HttpGet("GetAidMembers")]
         public ActionResult<List<MemberAid>> GetAidMembers(int aidID)
         {
@@ -70,8 +67,6 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
-
         [HttpPost("Register")]
         public ActionResult<AidStatus> Register(string memberCode, int aidID, string? notes)
         {
@@ -90,7 +85,23 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        
+        [HttpPost("Create")]
+        public ActionResult<int> Create([FromBody] AidParams aidParams)
+        {
+            try
+            {
+                using (SM.BAL.AidHandler aidHandler = new SM.BAL.AidHandler())
+                {
+                    int aidID = aidHandler.CreateAid(aidParams.Aid, aidParams.Classes);
+                    return Ok(aidID);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
 
 
         public class AidStatusResponse
@@ -98,6 +109,10 @@ namespace SM.API.Controllers
             public Member Member { get; set; }
             public AidStatus Status { get; set; }
         }
-        
+        public class AidParams
+        {
+            public Aid Aid { get; set; }
+            public List<int> Classes { get; set; }
+        }
     }
 }

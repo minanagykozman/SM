@@ -124,7 +124,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
+    const year = String(date.getFullYear());
+    return `${day}-${month}-${year}`;
+}
 // Function to Sort Table Columns
 function sortTable(columnIndex, thElement) {
     let table = document.getElementById("dataTable");
@@ -169,6 +175,52 @@ function sortTable(columnIndex, thElement) {
     });
 }
 
+function sortByDate(columnIndex, thElement) {
+    const table = document.getElementById("dataTable");
+    const rows = Array.from(table.rows).slice(1); // Exclude header
+    const ascending = thElement.getAttribute("data-sort-dir") !== "asc";
+
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.cells[columnIndex].innerText.trim();
+        const cellB = rowB.cells[columnIndex].innerText.trim();
+
+        const dateA = parseDate(cellA);
+        const dateB = parseDate(cellB);
+
+        return ascending ? dateA - dateB : dateB - dateA;
+    });
+
+    // Reorder rows in the table
+    rows.forEach(row => table.querySelector("tbody").appendChild(row));
+
+    // Toggle sort direction
+    thElement.setAttribute("data-sort-dir", ascending ? "asc" : "desc");
+
+    // Update Font Awesome Icons
+    let icon = thElement.querySelector("i");
+    if (ascending) {
+        icon.classList.remove("fa-sort", "fa-sort-down");
+        icon.classList.add("fa-sort-up");
+    } else {
+        icon.classList.remove("fa-sort", "fa-sort-up");
+        icon.classList.add("fa-sort-down");
+    }
+
+    // Reset other columns' icons
+    document.querySelectorAll("th i").forEach(otherIcon => {
+        if (otherIcon !== icon) {
+            otherIcon.classList.remove("fa-sort-up", "fa-sort-down");
+            otherIcon.classList.add("fa-sort");
+        }
+    });
+}
+
+// Helper to parse "dd-mm-yy" to a Date object
+function parseDate(dateStr) {
+    const [day, month, year] = dateStr.split("-");
+    return new Date(`${year}`, month - 1, day);
+}
+
 function sortBySequence(thElement) {
     let table = document.getElementById("dataTable");
     let rows = Array.from(table.rows).slice(1); // Exclude header and filter row
@@ -208,6 +260,20 @@ function sortBySequence(thElement) {
 function showModal() {
     const modal = new bootstrap.Modal(document.getElementById("myModal"));
     modal.show();
+}
+// Function to show the modal using Bootstrap
+function showDeleteModal(title, message, ID) {
+    document.getElementById("myModalLabel").innerText = title;
+    document.getElementById("lblDeleteMessage").value = message;
+    document.getElementById("ID").value = ID;
+
+    const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+    modal.show();
+}
+// Function to close the delete modal using Bootstrap
+function closeDeleteModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+    if (modal) modal.hide();
 }
 // Function to close the modal using Bootstrap
 function closeModal() {
@@ -294,4 +360,11 @@ function showLoading() {
 function hideLoading() {
     const loadingIndicator = document.getElementById("loadingIndicator");
     loadingIndicator.classList.add("d-none");
+}
+function showSuccessToast(message) {
+    const toastElement = document.getElementById('successToast');
+    const lblSuccessMessage = document.getElementById('lblSuccessMessage');
+    lblSuccessMessage.textContent = message;
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 }); // 3 seconds
+    toast.show();
 }

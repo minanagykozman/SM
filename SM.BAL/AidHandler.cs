@@ -14,7 +14,7 @@ namespace SM.BAL
 {
     public class AidHandler : HandlerBase
     {
-        public int CreateAid(Aid aid)
+        public int CreateAid(Aid aid,List<int> classIDs)
         {
             Aid aidNew = new Aid();
             aidNew.AidName = aid.AidName;
@@ -25,6 +25,12 @@ namespace SM.BAL
             aidNew.TotalCost = aid.TotalCost;
             aidNew.IsActive = true;
             _dbcontext.Aids.Add(aidNew);
+            _dbcontext.SaveChanges();
+            foreach (int classID in classIDs)
+            {
+                _dbcontext.AidClasses.Add(new AidClass() { ClassID = classID, AidID = aidNew.AidID });
+            }
+
             _dbcontext.SaveChanges();
             return aidNew.AidID;
         }

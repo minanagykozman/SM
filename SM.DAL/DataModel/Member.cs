@@ -56,6 +56,7 @@ namespace SM.DAL.DataModel
         public int? CreatedBy { get; set; } = null;
         public string? ModifiedLog { get; set; } = null;
         public string? VisitationNotes { get; set; } = null;
+        public bool IsDeleted { get; set; } = false;
         public int Age
         {
             get

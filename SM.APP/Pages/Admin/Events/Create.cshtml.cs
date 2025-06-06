@@ -12,5 +12,10 @@ namespace SM.APP.Pages.Admin.Events
     {
         [BindProperty]
         public Event Event { get; set; } = default!;
+        public async Task<IActionResult> OnGetAsync()
+        {
+            await GetAPIToken();
+            return Page();
+        }
     }
 }

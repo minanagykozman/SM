@@ -19,7 +19,15 @@ namespace SM.BAL
             var members = _dbcontext.Members.Where(m => m.UNFileNumber == unFileNumber).ToList<Member>();
             return members.OrderBy(m => m.Birthdate).ToList<Member>();
         }
-
+        public void UpdateMemberStatus()
+        {
+            var activeMembers = _dbcontext.ClassAttendances.Select(c => c.Member).Distinct().ToList();
+            foreach (var member in activeMembers)
+            {
+                member.IsActive = true;
+            }
+            _dbcontext.SaveChanges();
+        }
 
         public Member? GetMemberByCodeOnly(string memberCode)
         {
@@ -183,7 +191,7 @@ namespace SM.BAL
                 var member = _dbcontext.Members.
                     FirstOrDefault(m => m.Code.Contains(memberCode) ||
                     m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode
-                    ||m.ImageReference==memberCode);
+                    || m.ImageReference == memberCode);
 
                 if (member == null)
                     return members;
@@ -245,7 +253,7 @@ namespace SM.BAL
         public List<EventRegistration> GetMemberEventRegistrations(int memberId)
         {
             return _dbcontext.EventRegistrations
-                .Include(e=>e.Event)
+                .Include(e => e.Event)
                 .Where(e => e.MemberID == memberId)
                 .OrderByDescending(e => e.Event.EventStartDate)
                 .ToList();

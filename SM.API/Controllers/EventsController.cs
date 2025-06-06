@@ -31,6 +31,24 @@ namespace SM.API.Controllers
             }
         }
 
+        [HttpGet("GetEvent")]
+        public ActionResult<Event> GetEvent(int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    Event? ev = eventHandler.GetEvent(eventID);
+                    return Ok(ev);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
 
         [HttpGet("CheckRegistrationStatus")]
         public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus(string memberCode, int eventID)
@@ -150,6 +168,40 @@ namespace SM.API.Controllers
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     var eventID = eventHandler.CreateEvent(eventParams.Event.EventName, eventParams.Event.EventStartDate, eventParams.Event.EventEndDate, eventParams.Classes);
+                    return Ok(eventID);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("DeleteEvent")]
+        public ActionResult<int> DeleteEvent([FromBody] int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var id = eventHandler.DeleteEvent(eventID);
+                    return Ok(id);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("UpdateEvent")]
+        public ActionResult<int> UpdateEvent([FromBody] EventParams eventParams)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    var eventID = eventHandler.UpdateEvent(eventParams.Event.EventID, eventParams.Event.EventName, eventParams.Event.EventStartDate, eventParams.Event.EventEndDate, eventParams.Event.IsActive, eventParams.Classes);
                     return Ok(eventID);
                 }
 
