@@ -41,7 +41,7 @@ namespace SM.APP.Pages.Events
                             {
                                 PropertyNameCaseInsensitive = true // Enable case insensitivity
                             };
-                            EventMembers = JsonSerializer.Deserialize<List<MemberEventView>>(responseData, options);
+                            EventMembers = JsonSerializer.Deserialize<List<MemberEventView>>(responseData, options)!;
                             RegisteredCount = EventMembers.Count();
                         }
                         if (EventMembers == null)

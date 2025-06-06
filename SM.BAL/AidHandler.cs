@@ -14,7 +14,7 @@ namespace SM.BAL
 {
     public class AidHandler : HandlerBase
     {
-        public int CreateAid(Aid aid,List<int> classIDs)
+        public int CreateAid(Aid aid, List<int> classIDs)
         {
             Aid aidNew = new Aid();
             aidNew.AidName = aid.AidName;
@@ -102,7 +102,7 @@ namespace SM.BAL
                 throw new Exception("Servant not found");
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> aids = _dbcontext.AidClasses.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.AidID).ToList<int>();
-            return _dbcontext.Aids.Where(e => aids.Contains(e.AidID) && e.IsActive).ToList();
+            return _dbcontext.Aids.Where(e => aids.Contains(e.AidID) && e.IsActive).OrderBy(a => a.AidDate).ToList();
         }
     }
 }

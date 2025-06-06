@@ -1,0 +1,162 @@
+﻿@page
+@model SM.APP.Pages.Admin.Aids.CreateModel
+@{
+    ViewData["Title"] = "Create Aid";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0" id="lblTitle">Create Aid</h4>
+</div>
+<form id="aidForm" style="position:relative">
+    <div class="card shadow-lg p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input class="form-control" id="AidName" placeholder="Enter Aid Name" required />
+                    <label>Aid Name</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="datetime-local" class="form-control" id="AidDate" placeholder="Select Aid Date" required />
+                    <label>Aid Date</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="Enter components" id="Components" style="height: 100px"></textarea>
+                    <label>Components</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input class="form-control" id="CostPP" step="0.01" type="number" placeholder="Enter Cost Per Person" required />
+                    <label>Cost (per person)</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input class="form-control" id="CostTotal" step="0.01" type="number" placeholder="Enter Total Cost" required />
+                    <label>Total Cost</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input class="form-control" id="MembersPlanned" type="number" placeholder="Enter Cost Per Person" required />
+                    <label>Planned Members#</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
+                <select class="form-select" id="drpClasses" multiple required></select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const classesDropdown = document.getElementById("drpClasses");
+        const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+
+        // 1. Load class options from API
+        try {
+            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+            const classResponse = await fetch(request, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+            const classList = await classResponse.json();
+
+            // Populate the dropdown
+            classesDropdown.innerHTML = "";
+            classList.forEach(cls => {
+                const option = document.createElement("option");
+                option.value = cls.classID;
+                option.textContent = cls.className;
+                classesDropdown.appendChild(option);
+            });
+
+            $('#drpClasses').select2({
+            placeholder: "Select classes",
+            allowClear: true,
+            width: '100%' // Ensures proper styling with Bootstrap
+        });
+
+        } catch (err) {
+            console.error("Error loading classes:", err);
+        }
+
+        // 2. Handle form submission
+        const form = document.getElementById("aidForm");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const aidName = document.getElementById("AidName").value;
+            const aidDate = document.getElementById("AidDate").value;
+            const components = document.getElementById("Components").value;
+            const totalCost = document.getElementById("CostTotal").value;
+            const costPerPerson = document.getElementById("CostPP").value;
+            const plannedMembersCount = document.getElementById("MembersPlanned").value;
+
+            // Get selected class IDs
+            const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+            const eventPayload = {
+                aid: {
+                    aidID: 0,
+                    aidName: aidName,
+                    components: components,
+                    costPerPerson: costPerPerson,
+                    totalCost:totalCost,
+                    plannedMembersCount:plannedMembersCount,
+                    actualMembersCount:0,
+                    aidDate:aidDate,
+                    isActive: true
+                },
+                classes: selectedClasses
+            };
+
+            try {
+                const request = `${apiBaseUrl}/Aids/Create`;
+                const response = await fetch(request, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(eventPayload)
+                });
+
+                if (!response.ok) throw new Error("Aid creation failed");
+
+                showSuccessToast("Aid created successfully");
+                $('#drpClasses').val(null).trigger('change');
+                form.reset();
+
+            } catch (err) {
+                console.error("Error creating aid:", err);
+            }
+        });
+    });
+</script>
+
