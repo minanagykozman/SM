@@ -1,51 +1,68 @@
 ﻿@page
 @model SM.APP.Pages.Admin.Aids.EditModel
 @{
-    ViewData["Title"] = "Edit Event";
+    ViewData["Title"] = "Edit Aid";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0" id="lblTitle">Edit Event</h4>
+    <h4 class="mb-0" id="lblTitle">Edit Aid</h4>
 </div>
-
-<form id="eventForm" style="position:relative">
+<partial name="_LoadingPartial" />
+<partial name="_SuccessToastPartial" />
+<form id="frm" style="position:relative">
     <div class="card shadow-lg p-4">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="row g-3 mt-2">
-            <div class="col-md-12">
-                <div class="form-floating">
-                    <input class="form-control" id="EventName" placeholder="Enter Event Name" required>
-                    <label>Event Name</label>
-                </div>
-                <div class="invalid-feedback">This field is required.</div>
-            </div>
-        </div>
-
         <div class="row g-3 mt-2">
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="EventStartDate" placeholder="Select Start Date" required>
-                    <label>Start Date</label>
+                    <input class="form-control" id="AidName" placeholder="Enter Aid Name" required />
+                    <label>Aid Name</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="EventEndDate" placeholder="Select End Date" required>
-                    <label>End Date</label>
+                    <input type="datetime-local" class="form-control" id="AidDate" placeholder="Select Aid Date" required />
+                    <label>Aid Date</label>
                 </div>
             </div>
         </div>
-
         <div class="row g-3 mt-2">
             <div class="col-md-12">
-                <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
-                <select class="form-select" id="EventClasses" multiple required></select>
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="Enter components" id="Components" style="height: 100px"></textarea>
+                    <label>Components</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input class="form-control" id="CostPP" step="0.01" type="number" placeholder="Enter Cost Per Person" required />
+                    <label for="CostPP">Cost (per person)</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input class="form-control" id="CostTotal" step="0.01" type="number" placeholder="Enter Total Cost" required />
+                    <label for="CostTotal">Total Cost</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input class="form-control" id="MembersPlanned" type="number" placeholder="Enter Planned Members" required />
+                    <label for="MembersPlanned">Planned Members#</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
+                <select class="form-select" id="drpClasses" multiple required></select>
             </div>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
-            <a href="Index" class="btn btn-outline-secondary">Back to List</a>
+            <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>
@@ -55,8 +72,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
-        const classesDropdown = document.getElementById("EventClasses");
-        const eventID = new URLSearchParams(window.location.search).get("eventID");
+        const classesDropdown = document.getElementById("drpClasses");
+        const aidID = new URLSearchParams(window.location.search).get("aidID");
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
 
         let allClasses = [];
@@ -81,7 +98,7 @@
                 classesDropdown.appendChild(option);
             });
 
-            $('#EventClasses').select2({
+            $('#drpClasses').select2({
                 placeholder: "Select classes",
                 allowClear: true,
                 width: '100%'
@@ -91,73 +108,86 @@
             console.error("Error loading class list:", err);
         }
 
-        // Load existing event data
-        if (eventID) {
+        // Load existing aid data
+        if (aidID) {
             try {
-                const response = await fetch(`${apiBaseUrl}/Events/GetEvent?eventID=${eventID}`, {
+                showLoading();
+                const response = await fetch(`${apiBaseUrl}/Aids/GetAid?aidID=${aidID}`, {
                     method: "GET",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" }
                 });
 
-                if (!response.ok) throw new Error("Failed to load event data");
-                const eventData = await response.json();
+                if (!response.ok) throw new Error("Failed to load aid data");
+                const aidData = await response.json();
 
                 // Fill form with data
-                document.getElementById("EventName").value = eventData.eventName;
-                document.getElementById("EventStartDate").value = eventData.eventStartDate.slice(0, 16);
-                document.getElementById("EventEndDate").value = eventData.eventEndDate.slice(0, 16);
-                document.getElementById("lblTitle").textContent ='Edit Event: ' + eventData.eventName;
+                document.getElementById("AidName").value = aidData.aidName;
+                document.getElementById("AidDate").value = aidData.aidDate.slice(0, 16);
+                document.getElementById("Components").value = aidData.components;
+                document.getElementById("CostTotal").value = aidData.totalCost;
+                document.getElementById("CostPP").value = aidData.costPerPerson;
+                document.getElementById("MembersPlanned").value = aidData.plannedMembersCount;
+                document.getElementById("lblTitle").textContent ='Edit Aid: ' + aidData.aidName;
 
                 // Set selected classes
-                const classIDs = eventData.classesIDs;
-                
-                $('#EventClasses').val(classIDs).trigger('change');
+                const classIDs = aidData.classesIDs;
+
+                $('#drpClasses').val(classIDs).trigger('change');
+                hideLoading();
 
             } catch (err) {
-                console.error("Error loading event:", err);
+                console.error("Error loading aid:", err);
             }
         }
 
         // Submit update
-        const form = document.getElementById("eventForm");
+        const form = document.getElementById("frm");
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            const eventName = document.getElementById("EventName").value;
-            const startDate = document.getElementById("EventStartDate").value;
-            const endDate = document.getElementById("EventEndDate").value;
+            const aidName = document.getElementById("AidName").value;
+            const aidDate = document.getElementById("AidDate").value;
+            const components = document.getElementById("Components").value;
+            const totalCost = document.getElementById("CostTotal").value;
+            const costPerPerson = document.getElementById("CostPP").value;
+            const plannedMembersCount = document.getElementById("MembersPlanned").value;
             const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
 
-            const eventPayload = {
-                event: {
-                    eventID: parseInt(eventID),
-                    eventName: eventName,
-                    eventStartDate: startDate,
-                    eventEndDate: endDate,
+            const aidPayload = {
+                aid: {
+                    aidID: aidID,
+                    aidName: aidName,
+                    components: components,
+                    costPerPerson: costPerPerson,
+                    totalCost:totalCost,
+                    plannedMembersCount:plannedMembersCount,
+                    actualMembersCount:0,
+                    aidDate:aidDate,
                     isActive: true
                 },
                 classes: selectedClasses
             };
 
             try {
-                const updateRequest = `${apiBaseUrl}/Events/UpdateEvent`;
+                const updateRequest = `${apiBaseUrl}/Aids/UpdateAid`;
                 const updateResponse = await fetch(updateRequest, {
                     method: "POST",
                     credentials: "include",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(eventPayload)
+                    body: JSON.stringify(aidPayload)
                 });
 
                 if (!updateResponse.ok) throw new Error("Update failed");
 
-                showSuccessToast("Event updated successfully");
+                showSuccessToast("Aid updated successfully");
 
             } catch (err) {
-                console.error("Error updating event:", err);
+                console.error("Error updating aid:", err);
             }
         });
     });
 </script>
+

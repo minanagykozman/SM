@@ -20,8 +20,23 @@ namespace SM.DAL.DataModel
         public int ActualMembersCount { get; set; }
         public DateTime AidDate { get; set; }
         public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
+        public List<int> ClassesIDs
+        {
+            get
+            {
+                if (AidClasses == null)
+                    return new List<int>();
+                else
+                {
+                    return AidClasses.Select(c => c.ClassID).ToList();
+                }
+            }
+        }
         [JsonIgnore]
         public ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
+        [JsonIgnore]
+        public ICollection<AidClass> AidClasses { get; set; } = new List<AidClass>();
     }
 
 }

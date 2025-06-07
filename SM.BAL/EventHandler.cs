@@ -41,7 +41,6 @@ namespace SM.BAL
                 return 0;
             }
         }
-
         public int UpdateEvent(int eventID, string eventName, DateTime eventStartDate, DateTime eventEndDate, bool isActive, List<int> classIDs)
         {
             try
@@ -72,7 +71,6 @@ namespace SM.BAL
                 return 0;
             }
         }
-
         public int DeleteEvent(int eventID)
         {
             try
@@ -91,7 +89,6 @@ namespace SM.BAL
                 return 0;
             }
         }
-
         public Event? GetEvent(int eventID)
         {
             var ev = _dbcontext.Events.Include(e => e.ClassEvents).Where(e => e.EventID == eventID).FirstOrDefault();

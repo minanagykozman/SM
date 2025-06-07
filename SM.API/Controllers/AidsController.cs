@@ -31,6 +31,57 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetAid")]
+        public ActionResult<Aid> GetAid(int aidID)
+        {
+            try
+            {
+                using (SM.BAL.AidHandler eventHandler = new SM.BAL.AidHandler())
+                {
+                    ValidateServant();
+                    Aid? ev = eventHandler.GetAid(aidID);
+                    return Ok(ev);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("DeleteAid")]
+        public ActionResult<int> DeleteAid([FromBody] int aidID)
+        {
+            try
+            {
+                using (SM.BAL.AidHandler aidHandler = new SM.BAL.AidHandler())
+                {
+                    var id = aidHandler.DeleteAid(aidID);
+                    return Ok(id);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("UpdateAid")]
+        public ActionResult<int> UpdateAid([FromBody] AidParams aidParams)
+        {
+            try
+            {
+                using (SM.BAL.AidHandler aidHandler = new SM.BAL.AidHandler())
+                {
+                    var id = aidHandler.UpdateAid(aidParams.Aid,aidParams.Classes);
+                    return Ok(id);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpGet("CheckMemberStatus")]
         public ActionResult<AidStatusResponse> CheckMemberStatus(string memberCode, int aidID)
         {

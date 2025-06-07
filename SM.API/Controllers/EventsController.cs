@@ -48,8 +48,6 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
-
         [HttpGet("CheckRegistrationStatus")]
         public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus(string memberCode, int eventID)
         {

@@ -34,7 +34,62 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return aidNew.AidID;
         }
+        public int UpdateAid(Aid aidToUpdate, List<int> classIDs)
+        {
+            try
+            {
+                Aid? ev = _dbcontext.Aids.Where(e => e.AidID == aidToUpdate.AidID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Aid not found");
 
+                ev.AidDate = aidToUpdate.AidDate;
+                ev.AidName = aidToUpdate.AidName;
+                ev.CostPerPerson = aidToUpdate.CostPerPerson;
+                ev.Components = aidToUpdate.Components;
+                ev.PlannedMembersCount = aidToUpdate.PlannedMembersCount;
+                ev.IsActive = aidToUpdate.IsActive; ;
+                ev.TotalCost = aidToUpdate.TotalCost;
+
+                var classAids= _dbcontext.AidClasses.Where(e => e.AidID == aidToUpdate.AidID).ToList();
+                _dbcontext.AidClasses.RemoveRange(classAids);
+                _dbcontext.SaveChanges();
+
+                foreach (int classID in classIDs)
+                {
+                    _dbcontext.AidClasses.Add(new AidClass() { ClassID = classID, AidID = ev.AidID});
+                }
+                _dbcontext.SaveChanges();
+                return ev.AidID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public int DeleteAid(int aidID)
+        {
+            try
+            {
+                var ev = _dbcontext.Aids.Where(e => e.AidID == aidID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Event not found");
+                ev.IsDeleted = true;
+
+                _dbcontext.SaveChanges();
+                return ev.AidID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public Aid? GetAid(int aidID)
+        {
+            var ev = _dbcontext.Aids.Include(e => e.AidClasses).Where(e => e.AidID == aidID).FirstOrDefault();
+            return ev;
+        }
         public AidStatus CheckMemberStatus(int aidID, string memberCode, out Member member)
         {
             Member? lmember = GetMember(memberCode);
