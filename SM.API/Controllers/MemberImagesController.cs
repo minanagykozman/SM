@@ -44,8 +44,7 @@ namespace SM.API.Controllers
                     BucketName = BucketName,
                     Key = key,
                     InputStream = param.ImageFile.OpenReadStream(),
-                    ContentType = param.ImageFile.ContentType,
-                    CannedACL = S3CannedACL.PublicRead
+                    ContentType = param.ImageFile.ContentType
                 };
 
                 await _s3Client.PutObjectAsync(request);
