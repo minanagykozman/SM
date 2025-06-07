@@ -294,6 +294,16 @@ namespace SM.BAL
 
             return membersExtended;
         }
+        public void UpdateMemberImage(int memberID, string imageURL)
+        {
+            var member = _dbcontext.Members.Where(m => m.MemberID == memberID).FirstOrDefault();
+            if (member == null)
+            {
+                throw new Exception("Member not found");
+            }
+            member.ImageURL = imageURL;
+            _dbcontext.SaveChanges();
+        }
 
         // Get member attendance history
         public List<ClassAttendance> GetAttendanceHistory(int memberId)

@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Hangfire;
 using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,6 +10,8 @@ using Serilog;
 using SM.API.Services;
 using SM.DAL;
 using System.Text;
+using Amazon;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,7 +102,7 @@ Log.Logger = new LoggerConfiguration()
     )
     .CreateLogger();
 builder.Host.UseSerilog();
-
+builder.Services.AddAWSService<IAmazonS3>();
 // Add Swagger with JWT Authentication
 builder.Services.AddSwaggerGen(c =>
 {

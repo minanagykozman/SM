@@ -61,6 +61,23 @@
             <!-- Member Info Tab -->
             <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
                 <div class="card shadow-lg p-4">
+                    <!-- Member Image -->
+                    @if (string.IsNullOrEmpty(Model.Member.ImageURL))
+                    {
+                        <div class="text-center mb-4">
+                            <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center mb-4">
+                            <img src="@Model.Member.ImageURL"
+                                 alt="Member Photo"
+                                 class="img-thumbnail shadow-sm"
+                                 style="max-height: 200px;"
+                                 onerror="this.onerror=null; this.style.display='none';" />
+                        </div>
+                    }
                     <div class="col-md-12">
                         <div class="form-floating">
                             <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
