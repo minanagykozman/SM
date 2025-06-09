@@ -98,8 +98,7 @@ namespace SM.API.Controllers
                     BucketName = BucketName,
                     Key = key,
                     InputStream = ms,
-                    ContentType = GetMimeType(entry.Name),
-                    CannedACL = S3CannedACL.PublicRead
+                    ContentType = GetMimeType(entry.Name)
                 };
 
                 await _s3Client.PutObjectAsync(putRequest);
