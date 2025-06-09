@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SM.APP.Services;
 using SM.DAL;
 using Serilog;
+using Microsoft.AspNetCore.Http.Features;
 internal class Program
 {
     private static void Main(string[] args)
@@ -57,7 +58,10 @@ internal class Program
             options.LoginPath = "/Identity/Account/Login";
             options.AccessDeniedPath = "/Identity/Account/AccessDenied";
         });
-
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
+        });
         builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
         builder.Services.AddCors(options =>
