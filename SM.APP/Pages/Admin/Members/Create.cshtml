@@ -9,13 +9,8 @@
     <h1 class="text-center">Create Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
-        @if (Model.ShowMessage)
-        {
-            <div id="Message" class="alert alert-success w-100 text-center">
-                @Model.Message
-            </div>
-        }
         <partial name="_SuccessToastPartial" />
+        <partial name="_LoadingPartial" />
         <form id="frmCreate" style="position:relative">
             <input type="hidden" asp-for="Member.Code" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -246,14 +241,17 @@
 
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
+            showLoading();
             await createMember();
             const unFileNumber=document.getElementById("UNFileNumber").value;
             form.reset();
             const clickedButton = e.submitter;
             const action = clickedButton?.value;
+            document.getElementById("UNPersonalNumber").focus();
             if (action === "AddAnother") {
                 document.getElementById("UNFileNumber").value= unFileNumber;
             }
+            hideLoading();
         });
 
     });
