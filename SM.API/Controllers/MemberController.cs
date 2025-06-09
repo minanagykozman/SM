@@ -300,7 +300,7 @@ namespace SM.API.Controllers
         }
         public class MemberParam
         {
-            public IFormFile ImageFile { get; set; }
+            public IFormFile? ImageFile { get; set; }
             public string? UNFirstName { get; set; }
             public string? UNLastName { get; set; }
             public string? BaptismName { get; set; }
