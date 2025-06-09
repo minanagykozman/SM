@@ -307,8 +307,10 @@ namespace SM.BAL
         }
         public void BulkUploadImages(List<IamgeProperties> membersImages)
         {
-            var members = _dbcontext.Members.Where(m => membersImages.Any(r => r.Filename == m.ImageReference)).ToList();
+            var imageFilenames = membersImages.Select(r => r.Filename).ToList();
 
+            var members = _dbcontext.Members.Where(m => imageFilenames.Contains(m.ImageReference)).ToList();
+            
             foreach (var item in membersImages)
             {
                 var member = members.Where(m => m.ImageReference == item.Key).FirstOrDefault();
