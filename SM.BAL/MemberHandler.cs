@@ -142,7 +142,7 @@ namespace SM.BAL
             }
         }
 
-        public string CreateMember(Member member, string modifiedByUserName)
+        public Member CreateMember(Member member, string modifiedByUserName)
         {
             Servant servant = GetServantByUsername(modifiedByUserName);
             int sequence = 0;
@@ -164,17 +164,73 @@ namespace SM.BAL
             newMember.CreatedAt = CurrentTime;
             newMember.Code = GenerateCode(member.Gender, member.Birthdate, out sequence);
             newMember.Sequence = sequence;
+            newMember.S3ImageKey = member.S3ImageKey;
+            newMember.ImageURL = member.ImageURL;
             if ((CurrentTime.Year - newMember.Birthdate.Year) <= 5)
                 newMember.CardStatus = "NotApplicable";
             else
-                newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageReference) ? "MissingPhoto" : "ReadyToPrint";
+                newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageURL) ? "MissingPhoto" : "ReadyToPrint";
             newMember.IsActive = true;
             newMember.IsMainMember = newMember.Age >= 20;
             newMember.ModifiedLog = "Member created.";
 
             _dbcontext.Members.Add(newMember);
             _dbcontext.SaveChanges();
-            return newMember.Code;
+            return newMember;
+        }
+
+        public Member CreateMember(string? unFirstName,
+            string? unLastName,
+            string? baptismName,
+            string? nickname,
+            string unFileNumber,
+            string unPersonalNumber,
+            string? mobile,
+            bool baptised,
+            DateTime birthdate,
+            char gender,
+            string? school,
+            string? work,
+            string? notes,
+            string? imageURL,
+            string? s3ImageKey,
+            string? imageReference,
+            string modifiedByUserName)
+        {
+            Servant servant = GetServantByUsername(modifiedByUserName);
+            int sequence = 0;
+            Member newMember = new Member();
+            newMember.Gender = gender;
+            newMember.UNFirstName = unFirstName;
+            newMember.UNLastName = unLastName;
+            newMember.UNFileNumber = unFileNumber;
+            newMember.UNPersonalNumber = unPersonalNumber;
+            newMember.Birthdate = birthdate;
+            newMember.Baptised = baptised;
+            newMember.BaptismName = baptismName;
+            newMember.ImageReference = imageReference;
+            newMember.Mobile = mobile;
+            newMember.Nickname = nickname;
+            newMember.School = school;
+            newMember.Work = work;
+            newMember.Notes = notes;
+            newMember.CreatedBy = servant.ServantID;
+            newMember.CreatedAt = CurrentTime;
+            newMember.Code = GenerateCode(gender, birthdate, out sequence);
+            newMember.Sequence = sequence;
+            newMember.S3ImageKey = s3ImageKey;
+            newMember.ImageURL = imageURL;
+            if ((CurrentTime.Year - newMember.Birthdate.Year) <= 5)
+                newMember.CardStatus = "NotApplicable";
+            else
+                newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageURL) ? "MissingPhoto" : "ReadyToPrint";
+            newMember.IsActive = true;
+            newMember.IsMainMember = newMember.Age >= 20;
+            newMember.ModifiedLog = "Member created.";
+
+            _dbcontext.Members.Add(newMember);
+            _dbcontext.SaveChanges();
+            return newMember;
         }
 
 
@@ -310,7 +366,7 @@ namespace SM.BAL
             var imageFilenames = membersImages.Select(r => r.Filename).ToList();
 
             var members = _dbcontext.Members.Where(m => imageFilenames.Contains(m.ImageReference)).ToList();
-            
+
             foreach (var item in membersImages)
             {
                 var member = members.Where(m => m.ImageReference == item.Key).FirstOrDefault();

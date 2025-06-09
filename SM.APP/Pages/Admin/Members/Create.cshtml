@@ -15,7 +15,8 @@
                 @Model.Message
             </div>
         }
-        <form method="post">
+        <partial name="_SuccessToastPartial" />
+        <form id="frmCreate" style="position:relative">
             <input type="hidden" asp-for="Member.Code" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -39,21 +40,21 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
+                        <input asp-for="Member.UNFirstName" id="UNFirstName" class="form-control" placeholder="Enter First Name" />
                         <label asp-for="Member.UNFirstName"></label>
                     </div>
                     <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
+                        <input asp-for="Member.UNLastName" id="UNLastName" class="form-control" placeholder="Enter Last Name" />
                         <label asp-for="Member.UNLastName"></label>
                     </div>
                     <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.Gender" class="form-select">
+                        <select asp-for="Member.Gender" id="Gender" class="form-select">
                             <option value="">Select Gender</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -64,55 +65,63 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
+                        <input type="date" asp-for="Member.Birthdate" id="Birthdate" class="form-control" placeholder="Enter Birthdate" />
                         <label asp-for="Member.Birthdate"></label>
                     </div>
                     <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
+                        <input class="form-check-input" id="Baptised" type="checkbox" asp-for="Member.Baptised" />
                         <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <input asp-for="Member.BaptismName" id="BaptismName" class="form-control" placeholder="Enter Baptism Name" />
+                        <label asp-for="Member.BaptismName"></label>
+                    </div>
+                    <span asp-validation-for="Member.BaptismName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Mobile" id="Mobile" class="form-control" placeholder="Enter Mobile" />
                         <label asp-for="Member.Mobile"></label>
                     </div>
                     <span asp-validation-for="Member.Mobile" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
-                    </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
+                        <input asp-for="Member.Nickname" id="Nickname" class="form-control" placeholder="Enter Nickname" />
                         <label asp-for="Member.Nickname"></label>
                     </div>
                     <span asp-validation-for="Member.Nickname" class="text-danger"></span>
                 </div>
+               
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
+                        <input asp-for="Member.School" id="School" class="form-control" placeholder="Enter School" />
                         <label asp-for="Member.School"></label>
                     </div>
                     <span asp-validation-for="Member.School" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
+                        <input asp-for="Member.Work" id="Work" class="form-control" placeholder="Enter Work" />
                         <label asp-for="Member.Work"></label>
                     </div>
                     <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
                 <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
+                        <label for="ImageUpload">Upload Image</label>
+                    </div>
+                    <span id="ImageUploadError" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
                     <div class="form-floating">
-                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                        <textarea asp-for="Member.Notes" id="Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
                         <label asp-for="Member.Notes"></label>
                     </div>
                     <span asp-validation-for="Member.Notes" class="text-danger"></span>
@@ -135,11 +144,11 @@
     });
 </script>
 <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
         async function validateUNPersonalNumber() {
         let inputField = document.getElementById("UNPersonalNumber");
         let personalNumber = inputField.value.trim();
         let errorSpan = document.getElementById("UNPersonalNumberError");
-        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
         if (!personalNumber) {
             errorSpan.textContent = "Personal number is required.";
             return false;
@@ -147,7 +156,11 @@
 
         try {
             const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
-            const response = await fetch(request);
+            const response = await fetch(request, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
 
             // Ensure response is valid
             if (!response.ok) {
@@ -171,6 +184,72 @@
             return false;
         }
     }
+        async function createMember() {
+        console.info("Populating data");
+        const formData = new FormData();
+
+        // Collect form values
+        formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
+        formData.append("UNFileNumber", document.getElementById("UNFileNumber").value);
+        formData.append("UNFirstName", document.getElementById("UNFirstName").value);
+        formData.append("UNLastName", document.getElementById("UNLastName").value);
+        formData.append("Gender", document.getElementById("Gender").value);
+        formData.append("Birthdate", document.getElementById("Birthdate").value);
+        formData.append("Baptised", document.getElementById("Baptised").checked);
+        formData.append("Mobile", document.getElementById("Mobile").value);
+        formData.append("Nickname", document.getElementById("Nickname").value);
+        formData.append("BaptismName", document.getElementById("BaptismName").value);
+        formData.append("School", document.getElementById("School").value);
+        formData.append("Work", document.getElementById("Work").value);
+        formData.append("Notes", document.getElementById("Notes").value);
+        console.info("Populated data");
+        const fileInput = document.getElementById("ImageUpload");
+        if (fileInput.files.length > 0) {
+            formData.append("ImageFile", fileInput.files[0]);
+        }
+        const request = `${apiBaseUrl}/Member/CreateMemberWImage`;
+        try {
+            const response = await fetch(request, {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error);
+            }
+
+            const memberCode = await response.json();
+            showSuccessToast("Member created successfully with code: "+ memberCode);
+        } catch (err) {
+            console.error("Failed to submit form:", err);
+            alert("Error: " + err.message);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        const baptisedCheckbox = document.getElementById("Baptised");
+        const baptismNameInput = document.getElementById("BaptismName");
+
+        function toggleBaptismName() {
+            baptismNameInput.disabled = !baptisedCheckbox.checked;
+        }
+
+        // Initial state
+        toggleBaptismName();
+
+        // Listen for changes
+        baptisedCheckbox.addEventListener("change", toggleBaptismName);
+        const form = document.getElementById("frmCreate");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            await createMember(); 
+        });
+
+    });
 </script>
 
 @section Scripts {

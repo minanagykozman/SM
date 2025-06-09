@@ -19,7 +19,7 @@ namespace SM.API.Controllers
     public class MemberImagesController : SMControllerBase
     {
         private readonly IAmazonS3 _s3Client;
-        private const string BucketName = "amapptesting";
+        //private const string BucketName = "amapptesting";
 
         public MemberImagesController(ILogger<SMControllerBase> logger, IAmazonS3 s3Client)
         : base(logger)
@@ -42,7 +42,7 @@ namespace SM.API.Controllers
 
                 var request = new PutObjectRequest
                 {
-                    BucketName = BucketName,
+                    BucketName = SMConfigurationManager.S3BucketName,
                     Key = key,
                     InputStream = param.ImageFile.OpenReadStream(),
                     ContentType = param.ImageFile.ContentType
@@ -50,7 +50,7 @@ namespace SM.API.Controllers
 
                 await _s3Client.PutObjectAsync(request);
 
-                var url = $"https://{BucketName}.s3.amazonaws.com/{key}";
+                var url = $"https://{SMConfigurationManager.S3BucketName}.s3.amazonaws.com/{key}";
 
                 using (MemberHandler handler = new MemberHandler())
                 {
@@ -96,7 +96,7 @@ namespace SM.API.Controllers
 
                 var putRequest = new PutObjectRequest
                 {
-                    BucketName = BucketName,
+                    BucketName = SMConfigurationManager.S3BucketName,
                     Key = key,
                     InputStream = ms,
                     ContentType = GetMimeType(entry.Name)
@@ -104,7 +104,7 @@ namespace SM.API.Controllers
 
                 await _s3Client.PutObjectAsync(putRequest);
 
-                var imageUrl = $"https://{BucketName}.s3.amazonaws.com/{key}";
+                var imageUrl = $"https://{SMConfigurationManager.S3BucketName}.s3.amazonaws.com/{key}";
                 var fileNameOnly = Path.GetFileNameWithoutExtension(entry.FullName);
                 membersImages.Add(new IamgeProperties() { Filename = fileNameOnly, ImageURL = imageUrl, Key = key });
             }

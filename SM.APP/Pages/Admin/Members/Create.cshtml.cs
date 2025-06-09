@@ -23,21 +23,9 @@ namespace SM.APP.Pages.Admin.Members
     [Authorize(Roles = "Admin,Servant")]
     public class CreateModel(UserManager<IdentityUser> userManager, ILogger<CreateModel> logger) : PageModelBase(userManager, logger)
     {
-        public IActionResult OnGet(string unFileNumber, bool? showMessage, string code)
+        public async Task<IActionResult> OnGet(string unFileNumber, bool? showMessage, string code)
         {
-            if (Member == null)
-                Member = new Member();
-            Member.Code = "code";
-            if (!string.IsNullOrEmpty(unFileNumber))
-            {
-
-                Member.UNFileNumber = unFileNumber;
-            }
-            if (showMessage.HasValue && showMessage.Value && !string.IsNullOrEmpty(code))
-            {
-                ShowMessage = showMessage.Value;
-                Message = string.Format("Member created successfully with code {0}", code);
-            }
+            await GetAPIToken();
             return Page();
         }
 
@@ -98,7 +86,6 @@ namespace SM.APP.Pages.Admin.Members
 
                     if (action == "AddAnother")
                     {
-
                         return RedirectToPage("", new { unFileNumber = Member.UNFileNumber, showMessage = true, code = code });
                     }
                     else

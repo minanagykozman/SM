@@ -1,18 +1,25 @@
+using Amazon.S3;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.API.Services;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using static SM.BAL.EventHandler;
 
 namespace SM.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    //[Authorize]
-    public class MemberController(ILogger<MemberController> logger) : SMControllerBase(logger)
+    [Authorize]
+    public class MemberController : SMControllerBase
     {
-
+        private readonly IAmazonS3 _s3Client;
+        public MemberController(ILogger<SMControllerBase> logger, IAmazonS3 s3Client)
+       : base(logger)
+        {
+            _s3Client = s3Client;
+        }
 
         [HttpGet("GetFamily")]
         public ActionResult<List<Member>> GetFamily(string unFileNumber)
@@ -142,8 +149,32 @@ namespace SM.API.Controllers
                 using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
                 {
                     ValidateServant();
-                    string code = eventHandler.CreateMember(member, User.Identity.Name);
-                    return Ok(code);
+                    Member newMember = eventHandler.CreateMember(member, User.Identity.Name);
+
+                    return Ok(newMember.Code);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("CreateMemberWImage")]
+        public async Task<IActionResult> CreateMemberWImage([FromForm] MemberParam param)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    ValidateServant();
+                    var imageData = await AWSHelper.UploadMemberImage(param.ImageFile, _s3Client, memberHandler);
+
+                    Member newMember = memberHandler.CreateMember(param.UNFirstName, param.UNLastName, param.BaptismName, param.Nickname
+                        , param.UNFileNumber, param.UNPersonalNumber, param.Mobile, param.Baptised, param.Birthdate, param.Gender, param.School, param.Work,
+                        param.Notes, imageData?.URL, imageData?.Key, param.ImageFile?.FileName, User.Identity.Name);
+
+                    return Ok(newMember.Code);
                 }
 
             }
@@ -267,6 +298,22 @@ namespace SM.API.Controllers
             public string CardStatus { get; set; }
 
         }
-
+        public class MemberParam
+        {
+            public IFormFile ImageFile { get; set; }
+            public string? UNFirstName { get; set; }
+            public string? UNLastName { get; set; }
+            public string? BaptismName { get; set; }
+            public string? Nickname { get; set; }
+            public string UNFileNumber { get; set; }
+            public string UNPersonalNumber { get; set; }
+            public string? Mobile { get; set; }
+            public bool Baptised { get; set; }
+            public DateTime Birthdate { get; set; }
+            public char Gender { get; set; }
+            public string? School { get; set; }
+            public string? Work { get; set; }
+            public string? Notes { get; set; }
+        }
     }
 }
