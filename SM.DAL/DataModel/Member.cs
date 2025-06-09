@@ -42,6 +42,7 @@ namespace SM.DAL.DataModel
         public bool IsActive { get; set; }
         [Display(Name = "Image Reference")]
         public string? ImageReference { get; set; }
+        public string? S3ImageKey { get; set; }
         [Display(Name = "Card Status")]
         [MaxLength(20)]
         public string? CardStatus { get; set; }

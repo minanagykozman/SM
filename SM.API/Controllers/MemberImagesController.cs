@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using static SM.API.Controllers.EventsController;
 using static SM.BAL.EventHandler;
+using static SM.BAL.MemberHandler;
 
 namespace SM.API.Controllers
 {
@@ -26,8 +27,8 @@ namespace SM.API.Controllers
             _s3Client = s3Client;
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadSingle([FromForm] ImageParams param)
+        [HttpPost("UploadMemberImage")]
+        public async Task<IActionResult> UploadMemberImage([FromForm] ImageParams param)
         {
             try
             {
@@ -53,7 +54,7 @@ namespace SM.API.Controllers
 
                 using (MemberHandler handler = new MemberHandler())
                 {
-                    handler.UpdateMemberImage(param.MemberID, url);
+                    handler.UpdateMemberImage(param.MemberID, url, key);
                 }
 
                 return Ok(new { imageUrl = url });
@@ -64,58 +65,65 @@ namespace SM.API.Controllers
             }
         }
 
+
+        [HttpPost("UploadBulkMembersImages")]
+        public async Task<IActionResult> UploadBulkMembersImages([FromForm] ZipParams param)
+        {
+            IFormFile zipFile = param.ZipFile;
+            if (zipFile == null || zipFile.Length == 0)
+                return BadRequest("No ZIP file uploaded.");
+
+            if (!zipFile.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Only ZIP files are allowed.");
+
+            using var archiveStream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(archiveStream);
+            List<IamgeProperties> membersImages = new List<IamgeProperties>();
+            foreach (var entry in archive.Entries)
+            {
+                if (!entry.FullName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) &&
+                    !entry.FullName.EndsWith(".png", StringComparison.OrdinalIgnoreCase) &&
+                    !entry.FullName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+                    continue; // skip non-images
+
+                using var entryStream = entry.Open();
+                using var ms = new MemoryStream();
+                await entryStream.CopyToAsync(ms);
+                ms.Position = 0;
+
+                var key = $"uploads/batch/{Guid.NewGuid()}_{entry.Name}";
+
+                var putRequest = new PutObjectRequest
+                {
+                    BucketName = BucketName,
+                    Key = key,
+                    InputStream = ms,
+                    ContentType = GetMimeType(entry.Name),
+                    CannedACL = S3CannedACL.PublicRead
+                };
+
+                await _s3Client.PutObjectAsync(putRequest);
+
+                var imageUrl = $"https://{BucketName}.s3.amazonaws.com/{key}";
+                var fileNameOnly = Path.GetFileNameWithoutExtension(entry.FullName);
+                membersImages.Add(new IamgeProperties() { Filename = fileNameOnly, ImageURL = imageUrl, Key = key });
+            }
+            using (MemberHandler handler = new MemberHandler())
+            {
+                handler.BulkUploadImages(membersImages);
+            }
+            return Ok(new { membersImages });
+        }
         public class ImageParams
         {
-           public IFormFile ImageFile { get; set; }
+            public IFormFile ImageFile { get; set; }
             public int MemberID { get; set; }
         }
-        //[HttpPost("upload-zip")]
-        //public async Task<IActionResult> UploadZip([FromForm] IFormFile zipFile)
-        //{
-        //    if (zipFile == null || zipFile.Length == 0)
-        //        return BadRequest("No ZIP file uploaded.");
-
-        //    if (!zipFile.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-        //        return BadRequest("Only ZIP files are allowed.");
-
-        //    var imageUrls = new List<string>();
-        //    using var archiveStream = zipFile.OpenReadStream();
-        //    using var archive = new ZipArchive(archiveStream);
-
-        //    foreach (var entry in archive.Entries)
-        //    {
-        //        if (!entry.FullName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) &&
-        //            !entry.FullName.EndsWith(".png", StringComparison.OrdinalIgnoreCase) &&
-        //            !entry.FullName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
-        //            continue; // skip non-images
-
-        //        using var entryStream = entry.Open();
-        //        using var ms = new MemoryStream();
-        //        await entryStream.CopyToAsync(ms);
-        //        ms.Position = 0;
-
-        //        var key = $"uploads/batch/{Guid.NewGuid()}_{entry.Name}";
-
-        //        var putRequest = new PutObjectRequest
-        //        {
-        //            BucketName = BucketName,
-        //            Key = key,
-        //            InputStream = ms,
-        //            ContentType = GetMimeType(entry.Name),
-        //            CannedACL = S3CannedACL.PublicRead
-        //        };
-
-        //        await _s3Client.PutObjectAsync(putRequest);
-
-        //        var imageUrl = $"https://{BucketName}.s3.amazonaws.com/{key}";
-        //        imageUrls.Add(imageUrl);
-
-        //        // TODO: Optionally save `imageUrl` and entry.Name to DB
-        //    }
-
-        //    return Ok(new { imageUrls });
-        //}
-
+        public class ZipParams
+        {
+            public IFormFile ZipFile { get; set; }
+        }
+        
         // Optional helper method
         private static string GetMimeType(string fileName)
         {

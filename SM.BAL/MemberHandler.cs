@@ -294,7 +294,7 @@ namespace SM.BAL
 
             return membersExtended;
         }
-        public void UpdateMemberImage(int memberID, string imageURL)
+        public void UpdateMemberImage(int memberID, string imageURL, string key)
         {
             var member = _dbcontext.Members.Where(m => m.MemberID == memberID).FirstOrDefault();
             if (member == null)
@@ -302,6 +302,22 @@ namespace SM.BAL
                 throw new Exception("Member not found");
             }
             member.ImageURL = imageURL;
+            member.S3ImageKey = key;
+            _dbcontext.SaveChanges();
+        }
+        public void BulkUploadImages(List<IamgeProperties> membersImages)
+        {
+            var members = _dbcontext.Members.Where(m => membersImages.Any(r => r.Filename == m.ImageReference)).ToList();
+
+            foreach (var item in membersImages)
+            {
+                var member = members.Where(m => m.ImageReference == item.Key).FirstOrDefault();
+                if (member != null)
+                {
+                    member.ImageURL = item.ImageURL;
+                    member.S3ImageKey = item.Key;
+                }
+            }
             _dbcontext.SaveChanges();
         }
 
@@ -336,6 +352,13 @@ namespace SM.BAL
                 .Where(f => f.MemberID == memberId)
                 .OrderByDescending(f => f.RequestDate)
                 .ToList();
+        }
+
+        public class IamgeProperties
+        {
+            public string Filename { get; set; }
+            public string Key { get; set; }
+            public string ImageURL { get; set; }
         }
     }
 }
