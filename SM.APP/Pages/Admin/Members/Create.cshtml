@@ -97,7 +97,7 @@
                     </div>
                     <span asp-validation-for="Member.Nickname" class="text-danger"></span>
                 </div>
-               
+
                 <div class="col-md-6">
                     <div class="form-floating">
                         <input asp-for="Member.School" id="School" class="form-control" placeholder="Enter School" />
@@ -220,7 +220,7 @@
                 throw new Error(error);
             }
 
-            const memberCode = await response.json();
+            const memberCode = await response.text();
             showSuccessToast("Member created successfully with code: "+ memberCode);
         } catch (err) {
             console.error("Failed to submit form:", err);
@@ -229,7 +229,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        
+
         const baptisedCheckbox = document.getElementById("Baptised");
         const baptismNameInput = document.getElementById("BaptismName");
 
@@ -246,7 +246,14 @@
 
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
-            await createMember(); 
+            await createMember();
+            const unFileNumber=document.getElementById("UNFileNumber").value;
+            form.reset();
+            const clickedButton = e.submitter;
+            const action = clickedButton?.value;
+            if (action === "AddAnother") {
+                document.getElementById("UNFileNumber").value= unFileNumber;
+            }
         });
 
     });
