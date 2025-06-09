@@ -65,7 +65,8 @@ namespace SM.API.Controllers
             }
         }
 
-
+        [RequestSizeLimit(100_000_000)] // 100 MB
+        [RequestFormLimits(MultipartBodyLengthLimit = 100_000_000)]
         [HttpPost("UploadBulkMembersImages")]
         public async Task<IActionResult> UploadBulkMembersImages([FromForm] ZipParams param)
         {

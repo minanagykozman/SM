@@ -155,7 +155,10 @@ builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
 });
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+});
 var app = builder.Build();
 
 // Automatically apply migrations on startup
