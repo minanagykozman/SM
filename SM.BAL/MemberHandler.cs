@@ -224,7 +224,8 @@ namespace SM.BAL
                 newMember.CardStatus = "NotApplicable";
             else
                 newMember.CardStatus = string.IsNullOrEmpty(newMember.ImageURL) ? "MissingPhoto" : "ReadyToPrint";
-            newMember.IsActive = true;
+            newMember.IsActive = false;
+            newMember.IsDeleted = false;
             newMember.IsMainMember = newMember.Age >= 20;
             newMember.ModifiedLog = "Member created.";
 
@@ -361,8 +362,9 @@ namespace SM.BAL
             member.S3ImageKey = key;
             _dbcontext.SaveChanges();
         }
-        public void BulkUploadImages(List<IamgeProperties> membersImages)
+        public List<string> BulkUploadImages(List<IamgeProperties> membersImages)
         {
+            List<string> missingMembers = new List<string>();
             var imageFilenames = membersImages.Select(r => r.Filename).ToList();
 
             var members = _dbcontext.Members.Where(m => imageFilenames.Contains(m.ImageReference)).ToList();
@@ -375,8 +377,13 @@ namespace SM.BAL
                     member.ImageURL = item.ImageURL;
                     member.S3ImageKey = item.Key;
                 }
+                else
+                {
+                    missingMembers.Add(item.Key);
+                }
             }
             _dbcontext.SaveChanges();
+            return missingMembers;
         }
 
         // Get member attendance history

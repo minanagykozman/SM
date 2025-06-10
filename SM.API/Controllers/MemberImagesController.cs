@@ -108,11 +108,12 @@ namespace SM.API.Controllers
                 var fileNameOnly = Path.GetFileNameWithoutExtension(entry.FullName);
                 membersImages.Add(new IamgeProperties() { Filename = fileNameOnly, ImageURL = imageUrl, Key = key });
             }
+            List<string> missingMembers= new List<string>();
             using (MemberHandler handler = new MemberHandler())
             {
                 handler.BulkUploadImages(membersImages);
             }
-            return Ok(new { membersImages });
+            return Ok(new { missingMembers });
         }
         public class ImageParams
         {
