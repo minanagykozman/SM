@@ -91,7 +91,7 @@ namespace SM.API.Controllers
                 using var ms = new MemoryStream();
                 await entryStream.CopyToAsync(ms);
                 ms.Position = 0;
-
+                string fileName = Path.GetFileNameWithoutExtension(entry.Name);
                 var key = $"uploads/batch/{Guid.NewGuid()}_{entry.Name}";
 
                 var putRequest = new PutObjectRequest
@@ -105,14 +105,20 @@ namespace SM.API.Controllers
                 await _s3Client.PutObjectAsync(putRequest);
 
                 var imageUrl = $"https://{SMConfigurationManager.S3BucketName}.s3.amazonaws.com/{key}";
-                var fileNameOnly = Path.GetFileNameWithoutExtension(entry.FullName);
-                membersImages.Add(new IamgeProperties() { Filename = fileNameOnly, ImageURL = imageUrl, Key = key });
+                IamgeProperties memberImage = new IamgeProperties()
+                {
+                    Filename = fileName,
+                    ImageURL = imageUrl,
+                    Key = key
+                };
+                membersImages.Add(memberImage);
             }
+            List<string> missingMembers = new List<string>();
             using (MemberHandler handler = new MemberHandler())
             {
-                handler.BulkUploadImages(membersImages);
+                missingMembers = handler.BulkUploadImages(membersImages);
             }
-            return Ok(new { membersImages });
+            return Ok(new { missingMembers });
         }
         public class ImageParams
         {
@@ -123,7 +129,7 @@ namespace SM.API.Controllers
         {
             public IFormFile ZipFile { get; set; }
         }
-        
+
         // Optional helper method
         private static string GetMimeType(string fileName)
         {

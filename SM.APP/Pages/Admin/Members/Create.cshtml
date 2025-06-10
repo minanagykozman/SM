@@ -9,13 +9,8 @@
     <h1 class="text-center">Create Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
-        @* @if (Model.ShowMessage)
-        {
-            <div id="Message" class="alert alert-success w-100 text-center">
-                @Model.Message
-            </div>
-        } *@
         <partial name="_SuccessToastPartial" />
+        <partial name="_LoadingPartial" />
         <form id="frmCreate" style="position:relative">
             <input type="hidden" asp-for="Member.Code" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -97,7 +92,7 @@
                     </div>
                     <span asp-validation-for="Member.Nickname" class="text-danger"></span>
                 </div>
-               
+
                 <div class="col-md-6">
                     <div class="form-floating">
                         <input asp-for="Member.School" id="School" class="form-control" placeholder="Enter School" />
@@ -226,7 +221,7 @@
                 throw new Error(error);
             }
 
-            const memberCode = await response.json();
+            const memberCode = await response.text();
             showSuccessToast("Member created successfully with code: "+ memberCode);
         } catch (err) {
             console.error("Failed to submit form:", err);
@@ -268,7 +263,7 @@
 
     }
     document.addEventListener("DOMContentLoaded", function () {
-        loadClasses();
+        
         const baptisedCheckbox = document.getElementById("Baptised");
         const baptismNameInput = document.getElementById("BaptismName");
 
@@ -285,7 +280,17 @@
 
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
-            await createMember(); 
+            showLoading();
+            await createMember();
+            const unFileNumber=document.getElementById("UNFileNumber").value;
+            form.reset();
+            const clickedButton = e.submitter;
+            const action = clickedButton?.value;
+            document.getElementById("UNPersonalNumber").focus();
+            if (action === "AddAnother") {
+                document.getElementById("UNFileNumber").value= unFileNumber;
+            }
+            hideLoading();
         });
 
     });
