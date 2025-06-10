@@ -59,7 +59,7 @@
         const classesDropdown = document.getElementById("EventClasses");
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
 
-        // 1. Load class options from API
+        // Load class options from API
         try {
             const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
             const classResponse = await fetch(request, {

@@ -2,55 +2,53 @@
 @model SM.APP.Pages.Admin.Members.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Member";
 }
 
 <div class="container mt-4">
     <h1 class="text-center">Edit Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
-        <form method="post">
-            <input type="hidden" asp-for="Member.MemberID" />
-            <input type="hidden" asp-for="Member.IsActive" />
+        <partial name="_SuccessToastPartial" />
+        <form id="frmCreate" style="position:relative">
+            <input type="hidden" asp-for="Member.Code" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="row g-3">
-                <div class="col-md-12">
-                    <div class="form-floating">
-                        <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
-                        <label asp-for="Member.Code"></label>
-                    </div>
-                </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" id="UNPersonalNumber" class="form-control" placeholder="Enter Personal Number" />
+                        <input asp-for="Member.UNPersonalNumber" class="form-control"
+                               id="UNPersonalNumber"
+                               placeholder="Enter Personal Number"
+                               onblur="validateUNPersonalNumber()" required />
                         <label asp-for="Member.UNPersonalNumber"></label>
                     </div>
-                    <span asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
+                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" class="form-control" placeholder="Enter File Number" />
+                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" required />
                         <label asp-for="Member.UNFileNumber"></label>
                     </div>
                     <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
+                        <input asp-for="Member.UNFirstName" id="UNFirstName" class="form-control" placeholder="Enter First Name" required />
                         <label asp-for="Member.UNFirstName"></label>
                     </div>
                     <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
+                        <input asp-for="Member.UNLastName" id="UNLastName" class="form-control" placeholder="Enter Last Name" required />
                         <label asp-for="Member.UNLastName"></label>
                     </div>
                     <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.Gender" class="form-select">
+                        <select asp-for="Member.Gender" id="Gender" class="form-select" required>
                             <option value="">Select Gender</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -61,27 +59,63 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
+                        <input type="date" asp-for="Member.Birthdate" id="Birthdate" class="form-control" placeholder="Enter Birthdate" />
                         <label asp-for="Member.Birthdate"></label>
                     </div>
                     <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="Baptised" type="checkbox" asp-for="Member.Baptised" />
                         <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <input asp-for="Member.BaptismName" id="BaptismName" class="form-control" placeholder="Enter Baptism Name" />
+                        <label asp-for="Member.BaptismName"></label>
+                    </div>
+                    <span asp-validation-for="Member.BaptismName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Mobile" id="Mobile" class="form-control" placeholder="Enter Mobile" />
                         <label asp-for="Member.Mobile"></label>
                     </div>
                     <span asp-validation-for="Member.Mobile" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.CardStatus" class="form-select" >
+                        <input asp-for="Member.Nickname" id="Nickname" class="form-control" placeholder="Enter Nickname" />
+                        <label asp-for="Member.Nickname"></label>
+                    </div>
+                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.School" id="School" class="form-control" placeholder="Enter School" />
+                        <label asp-for="Member.School"></label>
+                    </div>
+                    <span asp-validation-for="Member.School" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.Work" id="Work" class="form-control" placeholder="Enter Work" />
+                        <label asp-for="Member.Work"></label>
+                    </div>
+                    <span asp-validation-for="Member.Work" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Member.ImageURL" id="ImageURL" class="form-control" />
+                        <label asp-for="Member.ImageURL"></label>
+                    </div>
+                    <span asp-validation-for="Member.Work" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="Member.CardStatus" class="form-select">
                             <option value="MissingPhoto">Missing photo</option>
                             <option value="ReadyToPrint">Ready to print</option>
                             <option value="Printed">Printed</option>
@@ -92,54 +126,87 @@
                     </div>
                     <span asp-validation-for="Member.CardStatus" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
+                <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
+                        <label for="ImageUpload">Upload Image</label>
                     </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
+                    <span id="ImageUploadError" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
-                        <label asp-for="Member.Nickname"></label>
-                    </div>
-                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
-                        <label asp-for="Member.School"></label>
-                    </div>
-                    <span asp-validation-for="Member.School" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
-                        <label asp-for="Member.Work"></label>
-                    </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
+                <div class="col-md-12">
+                    <label class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" multiple required></select>
                 </div>
                 <div class="col-md-12">
                     <div class="form-floating">
-                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                        <textarea asp-for="Member.Notes" id="Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
                         <label asp-for="Member.Notes"></label>
                     </div>
                     <span asp-validation-for="Member.Notes" class="text-danger"></span>
                 </div>
-
             </div>
-
             <div class="d-flex justify-content-between mt-4">
-                <a asp-page="Index" asp-route-userCode="@Model.Member.Code" class="btn btn-outline-secondary">Back to List</a>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" name="action" value="AddAnother" class="btn btn-primary">Create & Add Another</button>
+                    <button type="submit" name="action" value="Add" class="btn btn-primary">Create</button>
+                </div>
             </div>
         </form>
     </div>
 </div>
 <script>
+    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    async function loadClasses(){
+        try {
+            const classesDropdown = document.getElementById("drpClasses");
+            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+            const classResponse = await fetch(request, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+            const classList = await classResponse.json();
+
+            // Populate the dropdown
+            classesDropdown.innerHTML = "";
+            classList.forEach(cls => {
+                const option = document.createElement("option");
+                option.value = cls.classID;
+                option.textContent = cls.className;
+                classesDropdown.appendChild(option);
+            });
+
+            $('#drpClasses').select2({
+            placeholder: "Select classes",
+            allowClear: true,
+            width: '100%' // Ensures proper styling with Bootstrap
+        });
+
+        } catch (err) {
+            console.error("Error loading classes:", err);
+        }
+
+    }
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("UNPersonalNumber").focus();
+        loadClasses();
+
+        const baptisedCheckbox = document.getElementById("Baptised");
+        const baptismNameInput = document.getElementById("BaptismName");
+
+        function toggleBaptismName() {
+            baptismNameInput.disabled = !baptisedCheckbox.checked;
+        }
+
+        // Initial state
+        toggleBaptismName();
+
+        // Listen for changes
+        baptisedCheckbox.addEventListener("change", toggleBaptismName);
+        const form = document.getElementById("frmCreate");
     });
 </script>
 @section Scripts {

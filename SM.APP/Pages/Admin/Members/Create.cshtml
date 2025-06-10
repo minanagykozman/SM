@@ -9,12 +9,12 @@
     <h1 class="text-center">Create Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
-        @if (Model.ShowMessage)
+        @* @if (Model.ShowMessage)
         {
             <div id="Message" class="alert alert-success w-100 text-center">
                 @Model.Message
             </div>
-        }
+        } *@
         <partial name="_SuccessToastPartial" />
         <form id="frmCreate" style="position:relative">
             <input type="hidden" asp-for="Member.Code" />
@@ -26,35 +26,35 @@
                         <input asp-for="Member.UNPersonalNumber" class="form-control"
                                id="UNPersonalNumber"
                                placeholder="Enter Personal Number"
-                               onblur="validateUNPersonalNumber()" />
+                               onblur="validateUNPersonalNumber()" required />
                         <label asp-for="Member.UNPersonalNumber"></label>
                     </div>
                     <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" />
+                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" required />
                         <label asp-for="Member.UNFileNumber"></label>
                     </div>
                     <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" id="UNFirstName" class="form-control" placeholder="Enter First Name" />
+                        <input asp-for="Member.UNFirstName" id="UNFirstName" class="form-control" placeholder="Enter First Name" required />
                         <label asp-for="Member.UNFirstName"></label>
                     </div>
                     <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNLastName" id="UNLastName" class="form-control" placeholder="Enter Last Name" />
+                        <input asp-for="Member.UNLastName" id="UNLastName" class="form-control" placeholder="Enter Last Name" required />
                         <label asp-for="Member.UNLastName"></label>
                     </div>
                     <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.Gender" id="Gender" class="form-select">
+                        <select asp-for="Member.Gender" id="Gender" class="form-select" required>
                             <option value="">Select Gender</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -118,6 +118,10 @@
                         <label for="ImageUpload">Upload Image</label>
                     </div>
                     <span id="ImageUploadError" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" multiple required></select>
                 </div>
                 <div class="col-md-12">
                     <div class="form-floating">
@@ -185,8 +189,10 @@
         }
     }
         async function createMember() {
-        console.info("Populating data");
         const formData = new FormData();
+
+        const classesDropdown = document.getElementById("drpClasses");
+        const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
 
         // Collect form values
         formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
@@ -202,7 +208,7 @@
         formData.append("School", document.getElementById("School").value);
         formData.append("Work", document.getElementById("Work").value);
         formData.append("Notes", document.getElementById("Notes").value);
-        console.info("Populated data");
+        formData.append("Classes", selectedClasses);
         const fileInput = document.getElementById("ImageUpload");
         if (fileInput.files.length > 0) {
             formData.append("ImageFile", fileInput.files[0]);
@@ -228,8 +234,41 @@
         }
     }
 
+    async function loadClasses(){
+        try {
+            const classesDropdown = document.getElementById("drpClasses");
+            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+            const classResponse = await fetch(request, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+            const classList = await classResponse.json();
+
+            // Populate the dropdown
+            classesDropdown.innerHTML = "";
+            classList.forEach(cls => {
+                const option = document.createElement("option");
+                option.value = cls.classID;
+                option.textContent = cls.className;
+                classesDropdown.appendChild(option);
+            });
+
+            $('#drpClasses').select2({
+            placeholder: "Select classes",
+            allowClear: true,
+            width: '100%' // Ensures proper styling with Bootstrap
+        });
+
+        } catch (err) {
+            console.error("Error loading classes:", err);
+        }
+
+    }
     document.addEventListener("DOMContentLoaded", function () {
-        
+        loadClasses();
         const baptisedCheckbox = document.getElementById("Baptised");
         const baptismNameInput = document.getElementById("BaptismName");
 

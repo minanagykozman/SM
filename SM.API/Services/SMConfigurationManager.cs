@@ -60,7 +60,7 @@ namespace SM.API.Services
             get
             {
                 if (IsDevelopment)
-                    return _configuration["JwtSettings:Issuer"] ?? string.Empty;
+                    return _configuration["S3Name"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("S3Name") ?? string.Empty;
             }

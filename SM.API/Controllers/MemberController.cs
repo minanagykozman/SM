@@ -172,7 +172,7 @@ namespace SM.API.Controllers
 
                     Member newMember = memberHandler.CreateMember(param.UNFirstName, param.UNLastName, param.BaptismName, param.Nickname
                         , param.UNFileNumber, param.UNPersonalNumber, param.Mobile, param.Baptised, param.Birthdate, param.Gender, param.School, param.Work,
-                        param.Notes, imageData?.URL, imageData?.Key, param.ImageFile?.FileName, User.Identity.Name);
+                        param.Notes, imageData?.URL, imageData?.Key, param.ImageFile?.FileName, param.Classes, User.Identity.Name);
 
                     return Ok(newMember.Code);
                 }
@@ -300,7 +300,7 @@ namespace SM.API.Controllers
         }
         public class MemberParam
         {
-            public IFormFile ImageFile { get; set; }
+            public IFormFile? ImageFile { get; set; }
             public string? UNFirstName { get; set; }
             public string? UNLastName { get; set; }
             public string? BaptismName { get; set; }
@@ -314,6 +314,7 @@ namespace SM.API.Controllers
             public string? School { get; set; }
             public string? Work { get; set; }
             public string? Notes { get; set; }
+            public List<int> Classes { get; set; }
         }
     }
 }

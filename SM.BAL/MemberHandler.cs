@@ -1,14 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SM.DAL;
 using SM.DAL.DataModel;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace SM.BAL
 {
@@ -195,6 +187,7 @@ namespace SM.BAL
             string? imageURL,
             string? s3ImageKey,
             string? imageReference,
+            List<int> classes,
             string modifiedByUserName)
         {
             Servant servant = GetServantByUsername(modifiedByUserName);
@@ -230,6 +223,13 @@ namespace SM.BAL
 
             _dbcontext.Members.Add(newMember);
             _dbcontext.SaveChanges();
+
+            foreach (var cl in classes)
+            {
+                _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = newMember.MemberID, ClassID = cl });
+            }
+            _dbcontext.SaveChanges();
+
             return newMember;
         }
 
