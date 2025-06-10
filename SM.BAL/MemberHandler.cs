@@ -367,9 +367,11 @@ namespace SM.BAL
             List<string> missingMembers = new List<string>();
             var imageFilenames = membersImages.Select(r => r.Filename).ToList();
 
+            var members = _dbcontext.Members.Where(m => imageFilenames.Contains(m.ImageReference)).ToList();
+
             foreach (var item in membersImages)
             {
-                var member = _dbcontext.Members.Where(m => m.ImageReference == item.Key).FirstOrDefault();
+                var member = members.Where(m => m.ImageReference == item.Filename).FirstOrDefault();
                 if (member != null)
                 {
                     member.ImageURL = item.ImageURL;
