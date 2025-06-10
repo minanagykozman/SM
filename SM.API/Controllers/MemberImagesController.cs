@@ -106,12 +106,18 @@ namespace SM.API.Controllers
 
                 var imageUrl = $"https://{SMConfigurationManager.S3BucketName}.s3.amazonaws.com/{key}";
                 var fileNameOnly = Path.GetFileNameWithoutExtension(entry.FullName);
-                membersImages.Add(new IamgeProperties() { Filename = fileNameOnly, ImageURL = imageUrl, Key = key });
+                IamgeProperties memberImage = new IamgeProperties()
+                {
+                    Filename = fileNameOnly,
+                    ImageURL = imageUrl,
+                    Key = key
+                };
+                membersImages.Add(memberImage);
             }
-            List<string> missingMembers= new List<string>();
+            List<string> missingMembers = new List<string>();
             using (MemberHandler handler = new MemberHandler())
             {
-                handler.BulkUploadImages(membersImages);
+                missingMembers = handler.BulkUploadImages(membersImages);
             }
             return Ok(new { missingMembers });
         }
@@ -124,7 +130,7 @@ namespace SM.API.Controllers
         {
             public IFormFile ZipFile { get; set; }
         }
-        
+
         // Optional helper method
         private static string GetMimeType(string fileName)
         {
