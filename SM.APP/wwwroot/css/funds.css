@@ -1,0 +1,644 @@
+/* Fund Management Styles */
+
+/* CSS Custom Properties for consistency */
+:root {
+    --fund-primary-color: #667eea;
+    --fund-secondary-color: #764ba2;
+    --fund-success-color: #198754;
+    --fund-warning-color: #ffc107;
+    --fund-danger-color: #dc3545;
+    --fund-info-color: #17a2b8;
+    --fund-light-color: #f8f9fa;
+    --fund-border-color: #e9ecef;
+    --fund-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --fund-shadow-hover: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --fund-border-radius: 10px;
+    --fund-border-radius-sm: 8px;
+    --fund-transition: all 0.3s ease;
+}
+
+/* General Fund Page Styles */
+.fund-header {
+    background: linear-gradient(135deg, var(--fund-primary-color) 0%, var(--fund-secondary-color) 100%);
+    color: white;
+    border-radius: var(--fund-border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--fund-shadow-hover);
+}
+
+.fund-header h1 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.fund-header .btn {
+    border: 2px solid white;
+    color: white;
+    font-weight: 500;
+    transition: var(--fund-transition);
+}
+
+.fund-header .btn:hover {
+    background: white;
+    color: var(--fund-primary-color);
+    transform: translateY(-2px);
+}
+
+/* Filters Section */
+.filters-section,
+.filters-card {
+    background: white;
+    border-radius: var(--fund-border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--fund-shadow);
+    border: 1px solid var(--fund-border-color);
+}
+
+.filters-card {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.filters-section .form-control,
+.filters-section .form-select {
+    border-radius: var(--fund-border-radius-sm);
+    border: 1px solid #dee2e6;
+    transition: var(--fund-transition);
+}
+
+.filters-section .form-control:focus,
+.filters-section .form-select:focus {
+    border-color: var(--fund-primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-outline-secondary.active {
+    background-color: var(--fund-primary-color);
+    border-color: var(--fund-primary-color);
+    color: white;
+}
+
+/* View Toggle */
+.view-toggle {
+    background: var(--fund-light-color);
+    border-radius: 6px;
+    padding: 0.25rem;
+}
+
+.view-toggle .btn {
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.view-toggle .btn.active {
+    background: white;
+    color: #495057;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* List View Styles */
+.list-view {
+    background: white;
+    border-radius: var(--fund-border-radius);
+    overflow: hidden;
+    box-shadow: var(--fund-shadow);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: var(--fund-light-color);
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    padding: 1rem 0.75rem;
+}
+
+.table tbody tr {
+    transition: var(--fund-transition);
+}
+
+.table tbody tr:hover {
+    background-color: var(--fund-light-color);
+    transform: translateY(-1px);
+    box-shadow: var(--fund-shadow-hover);
+}
+
+.fund-row td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+/* Clickable row for list view */
+.clickable-row {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.clickable-row:hover {
+    background: #f0f4ff;
+}
+
+/* Board View Styles */
+.board-view {
+    display: none;
+}
+
+.board-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.board-column {
+    min-width: 300px;
+    background: white;
+    border-radius: var(--fund-border-radius);
+    padding: 1rem;
+    box-shadow: var(--fund-shadow);
+    min-height: 500px;
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: white;
+    border-bottom: 2px solid var(--fund-border-color);
+}
+
+.board-header.open {
+    border-left: 4px solid var(--fund-warning-color);
+}
+
+.board-header.approved {
+    border-left: 4px solid var(--fund-info-color);
+}
+
+.board-header.completed {
+    border-left: 4px solid var(--fund-success-color);
+}
+
+.board-title {
+    font-weight: 600;
+    margin: 0;
+    color: #495057;
+}
+
+.board-count {
+    background: #6c757d;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.board-count.warning { background: var(--fund-warning-color); color: #212529; }
+.board-count.success { background: var(--fund-success-color); }
+.board-count.secondary { background: #6c757d; }
+
+/* Fund Card Styles */
+.fund-card {
+    border: 1px solid var(--fund-border-color);
+    border-radius: var(--fund-border-radius-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: white;
+    box-shadow: var(--fund-shadow);
+    transition: var(--fund-transition);
+    cursor: pointer;
+}
+
+.fund-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--fund-shadow-hover);
+    border-color: var(--fund-primary-color);
+}
+
+.fund-card .card-body {
+    padding: 1rem;
+}
+
+.fund-card .card-title {
+    color: var(--fund-primary-color);
+    font-weight: 600;
+}
+
+.fund-board-card {
+    background: white;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fund-board-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+/* Fund Detail Page Styles */
+.fund-detail-header {
+    background: linear-gradient(135deg, var(--fund-primary-color) 0%, var(--fund-secondary-color) 100%);
+    color: white;
+    border-radius: var(--fund-border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--fund-shadow-hover);
+}
+
+.fund-detail-header h1 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.fund-detail-header .btn {
+    border: 2px solid white;
+    color: white;
+    margin-right: 0.5rem;
+    transition: var(--fund-transition);
+}
+
+.fund-detail-header .btn:hover {
+    background: white;
+    color: var(--fund-primary-color);
+    transform: translateY(-2px);
+}
+
+.fund-info-card {
+    background: white;
+    border-radius: var(--fund-border-radius);
+    padding: 2rem;
+    box-shadow: var(--fund-shadow);
+    border: 1px solid var(--fund-border-color);
+    margin-bottom: 2rem;
+}
+
+.fund-info-card h5 {
+    color: var(--fund-primary-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--fund-border-color);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--fund-light-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.info-value {
+    color: #495057;
+    text-align: right;
+}
+
+/* Status Badge Styles */
+.status-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-open {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-approved {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-delivered {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Status-specific border styles for cards */
+.status-open.fund-card { border-left: 4px solid var(--fund-warning-color); }
+.status-approved.fund-card { border-left: 4px solid var(--fund-success-color); }
+.status-rejected.fund-card { border-left: 4px solid var(--fund-danger-color); }
+.status-delivered.fund-card { border-left: 4px solid #6c757d; }
+
+/* Timeline Styles */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--fund-border-color);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0.25rem;
+    width: 2rem;
+    height: 2rem;
+    background: white;
+    border: 3px solid #dee2e6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.timeline-item.completed .timeline-marker {
+    border-color: var(--fund-success-color);
+    background: var(--fund-success-color);
+    color: white;
+}
+
+.timeline-line {
+    position: absolute;
+    left: -1.125rem;
+    top: 2rem;
+    width: 2px;
+    height: calc(100% + 1rem);
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.timeline-item.completed .timeline-line {
+    background: var(--fund-success-color);
+}
+
+.timeline-content {
+    background: white;
+    border-radius: var(--fund-border-radius-sm);
+    padding: 1rem;
+    box-shadow: var(--fund-shadow-hover);
+    border: 1px solid var(--fund-border-color);
+}
+
+.timeline-content h6 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.timeline-title {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    color: #495057;
+}
+
+.timeline-description {
+    margin: 0 0 0.5rem 0;
+    color: #6c757d;
+}
+
+/* Notes Styles */
+.notes-section {
+    background: white;
+    border-radius: var(--fund-border-radius);
+    padding: 2rem;
+    box-shadow: var(--fund-shadow);
+    border: 1px solid var(--fund-border-color);
+}
+
+.notes-section h5 {
+    color: var(--fund-primary-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--fund-border-color);
+}
+
+.note-item {
+    background: var(--fund-light-color);
+    border: 1px solid var(--fund-border-color);
+    border-radius: var(--fund-border-radius-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: var(--fund-transition);
+}
+
+.note-item:hover {
+    box-shadow: var(--fund-shadow-hover);
+    transform: translateY(-1px);
+}
+
+.note-author {
+    color: var(--fund-primary-color);
+    font-weight: 600;
+}
+
+.note-content {
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: var(--fund-border-radius);
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--fund-border-color);
+    padding: 1rem 2rem;
+}
+
+/* Badge Styles */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: #6c757d;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: var(--fund-primary-color);
+}
+
+/* Hover effects */
+.hover-shadow {
+    transition: var(--fund-transition);
+}
+
+.hover-shadow:hover {
+    box-shadow: var(--fund-shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* Custom scrollbar for notes section */
+.notes-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notes-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notes-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.notes-container::-webkit-scrollbar-thumb {
+    background: var(--fund-primary-color);
+    border-radius: 3px;
+}
+
+.notes-container::-webkit-scrollbar-thumb:hover {
+    background: #5a6fd8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .fund-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .fund-header .btn {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .filters-section,
+    .filters-card {
+        padding: 1rem;
+    }
+    
+    .board-container {
+        flex-direction: column;
+    }
+    
+    .board-column {
+        min-width: auto;
+        margin-bottom: 1rem;
+    }
+    
+    .fund-detail-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .fund-detail-header .btn {
+        margin: 0.25rem;
+        width: calc(50% - 0.5rem);
+    }
+    
+    .timeline {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-marker {
+        left: -1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .timeline-line {
+        left: -0.875rem;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-value {
+        text-align: left;
+        margin-top: 0.25rem;
+    }
+    
+    .fund-info-card {
+        padding: 1rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+} 

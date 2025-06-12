@@ -43,24 +43,6 @@ namespace SM.BAL
             return query.OrderByDescending(f => f.RequestDate).ToList();
         }
 
-        // Get funds assigned to the current user
-        public List<MemberFund> GetMyAssignedFunds(string username, string? status)
-        {
-            var servant = GetServantByUsername(username);
-            var query = _dbcontext.MemberFunds
-                .Include(f => f.Member)
-                .Include(f => f.Servant)
-                .Include(f => f.Approver)
-                .Where(f => f.ServantID == servant.ServantID);
-
-            if (!string.IsNullOrEmpty(status) && Enum.TryParse<FundStatus>(status, out var statusEnum))
-            {
-                query = query.Where(f => f.Status == statusEnum);
-            }
-
-            return query.OrderByDescending(f => f.RequestDate).ToList();
-        }
-
         // Get funds grouped by status for workflow board
         public object GetFundsByStatus(int? assigneeId, string username)
         {
@@ -115,20 +97,18 @@ namespace SM.BAL
         {
             try
             {
-                var creator = GetServantByUsername(username);
-                
                 // Validate assignee exists
                 var assignee = _dbcontext.Servants.FirstOrDefault(s => s.ServantID == request.ServantID);
                 if (assignee == null)
                 {
-                    throw new ArgumentException("Invalid assignee ID");
+                    throw new ArgumentException($"Invalid assignee ID: {request.ServantID}");
                 }
 
                 // Validate member exists
                 var member = _dbcontext.Members.FirstOrDefault(m => m.MemberID == request.MemberID);
                 if (member == null)
                 {
-                    throw new ArgumentException("Invalid member ID");
+                    throw new ArgumentException($"Invalid member ID: {request.MemberID}");
                 }
 
                 var fund = new MemberFund
@@ -139,10 +119,8 @@ namespace SM.BAL
                     RequestedAmount = request.RequestedAmount,
                     FundCategory = request.FundCategory ?? "Others",
                     Status = FundStatus.Open,
-                    RequestDate = CurrentTime,
-                    ApproverNotes = request.ApproverNotes ?? string.Empty,
-                    ApproverID = null, // No approver initially
-                    ApprovedAmount = 0 // Default value
+                    RequestDate = DateTime.Now,
+                    ApproverNotes = request.ApproverNotes ?? string.Empty
                 };
 
                 _dbcontext.MemberFunds.Add(fund);
@@ -150,13 +128,9 @@ namespace SM.BAL
 
                 return fund.FundID;
             }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
-            {
-                throw new Exception($"Database error creating fund: {dbEx.Message}. Inner: {dbEx.InnerException?.Message}");
-            }
             catch (Exception ex)
             {
-                throw new Exception($"Error creating fund: {ex.Message}");
+                throw new Exception($"Error creating fund: {ex.Message}", ex);
             }
         }
 
