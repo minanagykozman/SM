@@ -9,16 +9,11 @@
 <partial name="_SuccessToastPartial" />
 <form id="eventForm" style="position:relative">
     <div class="card shadow-lg p-4">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
         <div class="row g-3 mt-2">
             <div class="col-md-12">
                 <div class="form-floating">
-                    <input asp-for="Event.EventName" class="form-control" id="EventName" placeholder="Enter Event Name" required>
+                    <input class="form-control" id="EventName" placeholder="Enter Event Name" required>
                     <label>Event Name</label>
-                </div>
-                <div class="invalid-feedback">
-                    This field is required.
                 </div>
             </div>
         </div>
@@ -41,7 +36,7 @@
         <div class="row g-3 mt-2">
             <div class="col-md-12">
                 <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
-                <select asp-for="Event.ClassEvents" class="form-select" id="EventClasses" multiple required></select>
+                <select class="form-select" id="drpClasses" multiple required></select>
             </div>
         </div>
 
@@ -55,47 +50,10 @@
 </form>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        const classesDropdown = document.getElementById("EventClasses");
-        const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-
-        // Load class options from API
-        try {
-            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
-            const classResponse = await fetch(request, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-
-            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
-            const classList = await classResponse.json();
-
-            // Populate the dropdown
-            classesDropdown.innerHTML = "";
-            classList.forEach(cls => {
-                const option = document.createElement("option");
-                option.value = cls.classID;
-                option.textContent = cls.className;
-                classesDropdown.appendChild(option);
-            });
-
-            $('#EventClasses').select2({
-            placeholder: "Select classes",
-            allowClear: true,
-            width: '100%' // Ensures proper styling with Bootstrap
-        });
-
-        } catch (err) {
-            console.error("Error loading classes:", err);
-        }
-
-        // 2. Handle form submission
-        const form = document.getElementById("eventForm");
-
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
+    const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    async function createEvent()
+    {
+        const classesDropdown = document.getElementById("drpClasses");
             const eventName = document.getElementById("EventName").value;
             const startDate = document.getElementById("EventStartDate").value;
             const endDate = document.getElementById("EventEndDate").value;
@@ -125,15 +83,25 @@
                     body: JSON.stringify(eventPayload)
                 });
 
-                if (!response.ok) throw new Error("Event creation failed");
+                if (!response.ok) 
+                    throw new Error("Event creation failed");
 
                 showSuccessToast("Event created successfully");
-                $('#EventClasses').val(null).trigger('change');
+                $('#drpClasses').val(null).trigger('change');
                 form.reset();
 
             } catch (err) {
                 console.error("Error creating event:", err);
             }
+    }
+    document.addEventListener("DOMContentLoaded", async function () {
+        await loadClasses(apiBaseUrl);
+
+        const form = document.getElementById("eventForm");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            await createEvent();
         });
     });
 </script>
