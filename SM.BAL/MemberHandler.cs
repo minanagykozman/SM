@@ -371,6 +371,12 @@ namespace SM.BAL
             List<int> classes,
             string modifiedByUserName)
         {
+            if(_dbcontext.Members.Any(m=>m.UNPersonalNumber == unPersonalNumber))
+            {
+                var ex= new Exception("UN Personal number already exists!");
+                ex.Source = "Show message";
+                throw ex;
+            }
             Servant servant = GetServantByUsername(modifiedByUserName);
             int sequence = 0;
             Member newMember = new Member();

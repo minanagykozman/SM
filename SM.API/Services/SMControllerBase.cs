@@ -16,7 +16,16 @@ namespace SM.API.Services
         internal ActionResult HandleError(Exception ex)
         {
             _logger.LogError(ex, User?.Identity?.Name);
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            if (ex.Source == "Show message")
+            {
+                var errorResponse = new { message = ex.Message };
+                return StatusCode(500, errorResponse);
+            }
+            else
+            {
+                var errorResponse = new { message = "An error occured, contact system admin" };
+                return StatusCode(500, errorResponse);
+            }
         }
         [NonAction]
         internal void ValidateServant()
