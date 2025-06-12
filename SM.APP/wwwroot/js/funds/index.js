@@ -165,8 +165,8 @@ class FundManager {
                             statusText = statusMap[statusText] || statusText;
                         }
                         let badgeClass = 'bg-secondary';
-                        if (fund.status === 3) badgeClass = 'bg-info'; // Delivered
-                        if (fund.status === 2) badgeClass = 'bg-danger'; // Rejected
+                        if (fund.status === this.STATUS.DELIVERED) badgeClass = 'bg-info';
+                        if (fund.status === this.STATUS.REJECTED) badgeClass = 'bg-danger';
                         statusBadge = `<span class="badge ${badgeClass} ms-1">${statusText}</span>`;
                     }
                     return `
