@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SM.BAL;
 using SM.API.Services;
 using SM.DAL.DataModel;
@@ -7,7 +8,7 @@ namespace SM.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class FundController(ILogger<FundController> logger) : SMControllerBase(logger)
     {
         // GET: api/Fund
@@ -18,22 +19,6 @@ namespace SM.API.Controllers
             {
                 FundHandler fundHandler = new SM.BAL.FundHandler();
                 var funds = fundHandler.GetAllFunds(assigneeId, status, User.Identity.Name);
-                return Ok(funds);
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex);
-            }
-        }
-
-        // GET: api/Fund/my-assigned
-        [HttpGet("my-assigned")]
-        public IActionResult GetMyAssignedFunds([FromQuery] string? status)
-        {
-            try
-            {
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                var funds = fundHandler.GetMyAssignedFunds(User.Identity.Name, status);
                 return Ok(funds);
             }
             catch (Exception ex)
@@ -154,26 +139,6 @@ namespace SM.API.Controllers
                 FundHandler fundHandler = new SM.BAL.FundHandler();
                 fundHandler.DeleteFund(id, User.Identity.Name);
                 return Ok(new { Message = "Fund deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex);
-            }
-        }
-
-        // GET: api/Fund/statuses
-        [HttpGet("statuses")]
-        public IActionResult GetFundStatuses()
-        {
-            try
-            {
-                var statuses = Enum.GetValues<FundStatus>()
-                    .Select(status => new { 
-                        Value = status.ToString(), 
-                        Label = status.ToString() 
-                    })
-                    .ToArray();
-                return Ok(statuses);
             }
             catch (Exception ex)
             {
