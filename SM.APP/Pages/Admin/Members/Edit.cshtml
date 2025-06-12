@@ -10,14 +10,12 @@
     <hr />
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
-        <form id="frmEdit" style="position:relative">
+        <form id="frmEdit" style="position:relative" class="needs-validation">
             <input type="hidden" id="S3Key" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="form-floating">
-                        <input id="Code" class="form-control" required />
+                        <input id="Code" name="Code" class="form-control" required />
                         <label>Code</label>
                     </div>
                 </div>

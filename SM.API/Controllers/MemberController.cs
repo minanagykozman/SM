@@ -43,10 +43,11 @@ namespace SM.API.Controllers
         {
             try
             {
-                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                using ( SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
                     bool result = memberHandler.ValidateUNNumber(unFileNumber, memberID);
-                    return Ok(result);
+                    var json= new JsonResult(result);
+                    return json;
                 }
 
             }

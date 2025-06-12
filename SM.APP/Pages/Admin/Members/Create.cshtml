@@ -19,6 +19,7 @@
                         <input class="form-control" id="UNPersonalNumber" name="UNPersonalNumber" placeholder="Enter Personal Number" required />
                         <label>UN Personal Number</label>
                     </div>
+                    <div id="UNPersonalNumberError" class="text-danger"></div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
@@ -118,49 +119,16 @@
         </form>
     </div>
 </div>
-
+@section Scripts {
 <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
 
-        async function validateUNPersonalNumber() {
-            let inputField = document.getElementById("UNPersonalNumber");
-            let personalNumber = inputField.value.trim();
-            let errorSpan = document.getElementById("UNPersonalNumberError");
-            if (!personalNumber) {
-                return false;
-            }
-
-            try {
-                const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
-                const response = await fetch(request, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-
-                if (data === true || data === "true") {
-                    errorSpan.textContent = ""; // No error
-                    return true;
-                }
-                else {
-                    errorSpan.textContent = "UN number already exists.";
-                    return false;}
-                }
-                catch (error) {
-                    errorSpan.textContent = "Validation service is unavailable.";
-                    return false;
-                }
-           }
         async function createMember() {
         const formData = new FormData();
 
-        const classesDropdown = document.getElementById("drpClasses");
-        const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
-
+        //const classesDropdown = document.getElementById("drpClasses");
+        //const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+        const selectedClasses = $('#drpClasses').val();
         // Collect form values
         formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
         formData.append("UNFileNumber", document.getElementById("UNFileNumber").value);
@@ -200,66 +168,122 @@
             alert("Error: " + err.message);
         }
     }
-
         $(async function() {
-
-        showLoading();
-        document.getElementById("UNPersonalNumber").focus();
-        loadClasses(apiBaseUrl);
-
-        const baptisedCheckbox = document.getElementById("Baptised");
-        const baptismNameInput = document.getElementById("BaptismName");
-        function toggleBaptismName() {
-            baptismNameInput.disabled = !baptisedCheckbox.checked;
-        }
-        toggleBaptismName();
-        baptisedCheckbox.addEventListener("change", toggleBaptismName);
-        hideLoading();
-        // --- jQuery Validation Setup ---
-        $("#frmCreate").validate({
-            errorClass: "text-danger",
-            errorElement: "div",
-            highlight: function(element) {
-                $(element).addClass("is-invalid");
-            },
-            unhighlight: function(element) {
-                $(element).removeClass("is-invalid");
-            },
-
-            errorPlacement: function(error, element) {
-                // For the special case of the UNPersonalNumber, place error in its dedicated span
-                if (element.attr("name") === "UNPersonalNumber") {
-                    error.appendTo("#UNPersonalNumberError");
-                }
-                // For other floating label inputs
-                else if (element.parent().hasClass('form-floating')) {
-                    error.insertAfter(element.parent());
-                }
-                // For all other elements
-                else {
-                    error.insertAfter(element);
-                }
-            },
-
-            // This function runs ONLY when the form is valid and submitted
-            submitHandler: async function(form, event) {
-                event.preventDefault(); // Prevent the default browser submission
-
+                // --- 1. INITIAL PAGE SETUP ---
                 showLoading();
-                await createMember();
-                const unFileNumber = document.getElementById("UNFileNumber").value;
-                form.reset();
-                $('#drpClasses').val(null).trigger('change');
-
-                const clickedButton = event.originalEvent.submitter;
-                const action = clickedButton?.value;
                 document.getElementById("UNPersonalNumber").focus();
 
-                if (action === "AddAnother") {
-                    document.getElementById("UNFileNumber").value = unFileNumber;
+                // Correctly wait for classes to be loaded and Select2 to be initialized
+                if (typeof loadClasses === "function") {
+                    await loadClasses(apiBaseUrl);
                 }
+
+                const baptisedCheckbox = document.getElementById("Baptised");
+                const baptismNameInput = document.getElementById("BaptismName");
+
+                function toggleBaptismName() {
+                    baptismNameInput.disabled = !baptisedCheckbox.checked;
+                }
+                toggleBaptismName();
+                baptisedCheckbox.addEventListener("change", toggleBaptismName);
+
                 hideLoading();
+
+
+                // --- 2. JQUERY VALIDATION SETUP ---
+                $("#frmCreate").validate({
+                    // FIX: This makes validation work with the hidden <select> used by Select2
+                    ignore: [],
+
+                    errorClass: "text-danger",
+                    errorElement: "div",
+
+                    // Defines all validation rules for this specific complex form
+                    rules: {
+                        UNPersonalNumber: {
+                            required: true,
+                            remote: { // The clean way to do the API check
+                                url: `${apiBaseUrl}/Member/ValidateUNNumber`,
+                                type: "get",
+                                data: {
+                                    unFileNumber: function() { return $("#UNPersonalNumber").val(); }
+                                },
+                                xhrFields: {
+                                    withCredentials: true
+                                }
+                            }
+                        },
+                        UNFileNumber: "required",
+                        UNFirstName: "required",
+                        UNLastName: "required",
+                        Gender: "required",
+                        Birthdate: "required",
+                        drpClasses: "required"
+                    },
+                    // Defines custom messages for the rules
+                    messages: {
+                        UNPersonalNumber: {
+                            required: "UN Personal Number is required.",
+                            remote: "This UN number already exists."
+                        },
+                        drpClasses: "At least one class must be selected."
+                    },
+
+                    // FIX: These functions correctly add/remove the red border from Select2 elements
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                        if ($(element).hasClass('form-select')) {
+                            $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid');
+                        }
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                        if ($(element).hasClass('form-select')) {
+                            $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+                        }
+                    },
+
+                           errorPlacement: function(error, element) {
+            if (element.attr("name") === "UNPersonalNumber") {
+                error.appendTo("#UNPersonalNumberError");
+            } else if (element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
+            } else if (element.parent().hasClass('form-floating')) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
             }
-        });
-    });
+        },
+
+
+                    // This function runs ONLY when the form is valid and submitted
+                    submitHandler: async function(form, event) {
+                        event.preventDefault();
+                        showLoading();
+                        await createMember();
+
+                        const unFileNumber = document.getElementById("UNFileNumber").value;
+                        form.reset();
+                        $('#drpClasses').val(null).trigger('change');
+
+                        const clickedButton = event.originalEvent.submitter;
+                        const action = clickedButton?.value;
+                        document.getElementById("UNPersonalNumber").focus();
+
+                        if (action === "AddAnother") {
+                            document.getElementById("UNFileNumber").value = unFileNumber;
+                        }
+                        hideLoading();
+                    }
+                });
+
+
+                // --- 3. JQUERY VALIDATION FIXES ---
+                // FIX: This manually triggers re-validation on the dropdown when you make a
+                // selection, which makes the error message disappear correctly.
+                $('#drpClasses').on('change', function() {
+                    $(this).valid();
+                });
+            });
 </script>
+}
