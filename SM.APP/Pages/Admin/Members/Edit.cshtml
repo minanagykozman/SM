@@ -4,17 +4,23 @@
 @{
     ViewData["Title"] = "Edit Member";
 }
-
-<div class="container mt-4">
+<partial name="_LoadingPartial" />
+<div class="container mt-4" id="container">
     <h1 class="text-center">Edit Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
-        <form id="frmCreate" style="position:relative">
-            <input type="hidden" asp-for="Member.Code" />
+        <form id="frmEdit" style="position:relative">
+            <input type="hidden" id="S3Key" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <input id="Code" class="form-control" required />
+                        <label>Code</label>
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-floating">
                         <input asp-for="Member.UNPersonalNumber" class="form-control"
@@ -59,7 +65,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" id="Birthdate" class="form-control" placeholder="Enter Birthdate" />
+                        <input type="date" asp-for="Member.Birthdate" id="Birthdate" class="form-control" placeholder="Enter Birthdate" required/>
                         <label asp-for="Member.Birthdate"></label>
                     </div>
                     <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
@@ -108,14 +114,14 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.ImageURL" id="ImageURL" class="form-control" />
+                        <input asp-for="Member.ImageURL" id="ImageURL" class="form-control" disabled />
                         <label asp-for="Member.ImageURL"></label>
                     </div>
                     <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.CardStatus" class="form-select">
+                        <select asp-for="Member.CardStatus" class="form-select" id="CardStatus">
                             <option value="MissingPhoto">Missing photo</option>
                             <option value="ReadyToPrint">Ready to print</option>
                             <option value="Printed">Printed</option>
@@ -148,8 +154,7 @@
             <div class="d-flex justify-content-between mt-4">
                 <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
                 <div class="d-flex gap-2">
-                    <button type="submit" name="action" value="AddAnother" class="btn btn-primary">Create & Add Another</button>
-                    <button type="submit" name="action" value="Add" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </div>
         </form>
@@ -157,42 +162,144 @@
 </div>
 <script>
     var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-    async function loadClasses(){
-        try {
-            const classesDropdown = document.getElementById("drpClasses");
-            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
-            const classResponse = await fetch(request, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
+    
+    async function validateUNPersonalNumber() {
+            let inputField = document.getElementById("UNPersonalNumber");
+            let id = new URLSearchParams(window.location.search).get("id");
+            let personalNumber = inputField.value.trim();
+            let errorSpan = document.getElementById("UNPersonalNumberError");
+            if (!personalNumber) {
+                errorSpan.textContent = "Personal number is required.";
+                return false;
+            }
 
-            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
-            const classList = await classResponse.json();
+            try {
+                const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}&memberID=${id}`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
 
-            // Populate the dropdown
-            classesDropdown.innerHTML = "";
-            classList.forEach(cls => {
-                const option = document.createElement("option");
-                option.value = cls.classID;
-                option.textContent = cls.className;
-                classesDropdown.appendChild(option);
-            });
+                if (data === true || data === "true") {
+                    errorSpan.textContent = ""; // No error
+                    return true;
+                }
+                else {
+                    errorSpan.textContent = "UN number already exists.";
+                    return false;}
+                }
+                catch (error) {
+                    errorSpan.textContent = "Validation service is unavailable.";
+                    return false;
+                }
+           }
+    async function loadMemberData()
+    {
+        const id = new URLSearchParams(window.location.search).get("id");
+        if (id) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/Member/GetMember?memberID=${id}`, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
 
-            $('#drpClasses').select2({
-            placeholder: "Select classes",
-            allowClear: true,
-            width: '100%' // Ensures proper styling with Bootstrap
-        });
+                if (!response.ok) throw new Error("Failed to load event data");
+                const memberData = await response.json();
+                const birthdate = new Date(memberData.birthdate);
+                const formattedBirthdate = birthdate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+                // Fill form with data
+                document.getElementById("Code").value = memberData.code;
+                document.getElementById("UNPersonalNumber").value = memberData.unPersonalNumber;
+                document.getElementById("UNFileNumber").value = memberData.unFileNumber;
+                document.getElementById("UNFirstName").value = memberData.unFirstName;
+                document.getElementById("UNLastName").value = memberData.unLastName;
+                document.getElementById("Gender").value = memberData.gender;
+                document.getElementById("Birthdate").value = formattedBirthdate;
+                document.getElementById("Baptised").checked = memberData.baptised;
+                document.getElementById("Mobile").value = memberData.mobile;
+                document.getElementById("Nickname").value = memberData.nickname;
+                document.getElementById("BaptismName").value = memberData.baptismName;
+                document.getElementById("School").value = memberData.school;
+                document.getElementById("Work").value = memberData.work;
+                document.getElementById("Notes").value = memberData.notes;
+                document.getElementById("ImageURL").value = memberData.imageURL;
+                document.getElementById("S3Key").value = memberData.s3ImageKey;
+                document.getElementById("CardStatus").value = memberData.cardStatus;
 
-        } catch (err) {
-            console.error("Error loading classes:", err);
+                // Set selected classes
+                const classIDs = memberData.classesIDs;
+
+                $('#drpClasses').val(classIDs).trigger('change');
+
+            } catch (err) {
+                console.error("Error loading event:", err);
+            }
         }
-
     }
-    document.addEventListener("DOMContentLoaded", function () {
+
+    async function updateMember() {
+        const id = new URLSearchParams(window.location.search).get("id");
+        const formData = new FormData();
+        const classesDropdown = document.getElementById("drpClasses");
+        const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+        // Collect form values
+        formData.append("MemberID", id);
+        formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
+        formData.append("UNFileNumber", document.getElementById("UNFileNumber").value);
+        formData.append("UNFirstName", document.getElementById("UNFirstName").value);
+        formData.append("UNLastName", document.getElementById("UNLastName").value);
+        formData.append("Gender", document.getElementById("Gender").value);
+        formData.append("Birthdate", document.getElementById("Birthdate").value);
+        formData.append("Baptised", document.getElementById("Baptised").checked);
+        formData.append("Mobile", document.getElementById("Mobile").value);
+        formData.append("Nickname", document.getElementById("Nickname").value);
+        formData.append("BaptismName", document.getElementById("BaptismName").value);
+        formData.append("School", document.getElementById("School").value);
+        formData.append("Work", document.getElementById("Work").value);
+        formData.append("Notes", document.getElementById("Notes").value);
+        formData.append("Code", document.getElementById("Code").value);
+        formData.append("ImageURL", document.getElementById("ImageURL").value);
+        formData.append("S3ImageKey", document.getElementById("S3Key").value);
+        formData.append("CardStatus", document.getElementById("CardStatus").value);
+        formData.append("Classes", selectedClasses);
+        const fileInput = document.getElementById("ImageUpload");
+        if (fileInput.files.length > 0) {
+            formData.append("ImageFile", fileInput.files[0]);
+        }
+        const request = `${apiBaseUrl}/Member/UpdateMemberWImage`;
+        try {
+            const response = await fetch(request, {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error);
+            }
+
+            showSuccessToast("Member Updated successfully!");
+        } catch (err) {
+            console.error("Failed to submit form:", err);
+            throw new Error(error);
+        }
+    }
+
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        showLoading();
+        await loadClasses(apiBaseUrl);
+        await loadMemberData();
         document.getElementById("UNPersonalNumber").focus();
-        loadClasses();
+        
 
         const baptisedCheckbox = document.getElementById("Baptised");
         const baptismNameInput = document.getElementById("BaptismName");
@@ -206,7 +313,23 @@
 
         // Listen for changes
         baptisedCheckbox.addEventListener("change", toggleBaptismName);
-        const form = document.getElementById("frmCreate");
+        hideLoading();
+        const form = document.getElementById("frmEdit");
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            try{
+                showLoading();
+                await updateMember();
+                document.getElementById("UNPersonalNumber").focus();
+                hideLoading();
+            }
+            catch (err) {
+            console.error("Failed to submit form:", err);
+            hideLoading();
+            showFailedToast("Failed to update member!");
+            }
+        });
+
     });
 </script>
 @section Scripts {

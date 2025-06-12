@@ -3,74 +3,75 @@
 @{
     ViewData["Title"] = "Class Members";
 }
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Class Members</h4>
-    <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
-</div>
-<input type="hidden" name="classID" value="@ViewContext.HttpContext.Request.Query["classID"]" />
-<!-- Table for Larger Screens -->
 <partial name="_LoadingPartial" />
-<div class="d-none d-md-block">
-
-    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-hover table-striped  align-middle" id="dataTable">
-            <thead class="table-primary">
-                <tr>
-                    <th onclick="sortBySequence(this)">
-                        Code
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
-                    </th>
-                    <th onclick="sortTable(1,this)">
-                        Name
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
-                    </th>
-                    <th onclick="sortTable(2,this)">
-                        Age
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search Age">
-                    </th>
-                    <th>
-                        UN File Number
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search File Number">
-                    </th>
-                    <th>
-                        UN Number
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
-                    </th>
-                    <th>
-                        Mobile
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Mobile">
-                    </th>
-                    <th onclick="sortTable(6,this)">
-                        Attendance
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Attendance">
-                    </th>
-                    <th onclick="sortTable(7,this)">
-                        Last Present
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="">
-                    </th>
-                    <th onclick="sortTable(8,this)">
-                        Servant
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search by servant">
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+<div class="container mt-4" id="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Class Members</h4>
+        <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
     </div>
+    <input type="hidden" name="classID" value="@ViewContext.HttpContext.Request.Query["classID"]" />
+    <!-- Table for Larger Screens -->
+
+    <div class="d-none d-md-block">
+
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-hover table-striped  align-middle" id="dataTable">
+                <thead class="table-primary">
+                    <tr>
+                        <th onclick="sortBySequence(this)">
+                            Code
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
+                        </th>
+                        <th onclick="sortTable(1,this)">
+                            Name
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
+                        </th>
+                        <th onclick="sortTable(2,this)">
+                            Age
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search Age">
+                        </th>
+                        <th>
+                            UN File Number
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search File Number">
+                        </th>
+                        <th>
+                            UN Number
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
+                        </th>
+                        <th>
+                            Mobile
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Mobile">
+                        </th>
+                        <th onclick="sortTable(6,this)">
+                            Attendance
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Attendance">
+                        </th>
+                        <th onclick="sortTable(7,this)">
+                            Last Present
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="">
+                        </th>
+                        <th onclick="sortTable(8,this)">
+                            Servant
+                            <i class="fa-solid fa-sort"></i>
+                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search by servant">
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <partial name="_MobileViewPartial" />
+
 </div>
-
-<partial name="_MobileViewPartial" />
-
-
 <script>
     var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
     document.addEventListener("DOMContentLoaded", function () {
@@ -231,9 +232,9 @@
         .then(data => {
             $('[data-member-id="' + memberID + '"]').text(data);
             const $btn = $(`.assign-btn[data-member-id="${memberID}"]`);
-            $btn.removeClass("btn-success btn-danger"); 
+            $btn.removeClass("btn-success btn-danger");
             $btn.addClass("btn-danger");
-            $btn.text("Unassign"); 
+            $btn.text("Unassign");
             $btn.attr("onclick", `unAssignServant(${memberID})`);
             //fetchClassMembers();
         })

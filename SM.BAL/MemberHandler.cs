@@ -29,7 +29,188 @@ namespace SM.BAL
 
         public Member GetMember(int memberID)
         {
-            return _dbcontext.Members.First(m => m.MemberID == memberID);
+            return _dbcontext.Members.Include(m => m.ClassMembers).First(m => m.MemberID == memberID);
+        }
+        public void UpdateMember(int memberID, string code,
+            string? unFirstName,
+            string? unLastName,
+            string? baptismName,
+            string? nickname,
+            string unFileNumber,
+            string unPersonalNumber,
+            string? mobile,
+            bool baptised,
+            DateTime birthdate,
+            char gender,
+            string? school,
+            string? work,
+            string? notes,
+            string? imageURL,
+            string? s3ImageKey,
+            string? imageReference,
+            string? cardStatus,
+            List<int> classes,
+            string modifiedByUserName)
+        {
+            Servant servant = GetServantByUsername(modifiedByUserName);
+            Member originalMember = _dbcontext.Members.First(m => m.MemberID == memberID);
+            Dictionary<string, string> auditTrail = new Dictionary<string, string>();
+
+            bool isChanged = false;
+            if (code != originalMember.Code)
+            {
+                auditTrail.Add("Code", string.Format("Old value: {0} new value:{1}", originalMember.Code, code));
+                originalMember.Code = code;
+                isChanged = true;
+            }
+            if (gender != originalMember.Gender)
+            {
+                auditTrail.Add("Gender", string.Format("Old value: {0} new value:{1}", originalMember.Gender, gender));
+                originalMember.Gender = gender;
+                isChanged = true;
+            }
+            if (unFirstName != originalMember.UNFirstName)
+            {
+                auditTrail.Add("UNFirstName", string.Format("Old value: {0} new value:{1}", originalMember.UNFirstName, unFirstName));
+                originalMember.UNFirstName = unFirstName;
+                isChanged = true;
+            }
+            if (unLastName != originalMember.UNLastName)
+            {
+                auditTrail.Add("UNLastName", string.Format("Old value: {0} new value:{1}", originalMember.UNLastName, unLastName));
+                originalMember.UNLastName = unLastName;
+                isChanged = true;
+            }
+            if (unFileNumber != originalMember.UNFileNumber)
+            {
+                auditTrail.Add("UNFileNumber", string.Format("Old value: {0} new value:{1}", originalMember.UNFileNumber, unFileNumber));
+                originalMember.UNFileNumber = unFileNumber;
+                isChanged = true;
+            }
+            if (unPersonalNumber != originalMember.UNPersonalNumber)
+            {
+                auditTrail.Add("UNPersonalNumber", string.Format("Old value: {0} new value:{1}", originalMember.UNPersonalNumber, unPersonalNumber));
+                originalMember.UNPersonalNumber = unPersonalNumber;
+                isChanged = true;
+            }
+            if (birthdate != originalMember.Birthdate)
+            {
+                auditTrail.Add("Birthdate", string.Format("Old value: {0} new value:{1}", originalMember.Birthdate.ToString("dd-MM-yyyy"), birthdate.ToString("dd-MM-yyyy")));
+                originalMember.Birthdate = birthdate;
+                isChanged = true;
+            }
+            if (baptised != originalMember.Baptised)
+            {
+                auditTrail.Add("Baptised", string.Format("Old value: {0} new value:{1}", originalMember.Baptised, baptised));
+                originalMember.Baptised = baptised;
+                isChanged = true;
+            }
+            if (cardStatus != originalMember.CardStatus)
+            {
+                auditTrail.Add("CardStatus", string.Format("Old value: {0} new value:{1}", originalMember.CardStatus, cardStatus));
+                originalMember.CardStatus = cardStatus;
+                isChanged = true;
+            }
+            if (imageReference != originalMember.ImageReference)
+            {
+                auditTrail.Add("ImageReference", string.Format("Old value: {0} new value:{1}", originalMember.ImageReference, imageReference));
+                originalMember.ImageReference = imageReference;
+                isChanged = true;
+            }
+            if (s3ImageKey != originalMember.S3ImageKey)
+            {
+                auditTrail.Add("S3ImageKey", string.Format("Old value: {0} new value:{1}", originalMember.S3ImageKey, s3ImageKey));
+                originalMember.S3ImageKey = s3ImageKey;
+                isChanged = true;
+            }
+            if (imageURL != originalMember.ImageURL)
+            {
+                auditTrail.Add("ImageURL", string.Format("Old value: {0} new value:{1}", originalMember.ImageURL, imageURL));
+                originalMember.ImageURL = imageURL;
+                isChanged = true;
+            }
+            if (mobile != originalMember.Mobile)
+            {
+                auditTrail.Add("Mobile", string.Format("Old value: {0} new value:{1}", originalMember.Mobile, mobile));
+                originalMember.Mobile = mobile;
+                isChanged = true;
+            }
+            if (nickname != originalMember.Nickname)
+            {
+                auditTrail.Add("Nickname", string.Format("Old value: {0} new value:{1}", originalMember.Nickname, nickname));
+                originalMember.Nickname = nickname;
+                isChanged = true;
+            }
+            if (school != originalMember.School)
+            {
+                auditTrail.Add("School", string.Format("Old value: {0} new value:{1}", originalMember.School, school));
+                originalMember.School = school;
+                isChanged = true;
+            }
+            if (work != originalMember.Work)
+            {
+                auditTrail.Add("Work", string.Format("Old value: {0} new value:{1}", originalMember.Work, work));
+                originalMember.Work = work;
+                isChanged = true;
+            }
+            if (notes != originalMember.Notes)
+            {
+                auditTrail.Add("Notes", string.Format("Old value: {0} new value:{1}", originalMember.Notes, notes));
+                originalMember.Notes = notes;
+                isChanged = true;
+            }
+            if (baptismName != originalMember.BaptismName)
+            {
+                auditTrail.Add("BaptismName", string.Format("Old value: {0} new value:{1}", originalMember.BaptismName, baptismName));
+                originalMember.BaptismName = baptismName;
+                isChanged = true;
+            }
+            var oldClasses = _dbcontext.ClassMembers.Where(cm => cm.MemberID == memberID).ToList();
+
+            var oldIds = new List<int>(oldClasses.Select(m => m.ClassID));
+
+
+            var toBeDeleted = oldClasses.Where(m => !classes.Contains(m.ClassID)).ToList();
+            var toBeAdded = classes.Where(m => !oldIds.Contains(m)).ToList();
+
+            string addedClasses = string.Empty;
+            foreach (var cl in toBeAdded)
+            {
+                isChanged = true;
+                _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = memberID, ClassID = cl });
+                addedClasses += cl.ToString() + ",";
+            }
+            if (string.IsNullOrEmpty(addedClasses))
+                auditTrail.Add("Added Classes", addedClasses.TrimEnd(','));
+
+            string deletedClasses = string.Empty;
+            foreach (var cl in toBeDeleted)
+            {
+                isChanged = true;
+                addedClasses += cl.ClassID.ToString() + ",";
+                _dbcontext.ClassMembers.Remove(cl);
+
+            }
+            if (string.IsNullOrEmpty(deletedClasses))
+                auditTrail.Add("Deleted Classes", deletedClasses.TrimEnd(','));
+
+            if (isChanged)
+            {
+                originalMember.ModifiedBy = servant.ServantID;
+                originalMember.ModifiedAt = CurrentTime;
+                originalMember.ModifiedLog = JsonSerializer.Serialize(auditTrail);
+
+                AuditTrail trail = new AuditTrail()
+                {
+                    AiditTrail = JsonSerializer.Serialize(auditTrail),
+                    EntityID = code,
+                    EntityName = "Member",
+                    ServantName = servant.ServantName,
+                    Timestamp=CurrentTime
+                };
+                _dbcontext.AuditTrail.Add(trail);
+            }
+            _dbcontext.SaveChanges();
         }
         public void UpdateMember(Member member, string modifiedByUserName)
         {
@@ -284,9 +465,9 @@ namespace SM.BAL
             sequence = seq;
             return string.Format("{0}{1}-{2}", birthdate.ToString("yy"), gender, seq.ToString("0000"));
         }
-        public bool ValidateUNNumber(string unPersonalNo)
+        public bool ValidateUNNumber(string unPersonalNo, int? memberID)
         {
-            return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower());
+            return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower() && m.MemberID != memberID);
         }
 
         public bool UpdateCardStatus(string memberCode, CardStatus cardStatus)

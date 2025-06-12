@@ -30,7 +30,16 @@ namespace SM.API.Services
             return new AWSImageFile() { Key = key, URL = url };
 
         }
+        public static async Task DeleteFileAsync(string key, IAmazonS3 s3Client)
+        {
+            var deleteObjectRequest = new DeleteObjectRequest
+            {
+                BucketName = SMConfigurationManager.S3BucketName,
+                Key = key
+            };
 
+            var response = await s3Client.DeleteObjectAsync(deleteObjectRequest);
+        }
         public class AWSImageFile
         {
             public string URL { get; set; }

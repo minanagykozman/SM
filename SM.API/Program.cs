@@ -15,7 +15,8 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Pass IConfiguration to the helper class
+SMConfigurationManager.SetConfiguration(builder.Configuration);
 // Retrieve the connection string from appsettings.json
 string connectionString = string.Empty;
 string loggerConnectionString = string.Empty;

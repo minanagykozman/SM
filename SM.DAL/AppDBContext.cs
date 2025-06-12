@@ -33,6 +33,7 @@
         public DbSet<AidClass> AidClasses { get; set; }
         public DbSet<Visitation> Visitations { get; set; }
         public DbSet<MemberFund> MemberFunds { get; set; }
+        public DbSet<AuditTrail> AuditTrail { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -82,6 +82,16 @@ namespace SM.DAL.DataModel
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
             }
         }
+        public List<int> ClassesIDs
+        {
+            get
+            {
+                if (ClassMembers == null)
+                    return new List<int>();
+                else
+                    return ClassMembers.Select(c => c.ClassID).ToList();
+            }
+        }
         public CardStatus? CardStatusDisplay
         {
             get

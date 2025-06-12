@@ -9,67 +9,68 @@
 </div>
 <partial name="_LoadingPartial" />
 <partial name="_SuccessToastPartial" />
-<form id="frm" style="position:relative">
-    <div class="card shadow-lg p-4">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="row g-3 mt-2">
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input class="form-control" id="AidName" placeholder="Enter Aid Name" required />
-                    <label>Aid Name</label>
+<div class="container mt-4" id="container">
+    <form id="frm" style="position:relative">
+        <div class="card shadow-lg p-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="AidName" placeholder="Enter Aid Name" required />
+                        <label>Aid Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="datetime-local" class="form-control" id="AidDate" placeholder="Select Aid Date" required />
+                        <label>Aid Date</label>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="AidDate" placeholder="Select Aid Date" required />
-                    <label>Aid Date</label>
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Enter components" id="Components" style="height: 100px"></textarea>
+                        <label>Components</label>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row g-3 mt-2">
-            <div class="col-md-12">
-                <div class="form-floating">
-                    <textarea class="form-control" placeholder="Enter components" id="Components" style="height: 100px"></textarea>
-                    <label>Components</label>
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="CostPP" step="0.01" type="number" placeholder="Enter Cost Per Person" required />
+                        <label for="CostPP">Cost (per person)</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="CostTotal" step="0.01" type="number" placeholder="Enter Total Cost" required />
+                        <label for="CostTotal">Total Cost</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="MembersPlanned" type="number" placeholder="Enter Planned Members" required />
+                        <label for="MembersPlanned">Planned Members#</label>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row g-3 mt-2">
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <input class="form-control" id="CostPP" step="0.01" type="number" placeholder="Enter Cost Per Person" required />
-                    <label for="CostPP">Cost (per person)</label>
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" multiple required></select>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <input class="form-control" id="CostTotal" step="0.01" type="number" placeholder="Enter Total Cost" required />
-                    <label for="CostTotal">Total Cost</label>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-floating">
-                    <input class="form-control" id="MembersPlanned" type="number" placeholder="Enter Planned Members" required />
-                    <label for="MembersPlanned">Planned Members#</label>
-                </div>
-            </div>
-        </div>
-        <div class="row g-3 mt-2">
-            <div class="col-md-12">
-                <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
-                <select class="form-select" id="drpClasses" multiple required></select>
-            </div>
-        </div>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Update</button>
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
             </div>
         </div>
-    </div>
-</form>
-
+    </form>
+</div>
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
         const classesDropdown = document.getElementById("drpClasses");

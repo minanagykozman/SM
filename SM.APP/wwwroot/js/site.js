@@ -356,15 +356,58 @@ function showWarningMessage(message) {
 function showLoading() {
     const loadingIndicator = document.getElementById("loadingIndicator");
     loadingIndicator.classList.remove("d-none");
+    document.getElementById('container').style.display = 'none';
 }
 function hideLoading() {
     const loadingIndicator = document.getElementById("loadingIndicator");
     loadingIndicator.classList.add("d-none");
+    document.getElementById('container').style.display = 'block';
 }
 function showSuccessToast(message) {
     const toastElement = document.getElementById('successToast');
     const lblSuccessMessage = document.getElementById('lblSuccessMessage');
     lblSuccessMessage.textContent = message;
-    const toast = new bootstrap.Toast(toastElement, { delay: 3000 }); // 3 seconds
+    const toast = new bootstrap.Toast(toastElement, { delay: 6000 }); // 3 seconds
     toast.show();
+}
+function showFailedToast(message) {
+    const toastElement = document.getElementById('failedToast');
+    const lblFailedMessage = document.getElementById('lblFailedMessage');
+    lblFailedMessage.textContent = message;
+    const toast = new bootstrap.Toast(toastElement, { delay: 6000 }); // 3 seconds
+    toast.show();
+}
+
+async function loadClasses(apiBaseUrl) {
+    try {
+        const classesDropdown = document.getElementById("drpClasses");
+        const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+        const classResponse = await fetch(request, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+        const classList = await classResponse.json();
+
+        // Populate the dropdown
+        classesDropdown.innerHTML = "";
+        classList.forEach(cls => {
+            const option = document.createElement("option");
+            option.value = cls.classID;
+            option.textContent = cls.className;
+            classesDropdown.appendChild(option);
+        });
+
+        $('#drpClasses').select2({
+            placeholder: "Select classes",
+            allowClear: true,
+            width: '100%' // Ensures proper styling with Bootstrap
+        });
+
+    } catch (err) {
+        console.error("Error loading classes:", err);
+    }
+
 }

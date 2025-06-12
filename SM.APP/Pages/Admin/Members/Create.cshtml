@@ -4,13 +4,13 @@
 @{
     ViewData["Title"] = "Create Member";
 }
-
-<div class="container mt-4">
+<partial name="_LoadingPartial" />
+<div class="container mt-4" id="container">
     <h1 class="text-center">Create Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
-        <partial name="_LoadingPartial" />
+        
         <form id="frmCreate" style="position:relative">
             <input type="hidden" asp-for="Member.Code" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -115,7 +115,7 @@
                     <span id="ImageUploadError" class="text-danger"></span>
                 </div>
                 <div class="col-md-12">
-                    <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
+                    <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
                     <select class="form-select" id="drpClasses" multiple required></select>
                 </div>
                 <div class="col-md-12">
@@ -145,44 +145,39 @@
 <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
         async function validateUNPersonalNumber() {
-        let inputField = document.getElementById("UNPersonalNumber");
-        let personalNumber = inputField.value.trim();
-        let errorSpan = document.getElementById("UNPersonalNumberError");
-        if (!personalNumber) {
-            errorSpan.textContent = "Personal number is required.";
-            return false;
-        }
-
-        try {
-            const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
-            const response = await fetch(request, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-
-            // Ensure response is valid
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json(); // Ensure JSON parsing
-
-            //console.log("API Response:", data); // Debugging
-
-            // Properly check if the API returned `true` (as boolean or string)
-            if (data === true || data === "true") {
-                errorSpan.textContent = ""; // No error
-                return true;
-            } else {
-                errorSpan.textContent = "UN number already exists.";
+            let inputField = document.getElementById("UNPersonalNumber");
+            let personalNumber = inputField.value.trim();
+            let errorSpan = document.getElementById("UNPersonalNumberError");
+            if (!personalNumber) {
+                errorSpan.textContent = "Personal number is required.";
                 return false;
             }
-        } catch (error) {
-            errorSpan.textContent = "Validation service is unavailable.";
-            return false;
-        }
-    }
+            
+            try {
+                const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json(); 
+                
+                if (data === true || data === "true") {
+                    errorSpan.textContent = ""; // No error
+                    return true;
+                } 
+                else {
+                    errorSpan.textContent = "UN number already exists.";
+                    return false;}
+                }
+                catch (error) {
+                    errorSpan.textContent = "Validation service is unavailable.";
+                    return false;
+                }
+           }
         async function createMember() {
         const formData = new FormData();
 
@@ -229,39 +224,7 @@
         }
     }
 
-    async function loadClasses(){
-        try {
-            const classesDropdown = document.getElementById("drpClasses");
-            const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
-            const classResponse = await fetch(request, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-
-            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
-            const classList = await classResponse.json();
-
-            // Populate the dropdown
-            classesDropdown.innerHTML = "";
-            classList.forEach(cls => {
-                const option = document.createElement("option");
-                option.value = cls.classID;
-                option.textContent = cls.className;
-                classesDropdown.appendChild(option);
-            });
-
-            $('#drpClasses').select2({
-            placeholder: "Select classes",
-            allowClear: true,
-            width: '100%' // Ensures proper styling with Bootstrap
-        });
-
-        } catch (err) {
-            console.error("Error loading classes:", err);
-        }
-
-    }
+    
     document.addEventListener("DOMContentLoaded", function () {
         
         const baptisedCheckbox = document.getElementById("Baptised");
@@ -274,6 +237,7 @@
         // Initial state
         toggleBaptismName();
 
+        loadClasses(apiBaseUrl);
         // Listen for changes
         baptisedCheckbox.addEventListener("change", toggleBaptismName);
         const form = document.getElementById("frmCreate");
@@ -284,6 +248,7 @@
             await createMember();
             const unFileNumber=document.getElementById("UNFileNumber").value;
             form.reset();
+            $('#drpClasses').val(null).trigger('change');
             const clickedButton = e.submitter;
             const action = clickedButton?.value;
             document.getElementById("UNPersonalNumber").focus();

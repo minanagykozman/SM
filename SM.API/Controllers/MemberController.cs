@@ -39,13 +39,13 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("ValidateUNNumber")]
-        public ActionResult<bool> ValidateUNNumber(string unFileNumber)
+        public ActionResult<bool> ValidateUNNumber(string unFileNumber, int? memberID)
         {
             try
             {
                 using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
-                    bool result = memberHandler.ValidateUNNumber(unFileNumber);
+                    bool result = memberHandler.ValidateUNNumber(unFileNumber, memberID);
                     return Ok(result);
                 }
 
@@ -133,6 +133,44 @@ namespace SM.API.Controllers
                     ValidateServant();
                     eventHandler.UpdateMember(member, User.Identity.Name);
                     return Ok("Member updated");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPost("UpdateMemberWImage")]
+        public async Task<IActionResult> UpdateMemberWImage([FromForm] MemberParam param)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    ValidateServant();
+                    string url = string.Empty;
+                    string key = string.Empty;
+                    if (param.ImageFile != null)
+                    {
+                        var imageData = await AWSHelper.UploadMemberImage(param.ImageFile, _s3Client, memberHandler);
+                        url = imageData.URL;
+                        key = imageData.Key;
+                        if (!string.IsNullOrEmpty(param.S3Key))
+                            await AWSHelper.DeleteFileAsync(param.S3Key, _s3Client);
+                    }
+                    else
+                    {
+                        url = param.ImageURL;
+                        key = param.S3Key;
+                    }
+
+
+                    memberHandler.UpdateMember(param.MemberID.Value, param.Code, param.UNFirstName, param.UNLastName, param.BaptismName, param.Nickname
+                        , param.UNFileNumber, param.UNPersonalNumber, param.Mobile, param.Baptised, param.Birthdate, param.Gender, param.School, param.Work,
+                        param.Notes, url, key, param.ImageFile?.FileName, param.CardStatus, param.Classes, User.Identity.Name);
+
+                    return Ok("Member Updated!");
                 }
 
             }
@@ -301,6 +339,8 @@ namespace SM.API.Controllers
         public class MemberParam
         {
             public IFormFile? ImageFile { get; set; }
+            public int? MemberID { get; set; }
+            public string? Code { get; set; }
             public string? UNFirstName { get; set; }
             public string? UNLastName { get; set; }
             public string? BaptismName { get; set; }
@@ -314,6 +354,9 @@ namespace SM.API.Controllers
             public string? School { get; set; }
             public string? Work { get; set; }
             public string? Notes { get; set; }
+            public string? S3Key { get; set; }
+            public string? ImageURL { get; set; }
+            public string? CardStatus { get; set; }
             public List<int> Classes { get; set; }
         }
     }
