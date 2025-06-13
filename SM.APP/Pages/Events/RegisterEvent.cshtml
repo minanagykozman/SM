@@ -5,6 +5,7 @@
 }
 @using SM.APP.Pages.Events;
 @using SM.DAL.DataModel;
+<partial name="_LoadingPartial" />
 <div class="container my-4">
     <!-- Page Title -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -13,8 +14,100 @@
     </div>
     <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
     <partial name="_SearchPartial" />
-    <partial name="_ModalPartial" />
-    <partial name="_LoadingPartial" />
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="myModalLabel">Member Status</h5>
+                    <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <input type="hidden" name="MemberCode" value="" />
+                    <input type="hidden" name="MemberStatusCode" value="" />
+                    <!-- Status -->
+                    <div class="form-floating mb-3" id="divStatus">
+                        <div class="input-group">
+                            <span class="input-group-text bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </span>
+                            <input type="text" class="form-control text-success fw-bold" id="MemberStatus" value="Can attend" readonly />
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3" id="divStatusAlert">
+                        <div class="input-group">
+                            <span class="input-group-text bg-danger text-white">
+                                <i class="bi bi-x-circle"></i>
+                            </span>
+                            <input type="text" class="form-control text-danger fw-bold" id="MemberStatusAlert" value="Can attend" readonly />
+                        </div>
+                    </div>
+                    <div class="row g-3" id="MemberDataBody">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberCode" value="" readonly>
+                                <label for="MemberCode">Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberName" value="" readonly>
+                                <label for="MemberName">Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="divAge">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="MemberAge" value="" readonly>
+                                <label for="MemberAge">Age</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="divCard">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="CardStatus" value="" readonly>
+                                <label id="lblCard" for="CardStatus">Card Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="divBus">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="Bus" value="" readonly>
+                                <label id="lblBus" for="Bus">Bus</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="divTeam">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="Team" value="" readonly>
+                                <label for="CardStatus">Team</label>
+                            </div>
+                        </div>
+                        <div class="table-responsive d-none d-md-block">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Attendance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" id="submitBtn" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Present
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Table for Larger Screens -->
     <div class="d-none d-md-block">
         <div class="table-responsive">
@@ -99,7 +192,7 @@
                 return;
             }
 
-            //document.getElementById("counter").textContent = `Members: ${members.length}`;
+            document.getElementById("counter").textContent = `Members: ${members.length}`;
             populateTable(members);
         } catch (error) {
             console.error("Network error:", error);
@@ -145,6 +238,25 @@
         mobileList.appendChild(listItem);
         });
     }
+        function populateAttendanceTable(attendanceData) {
+        const tableBody = document.getElementById('attendance-table-body');
+        tableBody.innerHTML = '';
+        if (!attendanceData || attendanceData.length === 0) {
+            const row = tableBody.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 3; // Make the cell span all 3 columns
+            cell.textContent = 'No attendance records found';
+            cell.classList.add('text-center');
+            return; // Exit the function
+        }
+        attendanceData.forEach(record => {
+            const row = tableBody.insertRow();
+            const classCell = row.insertCell();
+            classCell.textContent = record.className;
+            const attendanceCell = row.insertCell();
+            attendanceCell.textContent= record.attendance;
+        });
+    }
     document.getElementById("btnCheck").addEventListener("click", function () {
         const searchValue = document.getElementById("SearchString").value.trim();
 
@@ -178,9 +290,9 @@
 
     // Function to fill modal with API response
     function populateModal(data) {
-        
+
         document.querySelector('input[name="MemberStatusCode"]').value = data.status;
-        
+
         switch (data.status) {
             case 0:
                 document.getElementById("MemberStatusAlert").value = "Member not found";
@@ -205,6 +317,7 @@
                 document.getElementById("MemberAge").value =data.member.age;
                 document.getElementById("CardStatus").value =data.member.cardStatus;
                 document.querySelector('input[name="MemberCode"]').value = data.member.code;
+                populateAttendanceTable(data.memberClasses);
                 $("#MemberDataBody").show();
                 $("#submitBtn").show();
                 break;
@@ -228,10 +341,11 @@
                 document.getElementById("MemberAge").value =data.member.age;
                 document.getElementById("CardStatus").value =data.member.cardStatus;
                 document.querySelector('input[name="MemberCode"]').value = data.member.code;
+                populateAttendanceTable(data.memberClasses);
                 $("#MemberDataBody").show();
                 $("#submitBtn").show();
                 break;
-           
+
         }
     }
 
