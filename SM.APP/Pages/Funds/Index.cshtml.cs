@@ -53,7 +53,7 @@ namespace SM.APP.Pages.Funds
                 Funds = _fundHandler.GetAllFunds(AssigneeFilter, StatusFilter, username);
 
                 // Load assignable servants for dropdowns
-                AssignableServants = _fundHandler.GetAssignableServants(username);
+                AssignableServants = _fundHandler.GetAssignableServants();
 
                 // Apply search filter
                 if (!string.IsNullOrEmpty(SearchTerm))

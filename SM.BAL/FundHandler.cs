@@ -7,10 +7,6 @@ namespace SM.BAL
 {
     public class FundHandler : HandlerBase
     {
-        // Default constructor
-        public FundHandler() : base()
-        {
-        }
 
         // Get all funds with optional filtering (Admin only or assigned funds for Servants)
         public List<MemberFund> GetAllFunds(int? assigneeId, string? status, string username)
@@ -290,7 +286,7 @@ namespace SM.BAL
         }
 
         // Get list of servants that can be assigned funds
-        public List<object> GetAssignableServants(string username)
+        public List<object> GetAssignableServants()
         {
             var x = _dbcontext.Servants;
             var servants = _dbcontext.Servants

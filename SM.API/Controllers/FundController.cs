@@ -152,9 +152,11 @@ namespace SM.API.Controllers
         {
             try
             {
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                var servants = fundHandler.GetAssignableServants(User.Identity.Name);
-                return Ok(servants);
+                using (FundHandler fundHandler = new SM.BAL.FundHandler())
+                {
+                    var servants = fundHandler.GetAssignableServants();
+                    return Ok(servants);
+                }
             }
             catch (Exception ex)
             {
