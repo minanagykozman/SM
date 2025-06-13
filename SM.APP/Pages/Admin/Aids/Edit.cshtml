@@ -1,0 +1,194 @@
+﻿@page
+@model SM.APP.Pages.Admin.Aids.EditModel
+@{
+    ViewData["Title"] = "Edit Aid";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0" id="lblTitle">Edit Aid</h4>
+</div>
+<partial name="_LoadingPartial" />
+<partial name="_SuccessToastPartial" />
+<div class="container mt-4" id="container">
+    <form id="frm" style="position:relative">
+        <div class="card shadow-lg p-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="AidName" placeholder="Enter Aid Name" required />
+                        <label>Aid Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="datetime-local" class="form-control" id="AidDate" placeholder="Select Aid Date" required />
+                        <label>Aid Date</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Enter components" id="Components" style="height: 100px"></textarea>
+                        <label>Components</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="CostPP" step="0.01" type="number" placeholder="Enter Cost Per Person" required />
+                        <label for="CostPP">Cost (per person)</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="CostTotal" step="0.01" type="number" placeholder="Enter Total Cost" required />
+                        <label for="CostTotal">Total Cost</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input class="form-control" id="MembersPlanned" type="number" placeholder="Enter Planned Members" required />
+                        <label for="MembersPlanned">Planned Members#</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-12">
+                    <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" multiple required></select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const classesDropdown = document.getElementById("drpClasses");
+        const aidID = new URLSearchParams(window.location.search).get("aidID");
+        const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+
+        let allClasses = [];
+
+        try {
+            // Load all available classes
+            const classResponse = await fetch(`${apiBaseUrl}/Meeting/GetServantClasses`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+            allClasses = await classResponse.json();
+
+            // Populate the dropdown
+            classesDropdown.innerHTML = "";
+            allClasses.forEach(cls => {
+                const option = document.createElement("option");
+                option.value = cls.classID;
+                option.textContent = cls.className;
+                classesDropdown.appendChild(option);
+            });
+
+            $('#drpClasses').select2({
+                placeholder: "Select classes",
+                allowClear: true,
+                width: '100%'
+            });
+
+        } catch (err) {
+            console.error("Error loading class list:", err);
+        }
+
+        // Load existing aid data
+        if (aidID) {
+            try {
+                showLoading();
+                const response = await fetch(`${apiBaseUrl}/Aids/GetAid?aidID=${aidID}`, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to load aid data");
+                const aidData = await response.json();
+
+                // Fill form with data
+                document.getElementById("AidName").value = aidData.aidName;
+                document.getElementById("AidDate").value = aidData.aidDate.slice(0, 16);
+                document.getElementById("Components").value = aidData.components;
+                document.getElementById("CostTotal").value = aidData.totalCost;
+                document.getElementById("CostPP").value = aidData.costPerPerson;
+                document.getElementById("MembersPlanned").value = aidData.plannedMembersCount;
+                document.getElementById("lblTitle").textContent ='Edit Aid: ' + aidData.aidName;
+
+                // Set selected classes
+                const classIDs = aidData.classesIDs;
+
+                $('#drpClasses').val(classIDs).trigger('change');
+                hideLoading();
+
+            } catch (err) {
+                console.error("Error loading aid:", err);
+            }
+        }
+
+        // Submit update
+        const form = document.getElementById("frm");
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const aidName = document.getElementById("AidName").value;
+            const aidDate = document.getElementById("AidDate").value;
+            const components = document.getElementById("Components").value;
+            const totalCost = document.getElementById("CostTotal").value;
+            const costPerPerson = document.getElementById("CostPP").value;
+            const plannedMembersCount = document.getElementById("MembersPlanned").value;
+            const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+            const aidPayload = {
+                aid: {
+                    aidID: aidID,
+                    aidName: aidName,
+                    components: components,
+                    costPerPerson: costPerPerson,
+                    totalCost:totalCost,
+                    plannedMembersCount:plannedMembersCount,
+                    actualMembersCount:0,
+                    aidDate:aidDate,
+                    isActive: true
+                },
+                classes: selectedClasses
+            };
+
+            try {
+                const updateRequest = `${apiBaseUrl}/Aids/UpdateAid`;
+                const updateResponse = await fetch(updateRequest, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(aidPayload)
+                });
+
+                if (!updateResponse.ok) throw new Error("Update failed");
+
+                showSuccessToast("Aid updated successfully");
+
+            } catch (err) {
+                console.error("Error updating aid:", err);
+            }
+        });
+    });
+</script>
+

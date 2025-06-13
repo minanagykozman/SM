@@ -27,7 +27,7 @@ namespace SM.APP.Pages.Classess
                 {
                     string jwtToken = await GetAPIToken();
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                    string req = string.Format("{0}/Meeting/GetClasses", SMConfigurationManager.ApiBase);
+                    string req = string.Format("{0}/Meeting/GetServantClasses", SMConfigurationManager.ApiBase);
                     HttpResponseMessage response = await client.GetAsync(req);
                     string responseData = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions

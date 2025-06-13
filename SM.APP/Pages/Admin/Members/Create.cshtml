@@ -5,122 +5,111 @@
     ViewData["Title"] = "Create Member";
 }
 
-<div class="container mt-4">
+<partial name="_LoadingPartial" />
+<div class="container mt-4" id="container">
     <h1 class="text-center">Create Member</h1>
     <hr />
     <div class="card shadow-lg p-4">
-        @if (Model.ShowMessage)
-        {
-            <div id="Message" class="alert alert-success w-100 text-center">
-                @Model.Message
-            </div>
-        }
-        <form method="post">
-            <input type="hidden" asp-for="Member.Code" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <partial name="_SuccessToastPartial" />
 
+        <form id="frmCreate" style="position:relative">
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNPersonalNumber" class="form-control"
-                               id="UNPersonalNumber"
-                               placeholder="Enter Personal Number"
-                               onblur="validateUNPersonalNumber()" />
-                        <label asp-for="Member.UNPersonalNumber"></label>
+                        <input class="form-control" id="UNPersonalNumber" name="UNPersonalNumber" placeholder="Enter Personal Number" required />
+                        <label>UN Personal Number</label>
                     </div>
-                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" />
-                        <label asp-for="Member.UNFileNumber"></label>
+                        <input id="UNFileNumber" name="UNFileNumber" class="form-control" placeholder="Enter File Number" required />
+                        <label>UN File Number</label>
                     </div>
-                    <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" class="form-control" placeholder="Enter First Name" />
-                        <label asp-for="Member.UNFirstName"></label>
+                        <input id="UNFirstName" name="UNFirstName" class="form-control" placeholder="Enter First Name" required />
+                        <label>First Name</label>
                     </div>
-                    <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNLastName" class="form-control" placeholder="Enter Last Name" />
-                        <label asp-for="Member.UNLastName"></label>
+                        <input id="UNLastName" name="UNLastName" class="form-control" placeholder="Enter Last Name" required />
+                        <label>Last Name</label>
                     </div>
-                    <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.Gender" class="form-select">
+                        <select id="Gender" name="Gender" class="form-select" required>
                             <option value="">Select Gender</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
                         </select>
-                        <label asp-for="Member.Gender"></label>
+                        <label>Gender</label>
                     </div>
-                    <span asp-validation-for="Member.Gender" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" class="form-control" placeholder="Enter Birthdate" />
-                        <label asp-for="Member.Birthdate"></label>
+                        <input type="date" id="Birthdate" name="Birthdate" class="form-control" placeholder="Enter Birthdate" required />
+                        <label>Birthdate</label>
                     </div>
-                    <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" asp-for="Member.Baptised" />
-                        <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                        <input class="form-check-input" id="Baptised" type="checkbox" />
+                        <label class="form-check-label">Baptised</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Mobile" class="form-control" placeholder="Enter Mobile" />
-                        <label asp-for="Member.Mobile"></label>
+                        <input id="BaptismName" class="form-control" placeholder="Enter Baptism Name" />
+                        <label>Baptism Name</label>
                     </div>
-                    <span asp-validation-for="Member.Mobile" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
+                        <label for="ImageUpload">Upload Image</label>
+                    </div>
+                    <span id="ImageUploadError" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" name="drpClasses" multiple required></select>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.ImageReference" class="form-control" placeholder="Enter Image Reference" />
-                        <label asp-for="Member.ImageReference"></label>
+                        <input id="Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <label>Mobile</label>
                     </div>
-                    <span asp-validation-for="Member.ImageReference" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Nickname" class="form-control" placeholder="Enter Nickname" />
-                        <label asp-for="Member.Nickname"></label>
+                        <input id="Nickname" class="form-control" placeholder="Enter Nickname" />
+                        <label></label>
                     </div>
-                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.School" class="form-control" placeholder="Enter School" />
-                        <label asp-for="Member.School"></label>
+                        <input id="School" class="form-control" placeholder="Enter School" />
+                        <label>School</label>
                     </div>
-                    <span asp-validation-for="Member.School" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Work" class="form-control" placeholder="Enter Work" />
-                        <label asp-for="Member.Work"></label>
+                        <input id="Work" class="form-control" placeholder="Enter Work" />
+                        <label>Work</label>
                     </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
                 <div class="col-md-12">
                     <div class="form-floating">
-                        <textarea asp-for="Member.Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
-                        <label asp-for="Member.Notes"></label>
+                        <textarea id="Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                        <label>Notes</label>
                     </div>
-                    <span asp-validation-for="Member.Notes" class="text-danger"></span>
                 </div>
             </div>
-
             <div class="d-flex justify-content-between mt-4">
-                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <a href="Index" id="backToList" class="btn btn-outline-secondary">Back to List</a>
                 <div class="d-flex gap-2">
                     <button type="submit" name="action" value="AddAnother" class="btn btn-primary">Create & Add Another</button>
                     <button type="submit" name="action" value="Add" class="btn btn-primary">Create</button>
@@ -129,52 +118,128 @@
         </form>
     </div>
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("UNPersonalNumber").focus();
-    });
-</script>
-<script>
-        async function validateUNPersonalNumber() {
-        let inputField = document.getElementById("UNPersonalNumber");
-        let personalNumber = inputField.value.trim();
-        let errorSpan = document.getElementById("UNPersonalNumberError");
-        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-        if (!personalNumber) {
-            errorSpan.textContent = "Personal number is required.";
-            return false;
-        }
-
-        try {
-            const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}`;
-            const response = await fetch(request);
-
-            // Ensure response is valid
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json(); // Ensure JSON parsing
-
-            console.log("API Response:", data); // Debugging
-
-            // Properly check if the API returned `true` (as boolean or string)
-            if (data === true || data === "true") {
-                errorSpan.textContent = ""; // No error
-                return true;
-            } else {
-                errorSpan.textContent = "UN number already exists.";
-                return false;
-            }
-        } catch (error) {
-            errorSpan.textContent = "Validation service is unavailable.";
-            return false;
-        }
-    }
-</script>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+
+        async function createMember() {
+            const formData = new FormData();
+            const selectedClasses = $('#drpClasses').val();
+            formData.append("UNPersonalNumber", $("#UNPersonalNumber").val());
+            formData.append("UNFileNumber", $("#UNFileNumber").val());
+            formData.append("UNFirstName", $("#UNFirstName").val());
+            formData.append("UNLastName", $("#UNLastName").val());
+            formData.append("Gender", $("#Gender").val());
+            formData.append("Birthdate", $("#Birthdate").val());
+            formData.append("Baptised", $("#Baptised").is(':checked'));
+            formData.append("Mobile", $("#Mobile").val());
+            formData.append("Nickname", $("#Nickname").val());
+            formData.append("BaptismName", $("#BaptismName").val());
+            formData.append("School", $("#School").val());
+            formData.append("Work", $("#Work").val());
+            formData.append("Notes", $("#Notes").val());
+            formData.append("Classes", selectedClasses);
+            const fileInput = document.getElementById("ImageUpload");
+            if (fileInput.files.length > 0) {
+                formData.append("ImageFile", fileInput.files[0]);
+            }
+            const request = `${apiBaseUrl}/Member/CreateMemberWImage`;
+            try {
+                const response = await fetch(request, { method: "POST", credentials: "include", body: formData });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Failed to save member data:", errorData);
+                    showFailedToast("Failed to save member: " + errorData.message);
+                    return;
+                }
+                else{
+                    const memberCode = await response.text();
+                    showSuccessToast("Member created successfully with code: " + memberCode);
+                }
+            } catch (err) {
+                console.error("Failed to submit member data:", err);
+                showFailedToast("Failed to save member data!");
+            }
+        }
+
+            $(async function() {
+            showLoading();
+
+            if (typeof loadClasses === "function") { await loadClasses(apiBaseUrl); }
+            const baptisedCheckbox = document.getElementById("Baptised");
+            const baptismNameInput = document.getElementById("BaptismName");
+            function toggleBaptismName() { baptismNameInput.disabled = !baptisedCheckbox.checked; }
+            toggleBaptismName();
+            baptisedCheckbox.addEventListener("change", toggleBaptismName);
+            hideLoading();
+            $("#UNPersonalNumber").focus();
+
+            $("#frmCreate").validate({
+                ignore: [],
+                errorClass: "text-danger",
+                errorElement: "div",
+                rules: {
+                    UNPersonalNumber: {
+                        required: true,
+                        remote: {
+                            url: `${apiBaseUrl}/Member/ValidateUNNumber`,
+                            type: "get",
+                            data: { unFileNumber: function() { return $("#UNPersonalNumber").val(); } },
+                            xhrFields: { withCredentials: true }
+                        }
+                    },
+                    UNFileNumber: "required",
+                    UNFirstName: "required",
+                    UNLastName: "required",
+                    Gender: "required",
+                    Birthdate: "required",
+                    drpClasses: "required"
+                },
+                messages: {
+                    UNPersonalNumber: { required: "UN Personal Number is required.", remote: "This UN number already exists." },
+                    drpClasses: "At least one class must be selected."
+                },
+
+                highlight: function(element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid'); } },
+
+                // The new, simplified errorPlacement function
+                errorPlacement: function(error, element) {
+                    if (element.next('.select2-container').length) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent().hasClass('form-floating')) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+
+                submitHandler: async function(form, event) {
+                    event.preventDefault();
+                    showLoading();
+                    await createMember();
+                    const unFileNumber = $("#UNFileNumber").val();
+
+                    form.reset();
+                    $('#drpClasses').val(null).trigger('change');
+
+                    var validator = $(form).validate();
+                    validator.resetForm(); // Using the standard reset which should now work.
+
+                    setTimeout(function() {
+                        $("#UNPersonalNumber").focus();
+                        if (event.originalEvent.submitter?.value === "AddAnother") {
+                            $("#UNFileNumber").val(unFileNumber);
+                        }
+                    }, 100);
+
+                    hideLoading();
+                }
+            });
+
+            $('#drpClasses').on('change', function() {
+                $(this).valid();
+            });
+        });
+    </script>
 }

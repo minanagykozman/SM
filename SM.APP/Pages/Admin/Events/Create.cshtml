@@ -1,64 +1,108 @@
 ﻿@page
 @model SM.APP.Pages.Admin.Events.CreateModel
 @{
+    ViewData["Title"] = "Create Event";
 }
-
-
-<div class="card shadow-lg p-4">
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0" id="lblTitle">Create Event</h4>
+</div>
+<partial name="_SuccessToastPartial" />
+<form id="eventForm" style="position:relative">
+    <div class="card shadow-lg p-4">
         <div class="row g-3 mt-2">
-            <!-- Event Name (Full Row) -->
             <div class="col-md-12">
                 <div class="form-floating">
-                    <input asp-for="Event.EventName" class="form-control" id="EventName" placeholder="Enter Event Name">
-                    <label for="EventName" asp-for="Event.EventName"></label>
+                    <input class="form-control" id="EventName" placeholder="Enter Event Name" required>
+                    <label>Event Name</label>
                 </div>
-                <span asp-validation-for="Event.EventName" class="text-danger"></span>
             </div>
         </div>
 
         <div class="row g-3 mt-2">
-            <!-- Event Start Date -->
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input asp-for="Event.EventStartDate" type="date" class="form-control" id="EventStartDate" placeholder="Select Start Date">
-                    <label for="EventStartDate" asp-for="Event.EventStartDate"></label>
+                    <input asp-for="Event.EventStartDate" type="datetime-local" class="form-control" id="EventStartDate" placeholder="Select Start Date" required>
+                    <label>Start Date</label>
                 </div>
-                <span asp-validation-for="Event.EventStartDate" class="text-danger"></span>
             </div>
-
-            <!-- Event End Date -->
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input asp-for="Event.EventEndDate" type="date" class="form-control" id="EventEndDate" placeholder="Select End Date">
-                    <label for="EventEndDate" asp-for="Event.EventEndDate"></label>
+                    <input asp-for="Event.EventEndDate" type="datetime-local" class="form-control" id="EventEndDate" placeholder="Select End Date" required>
+                    <label>End Date</label>
                 </div>
-                <span asp-validation-for="Event.EventEndDate" class="text-danger"></span>
             </div>
         </div>
 
         <div class="row g-3 mt-2">
-            <!-- Classes (Full Row) -->
             <div class="col-md-12">
-                <label for="EventClasses" class="form-label">@Html.DisplayNameFor(model => model.Event.ClassEvents)</label>
-                <select asp-for="Event.ClassEvents" class="form-select" id="EventClasses" multiple>
-                    <option value="Class1">Class 1</option>
-                    <option value="Class2">Class 2</option>
-                    <option value="Class3">Class 3</option>
-                    <option value="Class4">Class 4</option>
-                </select>
-                <span asp-validation-for="Event.ClassEvents" class="text-danger"></span>
+                <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
+                <select class="form-select" id="drpClasses" multiple required></select>
             </div>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
             <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
             <div class="d-flex gap-2">
-                <button type="submit" name="action" value="Add" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Create</button>
             </div>
         </div>
-    </form>
+    </div>
+</form>
 
-</div>
+<script>
+    const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    async function createEvent()
+    {
+        const classesDropdown = document.getElementById("drpClasses");
+            const eventName = document.getElementById("EventName").value;
+            const startDate = document.getElementById("EventStartDate").value;
+            const endDate = document.getElementById("EventEndDate").value;
+
+            // Get selected class IDs
+            const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+            const eventPayload = {
+                event: {
+                    eventID: 0,
+                    eventName: eventName,
+                    eventStartDate: startDate,
+                    eventEndDate: endDate,
+                    isActive: true
+                },
+                classes: selectedClasses
+            };
+
+            try {
+                const request = `${apiBaseUrl}/Events/CreateEvent`;
+                const response = await fetch(request, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(eventPayload)
+                });
+
+                if (!response.ok) 
+                    throw new Error("Event creation failed");
+
+                showSuccessToast("Event created successfully");
+                $('#drpClasses').val(null).trigger('change');
+                form.reset();
+
+            } catch (err) {
+                console.error("Error creating event:", err);
+            }
+    }
+    document.addEventListener("DOMContentLoaded", async function () {
+        await loadClasses(apiBaseUrl);
+
+        const form = document.getElementById("eventForm");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            await createEvent();
+        });
+    });
+</script>
+

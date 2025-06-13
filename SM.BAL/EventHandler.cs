@@ -25,6 +25,7 @@ namespace SM.BAL
                     IsActive = true
                 };
                 _dbcontext.Events.Add(ev);
+
                 _dbcontext.SaveChanges();
 
                 foreach (int classID in classIDs)
@@ -39,6 +40,59 @@ namespace SM.BAL
                 Logger.log.Error("", ex);
                 return 0;
             }
+        }
+        public int UpdateEvent(int eventID, string eventName, DateTime eventStartDate, DateTime eventEndDate, bool isActive, List<int> classIDs)
+        {
+            try
+            {
+                Event? ev = _dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Event not found");
+
+                ev.EventName = eventName;
+                ev.EventStartDate = eventStartDate;
+                ev.EventEndDate = eventEndDate;
+                ev.IsActive = isActive;
+
+                var classEvents = _dbcontext.ClassEvents.Where(e => e.EventID == eventID).ToList();
+                _dbcontext.ClassEvents.RemoveRange(classEvents);
+                _dbcontext.SaveChanges();
+
+                foreach (int classID in classIDs)
+                {
+                    _dbcontext.ClassEvents.Add(new ClassEvent() { ClassID = classID, EventID = ev.EventID });
+                }
+                _dbcontext.SaveChanges();
+                return ev.EventID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public int DeleteEvent(int eventID)
+        {
+            try
+            {
+                Event? ev = _dbcontext.Events.Where(e => e.EventID == eventID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Event not found");
+                ev.IsDeleted = true;
+
+                _dbcontext.SaveChanges();
+                return ev.EventID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public Event? GetEvent(int eventID)
+        {
+            var ev = _dbcontext.Events.Include(e => e.ClassEvents).Where(e => e.EventID == eventID).FirstOrDefault();
+            return ev;
         }
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
         {
@@ -133,7 +187,7 @@ namespace SM.BAL
         {
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
-            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsActive).ToList<Event>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsDeleted == false && e.IsActive).ToList<Event>();
         }
         public List<Event> GetEvents(string username)
         {
@@ -142,7 +196,7 @@ namespace SM.BAL
                 throw new Exception("Servant not found");
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
-            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsActive).ToList<Event>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsDeleted == false && e.IsActive).ToList<Event>();
         }
         public List<Member> GetEventRegisteredMembers(int eventID)
         {

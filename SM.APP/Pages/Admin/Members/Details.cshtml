@@ -61,11 +61,31 @@
             <!-- Member Info Tab -->
             <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
                 <div class="card shadow-lg p-4">
-                    <div class="col-md-12">
-                        <div class="form-floating">
+                    <!-- Member Image -->
+                    @if (string.IsNullOrEmpty(Model.Member.ImageURL))
+                    {
+                        <div class="text-center mb-4">
+                            <i class="fas fa-user-circle fa-5x text-secondary"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center mb-4">
+                            <img src="@Model.Member.ImageURL"
+                                 alt="Member Photo"
+                                 class="img-thumbnail shadow-sm"
+                                 style="max-height: 200px;"
+                                 onerror="this.onerror=null; this.style.display='none';" />
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-floating me-3" style="flex: 1;">
                             <input asp-for="Member.Code" class="form-control form-control-plaintext" readonly />
                             <label asp-for="Member.Code"></label>
                         </div>
+                        <a asp-page="./Edit" asp-route-id="@Model.Member.MemberID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil-square me-1"></i>Edit
+                        </a>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -567,12 +587,7 @@
     </div>
 </div>
 
-<div class="modal-footer">
-    <a asp-page="./Edit" asp-route-id="@Model.Member.MemberID" class="btn btn-primary">
-        <i class="bi bi-pencil-square me-1"></i>Edit
-    </a>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-</div>
+
 
 <script>
     // Function to show loading spinner

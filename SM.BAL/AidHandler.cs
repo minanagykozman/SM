@@ -14,7 +14,7 @@ namespace SM.BAL
 {
     public class AidHandler : HandlerBase
     {
-        public int CreateAid(Aid aid)
+        public int CreateAid(Aid aid, List<int> classIDs)
         {
             Aid aidNew = new Aid();
             aidNew.AidName = aid.AidName;
@@ -26,9 +26,70 @@ namespace SM.BAL
             aidNew.IsActive = true;
             _dbcontext.Aids.Add(aidNew);
             _dbcontext.SaveChanges();
+            foreach (int classID in classIDs)
+            {
+                _dbcontext.AidClasses.Add(new AidClass() { ClassID = classID, AidID = aidNew.AidID });
+            }
+
+            _dbcontext.SaveChanges();
             return aidNew.AidID;
         }
+        public int UpdateAid(Aid aidToUpdate, List<int> classIDs)
+        {
+            try
+            {
+                Aid? ev = _dbcontext.Aids.Where(e => e.AidID == aidToUpdate.AidID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Aid not found");
 
+                ev.AidDate = aidToUpdate.AidDate;
+                ev.AidName = aidToUpdate.AidName;
+                ev.CostPerPerson = aidToUpdate.CostPerPerson;
+                ev.Components = aidToUpdate.Components;
+                ev.PlannedMembersCount = aidToUpdate.PlannedMembersCount;
+                ev.IsActive = aidToUpdate.IsActive; ;
+                ev.TotalCost = aidToUpdate.TotalCost;
+
+                var classAids= _dbcontext.AidClasses.Where(e => e.AidID == aidToUpdate.AidID).ToList();
+                _dbcontext.AidClasses.RemoveRange(classAids);
+                _dbcontext.SaveChanges();
+
+                foreach (int classID in classIDs)
+                {
+                    _dbcontext.AidClasses.Add(new AidClass() { ClassID = classID, AidID = ev.AidID});
+                }
+                _dbcontext.SaveChanges();
+                return ev.AidID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public int DeleteAid(int aidID)
+        {
+            try
+            {
+                var ev = _dbcontext.Aids.Where(e => e.AidID == aidID).FirstOrDefault();
+                if (ev == null)
+                    throw new Exception("Event not found");
+                ev.IsDeleted = true;
+
+                _dbcontext.SaveChanges();
+                return ev.AidID;
+            }
+            catch (Exception ex)
+            {
+                Logger.log.Error("", ex);
+                return 0;
+            }
+        }
+        public Aid? GetAid(int aidID)
+        {
+            var ev = _dbcontext.Aids.Include(e => e.AidClasses).Where(e => e.AidID == aidID).FirstOrDefault();
+            return ev;
+        }
         public AidStatus CheckMemberStatus(int aidID, string memberCode, out Member member)
         {
             Member? lmember = GetMember(memberCode);
@@ -96,7 +157,7 @@ namespace SM.BAL
                 throw new Exception("Servant not found");
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> aids = _dbcontext.AidClasses.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.AidID).ToList<int>();
-            return _dbcontext.Aids.Where(e => aids.Contains(e.AidID) && e.IsActive).ToList();
+            return _dbcontext.Aids.Where(e => aids.Contains(e.AidID) && e.IsActive).OrderBy(a => a.AidDate).ToList();
         }
     }
 }

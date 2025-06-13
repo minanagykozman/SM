@@ -14,6 +14,7 @@ namespace SM.DAL.DataModel
         public DateTime EventStartDate { get; set; }
         public DateTime EventEndDate { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
         public int EventRegistrationCount
         {
             get
@@ -21,6 +22,18 @@ namespace SM.DAL.DataModel
                 if (EventRegistrations == null)
                     return 0;
                 return EventRegistrations.Count;
+            }
+        }
+        public List<int> ClassesIDs
+        {
+            get
+            {
+                if (ClassEvents == null)
+                    return new List<int>();
+                else
+                {
+                    return ClassEvents.Select(c => c.ClassID).ToList();
+                }
             }
         }
         [JsonIgnore]

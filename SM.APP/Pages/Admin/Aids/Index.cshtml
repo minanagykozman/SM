@@ -1,0 +1,185 @@
+﻿@page
+@model SM.APP.Pages.Admin.Aids.IndexModel
+@{
+    ViewData["Title"] = "Aids";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Aids</h4>
+    <a asp-page="Create" class="btn btn-success">Create</a>
+</div>
+<partial name="_DeleteModalPartial" />
+<partial name="_LoadingPartial" />
+<div class="d-none d-md-block" id="container">
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-hover table-striped align-middle" id="dataTable">
+            <thead class="table-primary">
+                <tr>
+                    <th onclick="sortTable(0,this)">
+                        Aid Name
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Filter">
+                    </th>
+                    <th onclick="sortByDate(1,this)">
+                        Aid Date
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(2,this)">
+                        Components
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(3,this)">
+                        Cost Per Person
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(4,this)">
+                        Total Cost
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(5,this)">
+                        Planned Members
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(6,this)">
+                        Actual Members
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Filter">
+                    </th>
+                    <th onclick="sortTable(7,this)">
+                        Active
+                        <i class="fa-solid fa-sort"></i>
+                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Yes/No">
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aids will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<partial name="_MobileViewPartial" />
+
+<!-- Action Menu Template (hidden) -->
+<div id="actionMenuTemplate" class="d-none">
+    <div class="dropdown">
+        <button class="btn btn-link text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item edit-btn" href="#">Edit</a></li>
+            <li><a class="dropdown-item delete-btn" href="#">Delete</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    async function loadAids() {
+        showLoading();
+        const request = apiBaseUrl+'/Aids/GetAids';
+        const response = await fetch(request, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+        });
+        const aids = await response.json();
+
+        const tbody = document.querySelector('#dataTable tbody');
+        tbody.innerHTML = '';
+        const mobileList = document.getElementById("mobileList");
+        mobileList.innerHTML = ""; // Clear existing list items
+        aids.forEach(aid => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${aid.aidName}</td>
+                <td>${formatDate(aid.aidDate)}</td>
+                <td>${aid.components}</td>
+                <td>${aid.costPerPerson}</td>
+                <td>${aid.totalCost}</td>
+                <td>${aid.plannedMembersCount}</td>
+                <td>${aid.actualMembersCount}</td>
+                <td>${aid.isActive ? 'Yes' : 'No'}</td>
+                <td class="text-end"></td>
+            `;
+
+            const actionCell = row.querySelector('td:last-child');
+            const menu = document.querySelector('#actionMenuTemplate').cloneNode(true);
+            menu.classList.remove('d-none');
+            menu.id = '';
+            actionCell.appendChild(menu);
+
+            const editBtn = menu.querySelector('.edit-btn');
+            const deleteBtn = menu.querySelector('.delete-btn');
+
+            editBtn.href = `/Admin/Aids/Edit?aidID=${aid.aidID}`;
+            deleteBtn.addEventListener('click', () => deleteAid(aid));
+            tbody.appendChild(row);
+
+            const aidJson = JSON.stringify(aid).replace(/"/g, '&quot;');
+            const listItem = document.createElement("div");
+            listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start", "position-relative");
+            listItem.innerHTML = `
+            <div class="dropdown position-absolute top-0 end-0 m-2">
+            <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+               <i class="fas fa-ellipsis-v"></i>
+            </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/Admin/Aids/Edit?aidID=${aid.aidID}">Edit</a></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="deleteAid(${aidJson})">Delete</a></li>
+              </ul>
+            </div>
+            <h5 class="mb-1 text-primary">
+                <a href="/Admin/Aids/Edit?aidID=${aid.aidID}" >${aid.aidName}</a>
+            </h5>
+            <p class="mb-1"><strong>Start Date:</strong> ${formatDate(aid.aidDate)}</p>
+            <p class="mb-1"><strong>Components:</strong> ${aid.components}</p>
+            <p class="mb-1"><strong>Components:</strong> ${aid.costPerPerson}</p>
+            <p class="mb-1"><strong>Total Cost:</strong> ${aid.totalCost}</p>
+            <p class="mb-1"><strong>Planned Members:</strong> ${aid.plannedMembersCount}</p>
+            <p class="mb-1"><strong>Actual Members:</strong> ${aid.actualMembersCount}</p>
+            <p class="mb-1"><strong>Active:</strong> ${aid.isActive ? 'Yes' : 'No'}</p>
+        `;
+
+        mobileList.appendChild(listItem);
+        });
+        hideLoading();
+    }
+
+    async function deleteAid(aid) {
+        let message='Are you sure you want to delete aid '+aid.aidName+'?';
+
+        showDeleteModal('Delete Aid',message,aid.aidID);
+    }
+    async function btnDelete_click(){
+        let aidID=document.getElementById("ID").value;
+
+        try {
+                const request = `${apiBaseUrl}/Aids/DeleteAid`;
+                const response = await fetch(request, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(aidtID)
+                });
+                if (!response.ok) throw new Error("Aid deletion failed");
+                closeDeleteModal();
+                showSuccessToast("Aid deleted successfully");
+                await loadAids();
+                }
+                catch (err) {
+                console.error("Error creating event:", err);
+            }
+
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAids);
+</script>

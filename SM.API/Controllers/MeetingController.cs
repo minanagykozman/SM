@@ -14,7 +14,7 @@ namespace SM.API.Controllers
     public class MeetingController(ILogger<MeetingController> logger) : SMControllerBase(logger)
     {
 
-        [HttpGet("GetClasses")]
+        [HttpGet("GetServantClasses")]
         public ActionResult<List<Class>> GetServantClasses()
         {
             try

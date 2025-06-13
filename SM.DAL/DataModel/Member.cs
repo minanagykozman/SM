@@ -42,6 +42,7 @@ namespace SM.DAL.DataModel
         public bool IsActive { get; set; }
         [Display(Name = "Image Reference")]
         public string? ImageReference { get; set; }
+        public string? S3ImageKey { get; set; }
         [Display(Name = "Card Status")]
         [MaxLength(20)]
         public string? CardStatus { get; set; }
@@ -56,6 +57,7 @@ namespace SM.DAL.DataModel
         public int? CreatedBy { get; set; } = null;
         public string? ModifiedLog { get; set; } = null;
         public string? VisitationNotes { get; set; } = null;
+        public bool IsDeleted { get; set; } = false;
         public int Age
         {
             get
@@ -78,6 +80,16 @@ namespace SM.DAL.DataModel
             get
             {
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
+            }
+        }
+        public List<int> ClassesIDs
+        {
+            get
+            {
+                if (ClassMembers == null)
+                    return new List<int>();
+                else
+                    return ClassMembers.Select(c => c.ClassID).ToList();
             }
         }
         public CardStatus? CardStatusDisplay
