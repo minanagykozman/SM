@@ -37,13 +37,10 @@ namespace SM.API.Controllers
             _s3Client = s3Client;
             _httpClient = new HttpClient();
 
-            // --- Load fonts ONCE in the constructor for efficiency ---
-            // This reads the font files directly from your project. No system installation needed.
-            // Ensure the paths are correct relative to your running application's directory.
             _fontCollection = new FontCollection();
-            // Assuming the 'fonts' folder is in the root of your SM.APP project
-            _dubaiFamily = _fontCollection.Add("fonts/Dubai-Regular.ttf");
-            _bahnschriftFamily = _fontCollection.Add("fonts/bahnschrift.ttf");
+            var fontPath = Path.Combine(AppContext.BaseDirectory, "fonts");
+            _dubaiFamily = _fontCollection.Add(Path.Combine(fontPath, "Dubai-Regular.ttf"));
+            _bahnschriftFamily = _fontCollection.Add(Path.Combine(fontPath, "bahnschrift.ttf"));
         }
         [HttpPost("generate-cards")]
         public async Task<IActionResult> GenerateMemberCards([FromBody] List<int> memberIDs)
