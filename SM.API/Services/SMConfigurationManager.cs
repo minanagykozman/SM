@@ -65,6 +65,16 @@ namespace SM.API.Services
                     return Environment.GetEnvironmentVariable("S3Name") ?? string.Empty;
             }
         }
+        public static string BaseImageURL
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["BaseImageURL"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("BaseImageURL") ?? string.Empty;
+            }
+        }
         public static bool IsDevelopment
         {
             get

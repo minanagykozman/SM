@@ -28,4 +28,23 @@ RUN dotnet publish "./SM.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+USER root
+
+# Install fontconfig which manages fonts on the system. --no-install-recommends keeps the image lean.
+RUN apt-get update && apt-get install -y --no-install-recommends fontconfig
+
+# Create a standard directory for the custom fonts
+RUN mkdir -p /usr/share/fonts/truetype/custom
+
+# IMPORTANT: This copies from a 'fonts' folder inside your SM.APP project directory.
+# Make sure you have created this folder and placed your .ttf files inside it.
+COPY SM.API/fonts/ /usr/share/fonts/truetype/custom/
+
+# Rebuild the font cache so the system recognizes the new fonts
+RUN fc-cache -f -v
+
+# Switch back to the user defined in the base image for security
+USER $APP_UID
+# -------------------- FONT INSTALLATION END ----------------------
 ENTRYPOINT ["dotnet", "SM.API.dll"]

@@ -31,6 +31,11 @@ namespace SM.BAL
         {
             return _dbcontext.Members.Include(m => m.ClassMembers).First(m => m.MemberID == memberID);
         }
+        public List<Member> GetMembersCardData(List<int> memberIDs)
+        {
+            return _dbcontext.Members.Where(m=>memberIDs.Contains(m.MemberID)).ToList();
+        }
+
         public void UpdateMember(int memberID, string code,
             string? unFirstName,
             string? unLastName,
