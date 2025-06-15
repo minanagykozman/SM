@@ -109,18 +109,11 @@ namespace SM.API.Controllers
         /// </summary>
         private async Task<Bitmap> DownloadImageAsync(string imageUrl)
         {
-            try
+            var response = await _httpClient.GetAsync(imageUrl);
+            response.EnsureSuccessStatusCode();
+            using (var stream = await response.Content.ReadAsStreamAsync())
             {
-                var response = await _httpClient.GetAsync(imageUrl);
-                response.EnsureSuccessStatusCode();
-                using (var stream = await response.Content.ReadAsStreamAsync())
-                {
-                    return new Bitmap(stream);
-                }
-            }
-            catch
-            {
-                return null; // Return null if download fails
+                return new Bitmap(stream);
             }
         }
 
@@ -223,7 +216,7 @@ namespace SM.API.Controllers
             }
             return fullName;
         }
-    
+
 
 
 
