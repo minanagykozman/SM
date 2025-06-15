@@ -3,17 +3,20 @@ using Amazon.S3.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
+using SixLabors.Fonts;
 using SM.API.Services;
 using SM.BAL;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
+
 using System.IO.Compression;
-using System.Net.Http;
-using static SM.API.Controllers.EventsController;
-using static SM.BAL.EventHandler;
+
 using static SM.BAL.MemberHandler;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+
 
 namespace SM.API.Controllers
 {
@@ -24,11 +27,23 @@ namespace SM.API.Controllers
     {
         private readonly IAmazonS3 _s3Client;
         private readonly HttpClient _httpClient;
+        // --- ImageSharp Font Management ---
+        private readonly FontCollection _fontCollection;
+        private readonly FontFamily _dubaiFamily;
+        private readonly FontFamily _bahnschriftFamily;
         public MemberImagesController(ILogger<SMControllerBase> logger, IAmazonS3 s3Client)
         : base(logger)
         {
             _s3Client = s3Client;
             _httpClient = new HttpClient();
+
+            // --- Load fonts ONCE in the constructor for efficiency ---
+            // This reads the font files directly from your project. No system installation needed.
+            // Ensure the paths are correct relative to your running application's directory.
+            _fontCollection = new FontCollection();
+            // Assuming the 'fonts' folder is in the root of your SM.APP project
+            _dubaiFamily = _fontCollection.Add("fonts/Dubai-Regular.ttf");
+            _bahnschriftFamily = _fontCollection.Add("fonts/bahnschrift.ttf");
         }
         [HttpPost("generate-cards")]
         public async Task<IActionResult> GenerateMemberCards([FromBody] List<int> memberIDs)
@@ -58,17 +73,20 @@ namespace SM.API.Controllers
             try
             {
                 // Download the base card image ONCE.
-                Bitmap baseCardTemplate = await DownloadImageAsync(SMConfigurationManager.BaseImageURL);
-                if (baseCardTemplate == null)
+                using (Image baseCardTemplate = await DownloadImageAsync(SMConfigurationManager.BaseImageURL))
                 {
-                    return StatusCode(500, "Failed to download the base card template from S3.");
+                    if (baseCardTemplate == null)
+                    {
+                        return StatusCode(500, "Failed to download the base card template from S3.");
+                    }
+
+                    foreach (var member in members)
+                    {
+                        await GenerateCard(member, baseCardTemplate, tempDirectory);
+                    }
                 }
 
-                // --- Step 3: Generate Each Card ---
-                foreach (var member in members)
-                {
-                    await GenerateCard(member, baseCardTemplate, tempDirectory);
-                }
+                
 
                 // --- Step 4: Zip the Generated Images ---
                 zipFilePath = Path.Combine(Path.GetTempPath(), $"Generated_IDs_{Guid.NewGuid()}.zip");
@@ -107,108 +125,89 @@ namespace SM.API.Controllers
         /// <summary>
         /// Downloads an image from a given URL and returns it as a Bitmap.
         /// </summary>
-        private async Task<Bitmap> DownloadImageAsync(string imageUrl)
+        /// <summary>
+        /// Downloads an image from a given URL and returns it as an ImageSharp Image object.
+        /// </summary>
+        private async Task<Image> DownloadImageAsync(string imageUrl)
         {
             var response = await _httpClient.GetAsync(imageUrl);
             response.EnsureSuccessStatusCode();
             using (var stream = await response.Content.ReadAsStreamAsync())
             {
-                return new Bitmap(stream);
+                // Use ImageSharp's loader
+                return await Image.LoadAsync(stream);
             }
         }
 
         /// <summary>
-        /// Generates a single card image and saves it to the specified output directory.
+        /// Generates a single card image using ImageSharp and saves it to the output directory.
         /// </summary>
-        private async Task GenerateCard(Member member, Bitmap baseCardTemplate, string outputDirectory)
+        private async Task GenerateCard(Member member, Image baseCardTemplate, string outputDirectory)
         {
-            // Download the member's personal photo
-            using (Bitmap personalPhoto = await DownloadImageAsync(member.ImageURL))
+            using (Image personalPhoto = await DownloadImageAsync(member.ImageURL))
             {
-                if (personalPhoto == null) return; // Skip card if photo download fails
+                if (personalPhoto == null) return;
 
                 string name = TrimName(member.FullName, 17);
                 string id = member.Code;
                 string outputImagePath = Path.Combine(outputDirectory, $"{id}.jpg");
 
-                // Generate QR code with the modern QRCoder library
                 byte[] qrCodeAsBytes;
                 using (var qrGenerator = new QRCodeGenerator())
                 using (var qrCodeData = qrGenerator.CreateQrCode(id, QRCodeGenerator.ECCLevel.Q))
                 using (var qrCode = new PngByteQRCode(qrCodeData))
                 {
-                    // Using 25 pixels per module as per original code
                     qrCodeAsBytes = qrCode.GetGraphic(25, new byte[] { 0, 0, 0 }, new byte[] { 255, 255, 255 });
                 }
 
-                // Convert byte array to Bitmap for drawing
-                using (var ms = new MemoryStream(qrCodeAsBytes))
-                using (var qrCodeImage = new Bitmap(ms))
-                // Clone the base template to create the final card for this member
-                using (Bitmap finalCard = new Bitmap(baseCardTemplate))
+                using (var qrCodeImage = Image.Load(qrCodeAsBytes))
+                // --- FIXED ---
+                // Clone the base template AND apply all drawing mutations in a single operation
+                using (var finalCard = baseCardTemplate.Clone(ctx =>
                 {
-                    // --- YOUR PRECISE DRAWING LOGIC STARTS HERE ---
+                    // Resize personal photo before drawing
+                    personalPhoto.Mutate(p => p.Resize(1150, 1150));
 
-                    // Calculate the position to center the overlay image
-                    int qrCodeX = (finalCard.Width - qrCodeImage.Width) / 2;
-                    int mid = (finalCard.Height - qrCodeImage.Height) / 2;
-                    int qrCodeY = mid + 1100;
+                    var arFont = _dubaiFamily.CreateFont(150, FontStyle.Regular);
+                    var enFont = _bahnschriftFamily.CreateFont(140, FontStyle.Regular);
 
-                    // Create a graphics object to modify the base image
-                    using (Graphics graphics = Graphics.FromImage(finalCard))
-                    {
-                        // Draw Personal Photo
-                        int personalImageX = (finalCard.Width - 1060) / 2;
-                        graphics.DrawImage(personalPhoto, personalImageX, 600, 1150, 1150);
+                    // --- Draw Images ---
+                    int personalImageX = (baseCardTemplate.Width - 1060) / 2;
+                    ctx.DrawImage(personalPhoto, new Point(personalImageX, 600), 1f);
 
-                        // Draw the QR Code image onto the final card at the calculated position
-                        graphics.DrawImage(qrCodeImage, qrCodeX, qrCodeY, qrCodeImage.Width, qrCodeImage.Height);
+                    int qrCodeX = (baseCardTemplate.Width - qrCodeImage.Width) / 2;
+                    int qrCodeY = (baseCardTemplate.Height / 2) - (qrCodeImage.Height / 2) + 1100;
+                    ctx.DrawImage(qrCodeImage, new Point(qrCodeX, qrCodeY), 1f);
 
-                        // NOTE: For custom fonts to work on a server (like your EC2 instance),
-                        // they must be installed on the operating system. If they are not present,
-                        // the system may substitute a default font.
-                        using (Font arFont = new Font("Dubai", 150, FontStyle.Regular, GraphicsUnit.Pixel))
-                        using (Font enFont = new Font("Bahnschrift", 140, FontStyle.Regular, GraphicsUnit.Pixel))
-                        using (SolidBrush textBrush = new SolidBrush(Color.DarkGreen))
-                        {
-                            // Measure text widths to center-align
-                            SizeF nameSize = graphics.MeasureString(name, arFont);
-                            SizeF idSize = graphics.MeasureString(id, enFont);
+                    // --- Text Measurement and Drawing ---
+                    var nameBounds = TextMeasurer.MeasureBounds(name, new TextOptions(arFont));
+                    var idBounds = TextMeasurer.MeasureBounds(id, new TextOptions(enFont));
 
-                            // Calculate text positions
-                            int nameX = (finalCard.Width - (int)nameSize.Width) / 2;
-                            int nameY = mid + qrCodeImage.Height - 100;
-                            int idX = (finalCard.Width - (int)idSize.Width) / 2;
-                            int idY = nameY + (int)nameSize.Height + 15; // Place below name
+                    float nameX = (baseCardTemplate.Width - nameBounds.Width) / 2;
+                    float nameY = (baseCardTemplate.Height / 2) + (qrCodeImage.Height / 2) - 100;
 
-                            // Draw text
-                            // Note: Your original code used arFont for both. I'm preserving that.
-                            // If the 'id' needs enFont, change 'arFont' to 'enFont' in the second DrawString call.
-                            graphics.DrawString(name, arFont, textBrush, new PointF(nameX, nameY));
-                            graphics.DrawString(id, arFont, textBrush, new PointF(idX, idY));
-                        }
-                    }
+                    float idX = (baseCardTemplate.Width - idBounds.Width) / 2;
+                    float idY = nameY + nameBounds.Height + 15;
 
-                    // Save the final composite image to the temporary directory
-                    finalCard.Save(outputImagePath, ImageFormat.Jpeg);
+                    ctx.DrawText(name, arFont, Color.DarkGreen, new PointF(nameX, nameY));
+                    ctx.DrawText(id, enFont, Color.DarkGreen, new PointF(idX, idY));
+                }))
+                {
+                    // Save the final composite image asynchronously
+                    await finalCard.SaveAsJpegAsync(outputImagePath);
                 }
             }
         }
 
-        /// <summary>
-        /// Helper function to trim a name to a maximum length by removing words from the end.
-        /// </summary>
         private string TrimName(string fullName, int maxLength)
         {
             if (string.IsNullOrEmpty(fullName)) return string.Empty;
 
-            // Trim the name by removing last parts
             while (fullName.Length > maxLength)
             {
                 int lastSpaceIndex = fullName.LastIndexOf(' ');
                 if (lastSpaceIndex == -1)
                 {
-                    // If no spaces, just truncate the string
                     fullName = fullName.Substring(0, maxLength);
                     break;
                 };
