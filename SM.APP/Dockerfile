@@ -30,25 +30,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# -------------------- FONT INSTALLATION START --------------------
-# Switch to root user to install packages
-USER root
-
-# Install fontconfig which manages fonts on the system. --no-install-recommends keeps the image lean.
-RUN apt-get update && apt-get install -y --no-install-recommends fontconfig
-
-# Create a standard directory for the custom fonts
-RUN mkdir -p /usr/share/fonts/truetype/custom
-
-# IMPORTANT: This copies from a 'fonts' folder inside your SM.APP project directory.
-# Make sure you have created this folder and placed your .ttf files inside it.
-COPY SM.APP/fonts/ /usr/share/fonts/truetype/custom/
-
-# Rebuild the font cache so the system recognizes the new fonts
-RUN fc-cache -f -v
-
-# Switch back to the user defined in the base image for security
-USER $APP_UID
-# -------------------- FONT INSTALLATION END ----------------------
-
 ENTRYPOINT ["dotnet", "SM.APP.dll"]
