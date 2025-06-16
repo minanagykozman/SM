@@ -158,8 +158,6 @@ namespace SM.API.Controllers
                 }
 
                 using (var qrCodeImage = Image.Load(qrCodeAsBytes))
-                // --- FIXED ---
-                // Clone the base template AND apply all drawing mutations in a single operation
                 using (var finalCard = baseCardTemplate.Clone(ctx =>
                 {
                     // Resize personal photo before drawing
@@ -181,10 +179,10 @@ namespace SM.API.Controllers
                     var idBounds = TextMeasurer.MeasureBounds(id, new TextOptions(enFont));
 
                     float nameX = (baseCardTemplate.Width - nameBounds.Width) / 2;
-                    float nameY = (baseCardTemplate.Height / 2) + (qrCodeImage.Height / 2) - 100;
+                    float nameY = (baseCardTemplate.Height / 2) + (qrCodeImage.Height / 2);
 
                     float idX = (baseCardTemplate.Width - idBounds.Width) / 2;
-                    float idY = nameY + nameBounds.Height + 15;
+                    float idY = nameY + nameBounds.Height + 80;
 
                     ctx.DrawText(name, arFont, Color.DarkGreen, new PointF(nameX, nameY));
                     ctx.DrawText(id, enFont, Color.DarkGreen, new PointF(idX, idY));
