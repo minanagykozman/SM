@@ -15,9 +15,13 @@ COPY ["SM.API/SM.API.csproj", "SM.API/"]
 COPY ["SM.BAL/SM.BAL.csproj", "SM.BAL/"]
 COPY ["SM.DAL/SM.DAL.csproj", "SM.DAL/"]
 RUN dotnet restore "./SM.API/SM.API.csproj"
-COPY . .
 
-# --- DEBUGGING STEP: List the contents of /src to verify the build context ---
+# --- MODIFIED: Replaced 'COPY . .' with explicit copy commands for robustness ---
+COPY SM.API/ SM.API/
+COPY SM.BAL/ SM.BAL/
+COPY SM.DAL/ SM.DAL/
+
+# --- DEBUGGING STEP: This will now show us if the explicit copy worked ---
 RUN ls -laR /src
 
 # --- FIXED: Corrected work directory path ---
