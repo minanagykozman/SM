@@ -39,7 +39,7 @@ namespace SM.API.Controllers
 
             _fontCollection = new FontCollection();
             var fontPath = Path.Combine(AppContext.BaseDirectory, "fonts");
-            _dubaiFamily = _fontCollection.Add(Path.Combine(fontPath, "Dubai-Regular.ttf"));
+            _dubaiFamily = _fontCollection.Add(Path.Combine(fontPath, "DUBAI-REGULAR.TTF"));
             _bahnschriftFamily = _fontCollection.Add(Path.Combine(fontPath, "bahnschrift.ttf"));
         }
         [HttpPost("generate-cards")]
