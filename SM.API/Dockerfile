@@ -28,5 +28,5 @@ RUN dotnet publish "./SM.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=build /src/SM.APP/fonts /app/fonts
+COPY --from=build /src/SM.API/fonts /app/fonts
 ENTRYPOINT ["dotnet", "SM.API.dll"]
