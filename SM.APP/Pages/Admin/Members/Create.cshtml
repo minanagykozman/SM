@@ -124,7 +124,7 @@
 
         async function createMember() {
             const formData = new FormData();
-            const selectedClasses = $('#drpClasses').val();
+
             formData.append("UNPersonalNumber", $("#UNPersonalNumber").val());
             formData.append("UNFileNumber", $("#UNFileNumber").val());
             formData.append("UNFirstName", $("#UNFirstName").val());
@@ -138,7 +138,14 @@
             formData.append("School", $("#School").val());
             formData.append("Work", $("#Work").val());
             formData.append("Notes", $("#Notes").val());
-            formData.append("Classes", selectedClasses);
+
+            const selectedClasses = $('#drpClasses').val();
+            if (selectedClasses) {
+                selectedClasses.forEach(classId => {
+                    formData.append("Classes", classId);
+                });
+            }
+
             const fileInput = document.getElementById("ImageUpload");
             if (fileInput.files.length > 0) {
                 formData.append("ImageFile", fileInput.files[0]);

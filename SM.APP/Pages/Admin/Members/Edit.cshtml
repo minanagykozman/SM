@@ -218,7 +218,6 @@
             const id = new URLSearchParams(window.location.search).get("id");
             const formData = new FormData();
             console.info('Loading data');
-            const selectedClasses = $('#drpClasses').val();
             // Collect form values
             formData.append("MemberID", id);
             formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
@@ -238,7 +237,14 @@
             formData.append("ImageURL", document.getElementById("ImageURL").value);
             formData.append("S3ImageKey", document.getElementById("S3Key").value);
             formData.append("CardStatus", document.getElementById("CardStatus").value);
-            formData.append("Classes", selectedClasses);
+
+            const selectedClasses = $('#drpClasses').val();
+            if (selectedClasses) {
+                selectedClasses.forEach(classId => {
+                    formData.append("Classes", classId);
+                });
+            }
+
             const fileInput = document.getElementById("ImageUpload");
             if (fileInput.files.length > 0) {
                 formData.append("ImageFile", fileInput.files[0]);
@@ -316,8 +322,6 @@
                 }
             });
 
-            // --- STEP 2: LOAD DATA ASYNCHRONOUSLY ---
-            // Now that the validator is ready, we can load the data.
             async function initializePage() {
                 var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
                 showLoading();
