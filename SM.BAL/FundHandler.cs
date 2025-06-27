@@ -40,7 +40,7 @@ namespace SM.BAL
         }
 
         // Get funds grouped by status for workflow board
-        public object GetFundsByStatus(int? assigneeId, string username)
+        public object GetFundsByStatus(int? assigneeId, string? status, string? searchTerm, string username)
         {
             var servant = GetServantByUsername(username);
             var query = _dbcontext.MemberFunds
@@ -57,6 +57,19 @@ namespace SM.BAL
             else if (assigneeId.HasValue)
             {
                 query = query.Where(f => f.ServantID == assigneeId.Value);
+            }
+
+            // Status filtering
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<FundStatus>(status, out var statusEnum))
+            {
+                query = query.Where(f => f.Status == statusEnum);
+            }
+
+            // Search term filtering
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(f => f.Member.FullName.Contains(searchTerm) || 
+                                       f.RequestDescription.Contains(searchTerm));
             }
 
             var funds = query.OrderByDescending(f => f.RequestDate).ToList();
@@ -116,7 +129,8 @@ namespace SM.BAL
                     FundCategory = request.FundCategory ?? "Others",
                     Status = FundStatus.Open,
                     RequestDate = DateTime.Now,
-                    ApproverNotes = request.ApproverNotes ?? string.Empty
+                    ApproverNotes = request.ApproverNotes ?? string.Empty,
+                    ApprovedAmount = 0 
                 };
 
                 _dbcontext.MemberFunds.Add(fund);
@@ -245,7 +259,7 @@ namespace SM.BAL
 
             if (!string.IsNullOrEmpty(request.ApproverNotes))
             {
-                var servant = GetServantByUsername(username);
+                var servant = GetServantByUsername(username); 
                 var timestamp = CurrentTime.ToString("yyyy-MM-dd HH:mm");
                 var noteEntry = $"[{timestamp} - {servant.ServantName}]: {request.ApproverNotes}";
 
@@ -309,7 +323,7 @@ namespace SM.BAL
         public string RequestDescription { get; set; } = string.Empty;
         public int ServantID { get; set; }
         public string? ApproverNotes { get; set; }
-        public decimal RequestedAmount { get; set; }
+        public decimal? RequestedAmount { get; set; }
         public string? FundCategory { get; set; }
     }
 

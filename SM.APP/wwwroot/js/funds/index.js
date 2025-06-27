@@ -53,14 +53,83 @@ class FundManager {
         $('#createFundBtn').on('click', () => this.showCreateModal());
         $('#saveFundBtn').on('click', () => this.saveFund());
 
-        // Member lookup
-        $('#memberCode').on('input', this.debounce((e) => this.lookupMember(e.target.value), 300));
-        $('#memberCode').on('blur', (e) => this.validateMember(e.target.value));
-
-        // Form validation
-        $('#createFundForm input, #createFundForm select, #createFundForm textarea').on('change', () => {
-            this.validateForm();
+        // Form submit handler
+        $('#createFundForm').on('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission
+            this.saveFund(); // Call our custom save method
         });
+
+        // Reset modal when dismissed
+        $('#createFundModal').on('hidden.bs.modal', () => this.resetCreateModal());
+
+        // Member lookup - modified to support dropdown search
+        $('#memberCode').on('input', this.debounce((e) => this.searchMembers(e.target.value), 300));
+        $('#memberCode').on('blur', (e) => {
+            // Delay hiding dropdown to allow for click events
+            setTimeout(() => this.hideSearchResults(), 200);
+        });
+        $('#memberCode').on('focus', () => {
+            if ($('#memberCode').val().length >= 2) {
+                this.searchMembers($('#memberCode').val());
+            }
+        });
+
+        // Search and Scan buttons - using standardized QR scanner approach
+        $('#btnSearchMember').on('click', () => this.searchMembersManually());
+        
+        // Use standardized QR scanner implementation
+        const scanButton = document.getElementById("btnScanQR");
+        const qrScannerContainer = document.getElementById("qrScannerContainer");
+        const stopScanButton = document.getElementById("btnStopScan");
+        
+        if (scanButton) {
+            let html5QrCode;
+            scanButton.addEventListener("click", () => {
+                qrScannerContainer.classList.remove("d-none");
+
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" }, // Use back camera
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    (decodedText) => {
+                        // Set the decoded text and search for members
+                        $('#memberCode').val(decodedText);
+                        this.searchMembers(decodedText);
+
+                        html5QrCode.stop();
+                        qrScannerContainer.classList.add("d-none");
+                    },
+                    (errorMessage) => {
+                        console.warn("QR Code scan error: ", errorMessage);
+                    }
+                ).catch((err) => {
+                    console.error("QR Code scanning failed: ", err);
+                    this.showError('Failed to start QR scanner. Please try again.');
+                    qrScannerContainer.classList.add("d-none");
+                });
+            });
+            
+            // Stop scanning
+            stopScanButton.addEventListener("click", () => {
+                if (html5QrCode) {
+                    html5QrCode.stop();
+                }
+                qrScannerContainer.classList.add("d-none");
+            });
+        }
+
+        // Click outside to hide dropdown
+        $(document).on('click', (e) => {
+            if (!$(e.target).closest('#memberCode, #memberSearchResults').length) {
+                this.hideSearchResults();
+            }
+        });
+
+        // Form validation - removed automatic validation on change events
+        // Validation now only happens on form submission
     }
 
     setupViewToggle() {
@@ -91,13 +160,25 @@ class FundManager {
             this.showLoading(true);
             
             const params = new URLSearchParams();
-            // Add any current filters to the board view request
+            
+            // Add all current filters to the board view request
             const assigneeFilter = document.getElementById('assigneeFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.getElementById('searchTerm');
+            
             if (assigneeFilter && assigneeFilter.value) {
                 params.set('assigneeId', assigneeFilter.value);
             }
             
-            const url = `${apiBaseUrl}/api/Fund/by-status?${params}`;
+            if (statusFilter && statusFilter.value) {
+                params.set('status', statusFilter.value);
+            }
+            
+            if (searchInput && searchInput.value) {
+                params.set('searchTerm', searchInput.value);
+            }
+            
+            const url = `${apiBaseUrl}/api/Fund/status?${params}`;
             
             const response = await fetch(url, {
                 credentials: 'include'
@@ -256,59 +337,102 @@ class FundManager {
         window.location.href = `${window.location.pathname}?${params}`;
     }
 
-    async lookupMember(memberCode) {
-        const memberInfo = $('#memberInfo');
+    async searchMembers(query) {
+        const searchResults = $('#memberSearchResults');
         
-        if (!memberCode || memberCode.length < 2) {
-            memberInfo.hide();
+        if (!query || query.length < 2) {
+            this.hideSearchResults();
+            this.clearMemberSelection();
             return;
         }
 
         try {
-            const response = await fetch(`${apiBaseUrl}/Member/GetMemberByCode?memberCode=${encodeURIComponent(memberCode)}`, {
+            const response = await fetch(`${apiBaseUrl}/Member/SearchMembers?memberCode=${encodeURIComponent(query)}&firstName=&lastName=`, {
                 credentials: 'include'
             });
+            
             if (response.ok) {
-                const member = await response.json();
-                if (member) {
-                    memberInfo.html(`
-                        <div class="alert alert-success">
-                            <strong>${member.unFirstName} ${member.unLastName}</strong><br>
-                            <small>Member Code: ${member.code}</small>
-                        </div>
-                    `).show();
-                    
-                    // Store member ID for form submission
-                    $('#memberID').val(member.memberID);
-                } else {
-                    memberInfo.html(`
-                        <div class="alert alert-warning">
-                            Member not found
-                        </div>
-                    `).show();
-                    $('#memberID').val('');
-                }
+                const members = await response.json();
+                this.displaySearchResults(members || []);
+            } else {
+                this.hideSearchResults();
             }
         } catch (error) {
-            console.error('Error looking up member:', error);
-            memberInfo.html(`
-                <div class="alert alert-danger">
-                    Error looking up member
-                </div>
-            `).show();
+            console.error('Error searching members:', error);
+            this.hideSearchResults();
         }
     }
 
-    validateMember(memberCode) {
-        const memberInfo = $('#memberInfo');
-        const memberID = $('#memberID').val();
+    displaySearchResults(members) {
+        const searchResults = $('#memberSearchResults');
         
-        if (memberCode && !memberID) {
-            memberInfo.html(`
-                <div class="alert alert-danger">
-                    Please select a valid member
+        if (members.length === 0) {
+            searchResults.html(`
+                <div class="dropdown-item-text text-muted">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No members found
                 </div>
-            `).show();
+            `).addClass('show');
+            return;
+        }
+
+        const resultsHtml = members.map(member => `
+            <a href="#" class="dropdown-item member-option" data-member-id="${member.memberID}" 
+               data-member-code="${member.code}" data-member-name="${member.unFirstName} ${member.unLastName}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${member.unFirstName} ${member.unLastName}</strong><br>
+                        <small class="text-muted">Code: ${member.code}</small>
+                    </div>
+                    <span class="badge bg-light text-dark">${member.cardStatusDisplay || 'N/A'}</span>
+                </div>
+            </a>
+        `).join('');
+
+        searchResults.html(resultsHtml).addClass('show');
+        
+        // Add click handlers for member selection
+        searchResults.find('.member-option').on('click', (e) => {
+            e.preventDefault();
+            const memberOption = $(e.currentTarget);
+            this.selectMember({
+                memberID: memberOption.data('member-id'),
+                code: memberOption.data('member-code'),
+                name: memberOption.data('member-name')
+            });
+        });
+    }
+
+    selectMember(member) {
+        $('#memberCode').val(member.code);
+        $('#memberID').val(member.memberID);
+        
+        $('#memberInfo').html(`
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>${member.name}</strong><br>
+                <small>Member Code: ${member.code}</small>
+            </div>
+        `).show();
+        
+        this.hideSearchResults();
+    }
+
+    clearMemberSelection() {
+        $('#memberID').val('');
+        $('#memberInfo').hide();
+    }
+
+    hideSearchResults() {
+        $('#memberSearchResults').removeClass('show');
+    }
+
+    searchMembersManually() {
+        const query = $('#memberCode').val().trim();
+        if (query.length >= 1) {
+            this.searchMembers(query);
+        } else {
+            this.showError('Please enter at least 1 character to search');
         }
     }
 
@@ -317,10 +441,24 @@ class FundManager {
         $('#createFundForm')[0].reset();
         $('#memberInfo').hide();
         $('#memberID').val('');
+        this.hideSearchResults();
+        this.clearMemberSelection();
         
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('createFundModal'));
         modal.show();
+    }
+
+    resetCreateModal() {
+        $('#createFundForm')[0].reset();
+        $('#memberInfo').hide();
+        $('#memberID').val('');
+        this.hideSearchResults();
+        this.clearMemberSelection();
+        
+        $('#validationErrors').empty();
+        
+        $('#createFundForm input, #createFundForm select, #createFundForm textarea').removeClass('is-invalid is-valid');
     }
 
     async saveFund() {
@@ -329,11 +467,12 @@ class FundManager {
         }
 
         try {
+            const requestedAmountValue = $('#requestedAmount').val();
             const formData = {
                 memberID: parseInt($('#memberID').val()),
                 requestDescription: $('#requestDescription').val(),
                 servantID: parseInt($('#servantID').val()),
-                requestedAmount: parseFloat($('#requestedAmount').val()),
+                requestedAmount: requestedAmountValue ? parseFloat(requestedAmountValue) : null,
                 fundCategory: $('#fundCategory').val(),
                 approverNotes: $('#approverNotes').val()
             };
@@ -369,7 +508,7 @@ class FundManager {
         const memberID = $('#memberID').val();
         const requestDescription = $('#requestDescription').val();
         const servantID = $('#servantID').val();
-        const requestedAmount = $('#requestedAmount').val();
+        const fundCategory = $('#fundCategory').val();
 
         if (!memberID) {
             this.showError('Please select a valid member');
@@ -386,8 +525,8 @@ class FundManager {
             return false;
         }
 
-        if (!requestedAmount || parseFloat(requestedAmount) <= 0) {
-            this.showError('Please enter a valid amount');
+        if (!fundCategory) {
+            this.showError('Please select a category');
             return false;
         }
 

@@ -41,11 +41,26 @@ class FundDetailManager {
 
     bindEvents() {
         // Action buttons
-        document.getElementById('editFundBtn')?.addEventListener('click', () => this.showEditModal());
-        document.getElementById('updateStatusBtn')?.addEventListener('click', () => this.showUpdateStatusModal());
-        document.getElementById('addNotesBtn')?.addEventListener('click', () => this.showAddNotesModal());
-        document.getElementById('addNoteBtn')?.addEventListener('click', () => this.showAddNotesModal());
-        document.getElementById('deleteFundBtn')?.addEventListener('click', () => this.deleteFund());
+        document.getElementById('editFundBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showEditModal();
+        });
+        document.getElementById('updateStatusBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showUpdateStatusModal();
+        });
+        document.getElementById('addNotesBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showAddNotesModal();
+        });
+        document.getElementById('addNoteBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showAddNotesModal();
+        });
+        document.getElementById('deleteFundBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.deleteFund();
+        });
 
         // Modal save buttons
         document.getElementById('saveEditBtn')?.addEventListener('click', () => this.saveFundEdit());
@@ -283,12 +298,13 @@ class FundDetailManager {
 
     async saveFundEdit() {
         try {
+            const requestedAmountValue = document.getElementById('editRequestAmount').value;
             const formData = {
                 fundID: parseInt(document.getElementById('editFundId').value),
                 servantID: parseInt(document.getElementById('editAssigneeSelect').value),
                 fundCategory: document.getElementById('editFundCategory').value,
                 requestDescription: document.getElementById('editRequestDescription').value,
-                requestedAmount: parseFloat(document.getElementById('editRequestAmount').value),
+                requestedAmount: requestedAmountValue ? parseFloat(requestedAmountValue) : null,
                 approverNotes: document.getElementById('editNotes').value
             };
 
@@ -424,7 +440,7 @@ class FundDetailManager {
     }
 
     formatCurrency(amount) {
-        if (!amount) return '$0.00';
+        if (!amount && amount !== 0) return 'Not specified';
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD'

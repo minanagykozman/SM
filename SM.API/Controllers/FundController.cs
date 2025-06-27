@@ -27,14 +27,14 @@ namespace SM.API.Controllers
             }
         }
 
-        // GET: api/Fund/by-status
-        [HttpGet("by-status")]
-        public IActionResult GetFundsByStatus([FromQuery] int? assigneeId)
+        // GET: api/Fund/status
+        [HttpGet("status")]
+        public IActionResult GetFundsByStatus([FromQuery] int? assigneeId, [FromQuery] string? status, [FromQuery] string? searchTerm)
         {
             try
             {
                 FundHandler fundHandler = new SM.BAL.FundHandler();
-                var fundsByStatus = fundHandler.GetFundsByStatus(assigneeId, User.Identity.Name);
+                var fundsByStatus = fundHandler.GetFundsByStatus(assigneeId, status, searchTerm, User.Identity.Name);
                 return Ok(fundsByStatus);
             }
             catch (Exception ex)

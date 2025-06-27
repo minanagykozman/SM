@@ -114,7 +114,7 @@
                                             <tr class="clickable-row" onclick="window.location.href='@Url.Page("./Detail", new { id = fund.FundID })'">
                                                 <td>@fund.Member?.FullName</td>
                                                 <td>@fund.RequestDescription</td>
-                                                <td>@fund.RequestedAmount.ToString("C")</td>
+                                                <td>@(fund.RequestedAmount?.ToString("C") ?? "Not specified")</td>
                                                 <td>@fund.FundCategory</td>
                                                 <td>
                                                     <span class="badge @GetStatusBadgeClass(fund.Status.ToString())">
@@ -169,7 +169,7 @@
                                         <p class="card-text text-muted mb-2">@fund.RequestDescription</p>
                                         <div class="row g-2 small text-muted">
                                             <div class="col-6">
-                                                <strong>Amount:</strong> @fund.RequestedAmount.ToString("C")
+                                                <strong>Amount:</strong> @(fund.RequestedAmount?.ToString("C") ?? "Not specified")
                                             </div>
                                             <div class="col-6">
                                                 <strong>Category:</strong> @fund.FundCategory
@@ -270,7 +270,7 @@
 <div class="modal fade" id="createFundModal" tabindex="-1" aria-labelledby="createFundModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="post" asp-page-handler="CreateFund">
+            <form method="post" asp-page-handler="CreateFund" id="createFundForm">
                 <div class="modal-header">
                     <h5 class="modal-title" id="createFundModalLabel">Create Fund Request</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -285,15 +285,35 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="memberCode" class="form-label">Member Code *</label>
-                                <input type="text" class="form-control" id="memberCode" name="memberCode" required 
-                                       placeholder="Enter member code">
+                                <label for="memberCode" class="form-label">Member Code</label>
+                                <div class="member-search-container">
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" class="form-control" id="memberCode" name="memberCode" 
+                                               placeholder="Enter member code or search">
+                                        <button type="button" id="btnScanQR" class="btn btn-secondary ms-2">
+                                            <i class="fas fa-qrcode"></i>
+                                        </button>
+                                        <button type="button" id="btnSearchMember" class="btn btn-primary ms-2">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="memberSearchResults" class="dropdown-menu position-absolute w-100" style="max-height: 200px; overflow-y: auto; z-index: 1050;">
+                                    </div>
+                                </div>
+                                
+                                <!-- QR Scanner Container -->
+                                <div id="qrScannerContainer" class="mt-3 d-none">
+                                    <div id="reader" style="width: 100%;"></div>
+                                    <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+                                </div>
+                                
                                 <div id="memberInfo" class="mt-2"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="servantID" class="form-label">Assign To *</label>
+                                <label for="servantID" class="form-label">Assign To</label>
                                 <select class="form-select" id="servantID" name="servantID" required>
                                     <option value="">Select Assignee</option>
                                     @foreach (var assignee in Model.AssignableServants)
@@ -307,24 +327,25 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="requestDescription" class="form-label">Request Description *</label>
+                        <label for="requestDescription" class="form-label">Request Description</label>
                         <textarea class="form-control" id="requestDescription" name="requestDescription" rows="3" required placeholder="Describe the fund request..."></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="requestedAmount" class="form-label">Amount *</label>
+                                <label for="requestedAmount" class="form-label">Amount (optional)</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
                                     <input type="number" class="form-control" id="requestedAmount" name="requestedAmount" 
-                                           step="0.01" min="0" required placeholder="0.00">
+                                           step="0.01" min="0" placeholder="0.00">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="fundCategory" class="form-label">Category</label>
-                                <select class="form-select" id="fundCategory" name="fundCategory">
+                                <select class="form-select" id="fundCategory" name="fundCategory" required>
+                                    <option value="">Select Category</option>
                                     <option value="Rent">Rent</option>
                                     <option value="ShantatBaraka">Shantat Baraka</option>
                                     <option value="Medical">Medical</option>
@@ -345,6 +366,50 @@
 </div>
 
 @section Scripts {
+    <style>
+        .member-search-container {
+            position: relative;
+        }
+        
+        #memberSearchResults {
+            top: 100%;
+            left: 0;
+            right: 0;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            background-color: #fff;
+        }
+        
+        #memberSearchResults.show {
+            display: block;
+        }
+        
+        #memberSearchResults .dropdown-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        #memberSearchResults .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        #memberSearchResults .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        #qrScannerContainer {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        
+        .member-option {
+            cursor: pointer;
+        }
+    </style>
+    
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
     </script>
