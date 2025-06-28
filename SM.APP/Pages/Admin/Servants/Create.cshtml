@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label floating-label-custom">Roles</label>
-                    <select class="form-select" id="drpRoles" name="drpRoles" multiple></select>
+                    <select class="form-select" id="drpRoles" name="drpRoles" multiple required></select>
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-4">
@@ -187,7 +187,6 @@
                             equalTo: "#Password" // Built-in rule to match password
                         },
                         Mobile: "required",
-                        drpClasses: "required",
                         drpRoles: "required"
                     },
                     messages: {
@@ -206,7 +205,6 @@
                             equalTo: "Passwords do not match."
                         },
                         Mobile: "Mobile number is required.",
-                        drpClasses: "Please select at least one class.",
                         drpRoles: "Please select at least one role."
                     },
 

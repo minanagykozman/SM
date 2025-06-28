@@ -47,7 +47,8 @@ namespace SM.BAL
                 IsActive = true
             };
             _dbcontext.Servants.Add(servant);
-            
+            _dbcontext.SaveChanges();
+
             foreach (var item in classes)
             {
                 _dbcontext.ServantClasses.Add(new ServantClass() { ClassID = item, ServantID = servant.ServantID });
