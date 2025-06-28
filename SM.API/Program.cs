@@ -50,38 +50,49 @@ else
 // Register ApplicationDbContext with the MySQL connection string
 builder.Services.AddDbContext<AppDbContext>(options =>
     AppDbContext.ConfigureDbContextOptions(options, connectionString));
-
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 var key = Encoding.UTF8.GetBytes(secretKey);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = true;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(key)
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                // Retrieve token from HttpOnly cookie
-                if (context.Request.Cookies.ContainsKey("AuthToken"))
-                {
-                    context.Token = context.Request.Cookies["AuthToken"];
-                }
-                return Task.CompletedTask;
-            }
-        };
+builder.Services.AddAuthentication(options =>
+{
+    // For any authentication, use JWTs.
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 
-    });
+    // If an unauthenticated user tries to access a protected endpoint,
+    // challenge them with the JWT scheme, which returns a 401 Unauthorized.
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+    // Use this scheme for any other default behavior.
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options => // This configures the JWT handler itself
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false; // Set to true in production
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = audience,
+        ValidIssuer = issuer,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+    // Your cookie retrieval logic remains perfectly valid
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("AuthToken"))
+            {
+                context.Token = context.Request.Cookies["AuthToken"];
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
 
 builder.Services.AddCors(options =>
 {

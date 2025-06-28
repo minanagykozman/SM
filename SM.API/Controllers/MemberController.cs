@@ -358,7 +358,7 @@ namespace SM.API.Controllers
             public string? S3Key { get; set; }
             public string? ImageURL { get; set; }
             public string? CardStatus { get; set; }
-            public List<int> Classes { get; set; }
+            public List<int>? Classes { get; set; }
         }
     }
 }
