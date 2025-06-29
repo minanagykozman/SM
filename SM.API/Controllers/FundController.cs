@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using SM.BAL;
 using SM.API.Services;
 using SM.DAL.DataModel;
+using System.Collections.Generic;
 
 namespace SM.API.Controllers
 {
@@ -20,6 +21,28 @@ namespace SM.API.Controllers
                 FundHandler fundHandler = new SM.BAL.FundHandler();
                 var funds = fundHandler.GetAllFunds(assigneeId, status, User.Identity.Name);
                 return Ok(funds);
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpGet("GetFundCategories")]
+        public ActionResult<List<string>> GetFundCategories()
+        {
+            try
+            {
+                List<string> categories = new List<string>
+                {
+                    "Food Supply",
+                    "Rent",
+                    "Devices",
+                    "Furinture",
+                    "Medical",
+                    "Education",
+                    "Others"
+                };
+                return Ok(categories);
             }
             catch (Exception ex)
             {
@@ -164,4 +187,4 @@ namespace SM.API.Controllers
             }
         }
     }
-} 
+}

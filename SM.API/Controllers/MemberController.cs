@@ -38,6 +38,23 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetAllCodes")]
+        public ActionResult<List<object>> GetAllCodes()
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    List<object> members = memberHandler.GetAllCodes();
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpGet("ValidateUNNumber")]
         public ActionResult<bool> ValidateUNNumber(string unFileNumber, int? memberID)
         {
@@ -358,7 +375,7 @@ namespace SM.API.Controllers
             public string? S3Key { get; set; }
             public string? ImageURL { get; set; }
             public string? CardStatus { get; set; }
-            public List<int> Classes { get; set; }
+            public List<int>? Classes { get; set; }
         }
     }
 }

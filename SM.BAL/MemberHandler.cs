@@ -54,7 +54,7 @@ namespace SM.BAL
             string? s3ImageKey,
             string? imageReference,
             string? cardStatus,
-            List<int> classes,
+            List<int>? classes,
             string modifiedByUserName)
         {
             Servant servant = GetServantByUsername(modifiedByUserName);
@@ -173,28 +173,39 @@ namespace SM.BAL
             var oldClasses = _dbcontext.ClassMembers.Where(cm => cm.MemberID == memberID).ToList();
 
             var oldIds = new List<int>(oldClasses.Select(m => m.ClassID));
-
-
-            var toBeDeleted = oldClasses.Where(m => !classes.Contains(m.ClassID)).ToList();
-            var toBeAdded = classes.Where(m => !oldIds.Contains(m)).ToList();
-
-            string addedClasses = string.Empty;
-            foreach (var cl in toBeAdded)
-            {
-                isChanged = true;
-                _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = memberID, ClassID = cl });
-                addedClasses += cl.ToString() + ",";
-            }
-            if (string.IsNullOrEmpty(addedClasses))
-                auditTrail.Add("Added Classes", addedClasses.TrimEnd(','));
-
             string deletedClasses = string.Empty;
-            foreach (var cl in toBeDeleted)
+            if (classes == null)
             {
-                isChanged = true;
-                addedClasses += cl.ClassID.ToString() + ",";
-                _dbcontext.ClassMembers.Remove(cl);
+                foreach (var cl in oldClasses)
+                {
+                    isChanged = true;
+                    deletedClasses += cl.ClassID.ToString() + ",";
+                    _dbcontext.ClassMembers.Remove(cl);
 
+                }
+            }
+            else
+            {
+                var toBeDeleted = oldClasses.Where(m => !classes!.Contains(m.ClassID)).ToList();
+                var toBeAdded = classes.Where(m => !oldIds.Contains(m)).ToList();
+
+                string addedClasses = string.Empty;
+                foreach (var cl in toBeAdded)
+                {
+                    isChanged = true;
+                    _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = memberID, ClassID = cl });
+                    addedClasses += cl.ToString() + ",";
+                }
+                if (string.IsNullOrEmpty(addedClasses))
+                    auditTrail.Add("Added Classes", addedClasses.TrimEnd(','));
+
+                foreach (var cl in toBeDeleted!)
+                {
+                    isChanged = true;
+                    deletedClasses += cl.ClassID.ToString() + ",";
+                    _dbcontext.ClassMembers.Remove(cl);
+
+                }
             }
             if (string.IsNullOrEmpty(deletedClasses))
                 auditTrail.Add("Deleted Classes", deletedClasses.TrimEnd(','));
@@ -211,7 +222,7 @@ namespace SM.BAL
                     EntityID = code,
                     EntityName = "Member",
                     ServantName = servant.ServantName,
-                    Timestamp=CurrentTime
+                    Timestamp = CurrentTime
                 };
                 _dbcontext.AuditTrail.Add(trail);
             }
@@ -373,12 +384,12 @@ namespace SM.BAL
             string? imageURL,
             string? s3ImageKey,
             string? imageReference,
-            List<int> classes,
+            List<int>? classes,
             string modifiedByUserName)
         {
-            if(_dbcontext.Members.Any(m=>m.UNPersonalNumber == unPersonalNumber))
+            if (_dbcontext.Members.Any(m => m.UNPersonalNumber == unPersonalNumber))
             {
-                var ex= new Exception("UN Personal number already exists!");
+                var ex = new Exception("UN Personal number already exists!");
                 ex.Source = "Show message";
                 throw ex;
             }
@@ -417,12 +428,14 @@ namespace SM.BAL
             _dbcontext.Members.Add(newMember);
             _dbcontext.SaveChanges();
 
-            foreach (var cl in classes)
+            if (classes != null)
             {
-                _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = newMember.MemberID, ClassID = cl });
+                foreach (var cl in classes)
+                {
+                    _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = newMember.MemberID, ClassID = cl });
+                }
+                _dbcontext.SaveChanges();
             }
-            _dbcontext.SaveChanges();
-
             return newMember;
         }
 
@@ -609,6 +622,11 @@ namespace SM.BAL
                 .Where(f => f.MemberID == memberId)
                 .OrderByDescending(f => f.RequestDate)
                 .ToList();
+        }
+
+        public List<object> GetAllCodes()
+        {
+            return _dbcontext.Members.OrderBy(m => m.Sequence).Select(m => new { m.MemberID, m.Code }).Cast<object>().ToList();
         }
 
         public class IamgeProperties
