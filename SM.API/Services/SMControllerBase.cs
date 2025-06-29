@@ -6,7 +6,7 @@ namespace SM.API.Services
 {
     public class SMControllerBase : ControllerBase
     {
-        private readonly ILogger<SMControllerBase> _logger;
+        internal readonly ILogger<SMControllerBase> _logger;
 
         public SMControllerBase(ILogger<SMControllerBase> logger)
         {

@@ -75,7 +75,7 @@
                 </div>
                 <div class="col-md-12">
                     <label for="drpClasses" class="form-label floating-label-custom">Classes</label>
-                    <select class="form-select" id="drpClasses" name="drpClasses" multiple required></select>
+                    <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
@@ -124,7 +124,7 @@
 
         async function createMember() {
             const formData = new FormData();
-            const selectedClasses = $('#drpClasses').val();
+
             formData.append("UNPersonalNumber", $("#UNPersonalNumber").val());
             formData.append("UNFileNumber", $("#UNFileNumber").val());
             formData.append("UNFirstName", $("#UNFirstName").val());
@@ -138,7 +138,14 @@
             formData.append("School", $("#School").val());
             formData.append("Work", $("#Work").val());
             formData.append("Notes", $("#Notes").val());
-            formData.append("Classes", selectedClasses);
+
+            const selectedClasses = $('#drpClasses').val();
+            if (selectedClasses) {
+                selectedClasses.forEach(classId => {
+                    formData.append("Classes", classId);
+                });
+            }
+
             const fileInput = document.getElementById("ImageUpload");
             if (fileInput.files.length > 0) {
                 formData.append("ImageFile", fileInput.files[0]);
@@ -192,12 +199,10 @@
                     UNFirstName: "required",
                     UNLastName: "required",
                     Gender: "required",
-                    Birthdate: "required",
-                    drpClasses: "required"
+                    Birthdate: "required"
                 },
                 messages: {
-                    UNPersonalNumber: { required: "UN Personal Number is required.", remote: "This UN number already exists." },
-                    drpClasses: "At least one class must be selected."
+                    UNPersonalNumber: { required: "UN Personal Number is required.", remote: "This UN number already exists." }
                 },
 
                 highlight: function(element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },

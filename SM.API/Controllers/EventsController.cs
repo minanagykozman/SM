@@ -53,13 +53,19 @@ namespace SM.API.Controllers
         {
             try
             {
+                Member member;
+                List<MemberClassOverview> memberClasses;
+                RegistrationStatus status;
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    Member member;
-                    RegistrationStatus status = eventHandler.CheckRegistationStatus(memberCode, eventID, out member);
-                    RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status };
-                    return Ok(response);
+                    status = eventHandler.CheckRegistationStatus(memberCode, eventID, out member);
                 }
+                using (SM.BAL.MemberHandler meetingHandler = new SM.BAL.MemberHandler())
+                {
+                    memberClasses = meetingHandler.GetMemberClassses(member.MemberID);
+                }
+                RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status, MemberClasses = memberClasses };
+                return Ok(response);
 
             }
             catch (Exception ex)
@@ -250,6 +256,7 @@ namespace SM.API.Controllers
         {
             public Member Member { get; set; }
             public RegistrationStatus Status { get; set; }
+            public List<MemberClassOverview> MemberClasses { get; set; }
         }
         public class EventAttendanceStatusResponse
         {

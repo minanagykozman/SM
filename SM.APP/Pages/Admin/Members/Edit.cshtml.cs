@@ -22,8 +22,6 @@ namespace SM.APP.Pages.Admin.Members
     [Authorize(Roles = "Admin,Servant")]
     public class EditModel(UserManager<IdentityUser> userManager, ILogger<EditModel> logger) : PageModelBase(userManager, logger)
     {
-        [BindProperty]
-        public Member Member { get; set; } = default!;
         public async Task<IActionResult> OnGetAsync()
         {
             await GetAPIToken();

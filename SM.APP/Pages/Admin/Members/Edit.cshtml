@@ -10,8 +10,10 @@
     <hr />
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
-        <form id="frmEdit" style="position:relative" class="needs-validation">
+        <form id="frmEdit" style="position:relative">
             <input type="hidden" id="S3Key" />
+            <input type="hidden" id="MemberID" name="MemberID"/>
+
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="form-floating">
@@ -21,129 +23,113 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input class="form-control" id="UNPersonalNumber" placeholder="Enter Personal Number" required />
+                        <input class="form-control" id="UNPersonalNumber" name="UNPersonalNumber" placeholder="Enter Personal Number" required />
                         <label>UN Personal Number</label>
                     </div>
-                    <span id="UNPersonalNumberError" asp-validation-for="Member.UNPersonalNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFileNumber" id="UNFileNumber" class="form-control" placeholder="Enter File Number" required />
-                        <label asp-for="Member.UNFileNumber"></label>
+                        <input id="UNFileNumber" name="UNFileNumber" class="form-control" placeholder="Enter File Number" required />
+                        <label>UN File Number</label>
                     </div>
-                    <span asp-validation-for="Member.UNFileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNFirstName" id="UNFirstName" class="form-control" placeholder="Enter First Name" required />
-                        <label asp-for="Member.UNFirstName"></label>
+                        <input id="UNFirstName" name="UNFirstName" class="form-control" placeholder="Enter First Name" required />
+                        <label>First Name</label>
                     </div>
-                    <span asp-validation-for="Member.UNFirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.UNLastName" id="UNLastName" class="form-control" placeholder="Enter Last Name" required />
-                        <label asp-for="Member.UNLastName"></label>
+                        <input id="UNLastName" name="UNLastName" class="form-control" placeholder="Enter Last Name" required />
+                        <label>Last Name</label>
                     </div>
-                    <span asp-validation-for="Member.UNLastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.Gender" id="Gender" class="form-select" required>
+                        <select  id="Gender" name="Gender" class="form-select" required>
                             <option value="">Select Gender</option>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
                         </select>
-                        <label asp-for="Member.Gender"></label>
+                        <label>Gender</label>
                     </div>
-                    <span asp-validation-for="Member.Gender" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="date" asp-for="Member.Birthdate" id="Birthdate" class="form-control" placeholder="Enter Birthdate" required />
-                        <label asp-for="Member.Birthdate"></label>
+                        <input type="date" id="Birthdate" name="Birthdate" class="form-control" placeholder="Enter Birthdate" required />
+                        <label>Birthdate</label>
                     </div>
-                    <span asp-validation-for="Member.Birthdate" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" id="Baptised" type="checkbox" asp-for="Member.Baptised" />
-                        <label class="form-check-label"> @Html.DisplayNameFor(model => model.Member.Baptised) </label>
+                        <input class="form-check-input" id="Baptised" name="Baptised" type="checkbox" />
+                        <label class="form-check-label">Baptised</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.BaptismName" id="BaptismName" class="form-control" placeholder="Enter Baptism Name" />
-                        <label asp-for="Member.BaptismName"></label>
+                        <input id="BaptismName" name="BaptismName" class="form-control" placeholder="Enter Baptism Name" />
+                        <label>Baptism Name</label>
                     </div>
-                    <span asp-validation-for="Member.BaptismName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Mobile" id="Mobile" class="form-control" placeholder="Enter Mobile" />
-                        <label asp-for="Member.Mobile"></label>
+                        <input id="Mobile" name="Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <label></label>
                     </div>
-                    <span asp-validation-for="Member.Mobile" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Nickname" id="Nickname" class="form-control" placeholder="Enter Nickname" />
-                        <label asp-for="Member.Nickname"></label>
+                        <input id="Nickname" name="Nickname" class="form-control" placeholder="Enter Nickname" />
+                        <label>Nickname</label>
                     </div>
-                    <span asp-validation-for="Member.Nickname" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input asp-for="Member.School" id="School" class="form-control" placeholder="Enter School" />
-                        <label asp-for="Member.School"></label>
-                    </div>
-                    <span asp-validation-for="Member.School" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.Work" id="Work" class="form-control" placeholder="Enter Work" />
-                        <label asp-for="Member.Work"></label>
+                        <input id="School" name="School" class="form-control" placeholder="Enter School" />
+                        <label>School</label>
                     </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input asp-for="Member.ImageURL" id="ImageURL" class="form-control" disabled />
-                        <label asp-for="Member.ImageURL"></label>
+                        <input id="Work" name="Work" class="form-control" placeholder="Enter Work" />
+                        <label>Work</label>
                     </div>
-                    <span asp-validation-for="Member.Work" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="Member.CardStatus" class="form-select" id="CardStatus">
+                        <input id="ImageURL" name="ImageURL" class="form-control" disabled />
+                        <label>Image URL</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="CardStatus">
                             <option value="MissingPhoto">Missing photo</option>
                             <option value="ReadyToPrint">Ready to print</option>
                             <option value="Printed">Printed</option>
                             <option value="Delivered">Delivered</option>
                             <option value="NotApplicable">Not applicable</option>
                         </select>
-                        <label asp-for="Member.CardStatus"></label>
+                        <label>Card Status</label>
                     </div>
-                    <span asp-validation-for="Member.CardStatus" class="text-danger"></span>
                 </div>
                 <div class="col-md-12">
                     <div class="form-floating position-relative">
                         <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
                         <label for="ImageUpload">Upload Image</label>
                     </div>
-                    <span id="ImageUploadError" class="text-danger"></span>
                 </div>
                 <div class="col-md-12">
                     <label class="form-label floating-label-custom">Classes</label>
-                    <select class="form-select" id="drpClasses" multiple required></select>
+                    <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
                 </div>
                 <div class="col-md-12">
                     <div class="form-floating">
-                        <textarea asp-for="Member.Notes" id="Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
-                        <label asp-for="Member.Notes"></label>
+                        <textarea id="Notes" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                        <label>Notes</label>
                     </div>
-                    <span asp-validation-for="Member.Notes" class="text-danger"></span>
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-4">
@@ -155,188 +141,208 @@
         </form>
     </div>
 </div>
-<script>
-    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-    function back(){
-        const code = document.getElementById("Code").value;
-        if (code) {
-            window.location.href = `/Index?memberCode=${encodeURIComponent(code)}`;
+
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+                function back() {
+            // Get the current value from the input field
+            const code = document.getElementById("Code").value;
+
+            // Log the value to the console for debugging
+            console.log("Value in 'Code' input field when back() was called:", code);
+
+            // Check if the code variable actually has a value
+            if (code && code.trim() !== '') {
+                // If it has a value, build the full URL
+                const url = `/Index?userCode=${encodeURIComponent(code)}`;
+
+                // THIS ALERT WILL PAUSE EXECUTION so you can see the URL
+                alert(`The browser will now try to redirect to this URL:\n\n${url}`);
+
+                // Perform the redirect
+                window.location.href = url;
+            } else {
+                // If it's empty, null, or just whitespace, redirect to the base Index page
+                alert("The 'Code' field is empty. Redirecting to /Index.");
+                window.location.href = '/Index';
+            }
         }
-        else {
-            window.location.href = `/Index`;
+        async function loadMemberData()
+        {
+            const id = new URLSearchParams(window.location.search).get("id");
+            if (id) {
+                try {
+                    const response = await fetch(`${apiBaseUrl}/Member/GetMember?memberID=${id}`, {
+                        method: "GET",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    if (!response.ok) throw new Error("Failed to load event data");
+                    const memberData = await response.json();
+                    const birthdate = new Date(memberData.birthdate);
+                    const formattedBirthdate = birthdate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+                    // Fill form with data
+                    document.getElementById("Code").value = memberData.code;
+                    document.getElementById("MemberID").value = memberData.memberID;
+                    document.getElementById("UNPersonalNumber").value = memberData.unPersonalNumber;
+                    document.getElementById("UNFileNumber").value = memberData.unFileNumber;
+                    document.getElementById("UNFirstName").value = memberData.unFirstName;
+                    document.getElementById("UNLastName").value = memberData.unLastName;
+                    document.getElementById("Gender").value = memberData.gender;
+                    document.getElementById("Birthdate").value = formattedBirthdate;
+                    document.getElementById("Baptised").checked = memberData.baptised;
+                    document.getElementById("Mobile").value = memberData.mobile;
+                    document.getElementById("Nickname").value = memberData.nickname;
+                    document.getElementById("BaptismName").value = memberData.baptismName;
+                    document.getElementById("School").value = memberData.school;
+                    document.getElementById("Work").value = memberData.work;
+                    document.getElementById("Notes").value = memberData.notes;
+                    document.getElementById("ImageURL").value = memberData.imageURL;
+                    document.getElementById("S3Key").value = memberData.s3ImageKey;
+                    document.getElementById("CardStatus").value = memberData.cardStatus;
+
+                    // Set selected classes
+                    const classIDs = memberData.classesIDs;
+
+                    $('#drpClasses').val(classIDs).trigger('change');
+
+                } catch (err) {
+                    console.error("Error loading event:", err);
+                }
+            }
         }
-    }
-    async function validateUNPersonalNumber() {
-            let inputField = document.getElementById("UNPersonalNumber");
-            let id = new URLSearchParams(window.location.search).get("id");
-            let personalNumber = inputField.value.trim();
-            let errorSpan = document.getElementById("UNPersonalNumberError");
-            if (!personalNumber) {
-                errorSpan.textContent = "Personal number is required.";
-                return false;
+
+        async function updateMember() {
+            const id = new URLSearchParams(window.location.search).get("id");
+            const formData = new FormData();
+            console.info('Loading data');
+            // Collect form values
+            formData.append("MemberID", id);
+            formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
+            formData.append("UNFileNumber", document.getElementById("UNFileNumber").value);
+            formData.append("UNFirstName", document.getElementById("UNFirstName").value);
+            formData.append("UNLastName", document.getElementById("UNLastName").value);
+            formData.append("Gender", document.getElementById("Gender").value);
+            formData.append("Birthdate", document.getElementById("Birthdate").value);
+            formData.append("Baptised", document.getElementById("Baptised").checked);
+            formData.append("Mobile", document.getElementById("Mobile").value);
+            formData.append("Nickname", document.getElementById("Nickname").value);
+            formData.append("BaptismName", document.getElementById("BaptismName").value);
+            formData.append("School", document.getElementById("School").value);
+            formData.append("Work", document.getElementById("Work").value);
+            formData.append("Notes", document.getElementById("Notes").value);
+            formData.append("Code", document.getElementById("Code").value);
+            formData.append("ImageURL", document.getElementById("ImageURL").value);
+            formData.append("S3ImageKey", document.getElementById("S3Key").value);
+            formData.append("CardStatus", document.getElementById("CardStatus").value);
+
+            const selectedClasses = $('#drpClasses').val();
+            if (selectedClasses) {
+                selectedClasses.forEach(classId => {
+                    formData.append("Classes", classId);
+                });
             }
 
+            const fileInput = document.getElementById("ImageUpload");
+            if (fileInput.files.length > 0) {
+                formData.append("ImageFile", fileInput.files[0]);
+            }
+            const request = `${apiBaseUrl}/Member/UpdateMemberWImage`;
             try {
-                const request = `${apiBaseUrl}/Member/ValidateUNNumber?unFileNumber=${encodeURIComponent(personalNumber)}&memberID=${id}`;
                 const response = await fetch(request, {
-                    method: "GET",
+                    method: "POST",
                     credentials: "include",
-                    headers: { "Content-Type": "application/json" }
+                    body: formData
                 });
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
+                        const errorData = await response.json();
+                        console.error("Failed to update member data:", errorData);
+                        showFailedToast("Failed to update member: " + errorData.message);
+                        return;
+                    }
 
-                if (data === true || data === "true") {
-                    errorSpan.textContent = ""; // No error
-                    return true;
-                }
-                else {
-                    errorSpan.textContent = "UN number already exists.";
-                    return false;}
-                }
-                catch (error) {
-                    errorSpan.textContent = "Validation service is unavailable.";
-                    return false;
-                }
-           }
-    async function loadMemberData()
-    {
-        const id = new URLSearchParams(window.location.search).get("id");
-        if (id) {
-            try {
-                const response = await fetch(`${apiBaseUrl}/Member/GetMember?memberID=${id}`, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" }
-                });
-
-                if (!response.ok) throw new Error("Failed to load event data");
-                const memberData = await response.json();
-                const birthdate = new Date(memberData.birthdate);
-                const formattedBirthdate = birthdate.toISOString().split('T')[0]; // "YYYY-MM-DD"
-                // Fill form with data
-                document.getElementById("Code").value = memberData.code;
-                document.getElementById("UNPersonalNumber").value = memberData.unPersonalNumber;
-                document.getElementById("UNFileNumber").value = memberData.unFileNumber;
-                document.getElementById("UNFirstName").value = memberData.unFirstName;
-                document.getElementById("UNLastName").value = memberData.unLastName;
-                document.getElementById("Gender").value = memberData.gender;
-                document.getElementById("Birthdate").value = formattedBirthdate;
-                document.getElementById("Baptised").checked = memberData.baptised;
-                document.getElementById("Mobile").value = memberData.mobile;
-                document.getElementById("Nickname").value = memberData.nickname;
-                document.getElementById("BaptismName").value = memberData.baptismName;
-                document.getElementById("School").value = memberData.school;
-                document.getElementById("Work").value = memberData.work;
-                document.getElementById("Notes").value = memberData.notes;
-                document.getElementById("ImageURL").value = memberData.imageURL;
-                document.getElementById("S3Key").value = memberData.s3ImageKey;
-                document.getElementById("CardStatus").value = memberData.cardStatus;
-
-                // Set selected classes
-                const classIDs = memberData.classesIDs;
-
-                $('#drpClasses').val(classIDs).trigger('change');
-
+                showSuccessToast("Member Updated successfully!");
             } catch (err) {
-                console.error("Error loading event:", err);
+                 console.error("Failed to submit member data:", err);
+                 showFailedToast("Failed to save member data!");
             }
         }
-    }
 
-    async function updateMember() {
-        const id = new URLSearchParams(window.location.search).get("id");
-        const formData = new FormData();
-        const classesDropdown = document.getElementById("drpClasses");
-        const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+            $(function() {
 
-        // Collect form values
-        formData.append("MemberID", id);
-        formData.append("UNPersonalNumber", document.getElementById("UNPersonalNumber").value);
-        formData.append("UNFileNumber", document.getElementById("UNFileNumber").value);
-        formData.append("UNFirstName", document.getElementById("UNFirstName").value);
-        formData.append("UNLastName", document.getElementById("UNLastName").value);
-        formData.append("Gender", document.getElementById("Gender").value);
-        formData.append("Birthdate", document.getElementById("Birthdate").value);
-        formData.append("Baptised", document.getElementById("Baptised").checked);
-        formData.append("Mobile", document.getElementById("Mobile").value);
-        formData.append("Nickname", document.getElementById("Nickname").value);
-        formData.append("BaptismName", document.getElementById("BaptismName").value);
-        formData.append("School", document.getElementById("School").value);
-        formData.append("Work", document.getElementById("Work").value);
-        formData.append("Notes", document.getElementById("Notes").value);
-        formData.append("Code", document.getElementById("Code").value);
-        formData.append("ImageURL", document.getElementById("ImageURL").value);
-        formData.append("S3ImageKey", document.getElementById("S3Key").value);
-        formData.append("CardStatus", document.getElementById("CardStatus").value);
-        formData.append("Classes", selectedClasses);
-        const fileInput = document.getElementById("ImageUpload");
-        if (fileInput.files.length > 0) {
-            formData.append("ImageFile", fileInput.files[0]);
-        }
-        const request = `${apiBaseUrl}/Member/UpdateMemberWImage`;
-        try {
-            const response = await fetch(request, {
-                method: "POST",
-                credentials: "include",
-                body: formData
+            const id = new URLSearchParams(window.location.search).get("id");
+            $("#frmEdit").validate({
+                ignore: [],
+                errorClass: "text-danger",
+                errorElement: "div",
+                rules: {
+                    UNPersonalNumber: {
+                        required: true,
+                        remote: {
+                            url: `${apiBaseUrl}/Member/ValidateUNNumber`,
+                            type: "get",
+                            data: {
+                                unFileNumber: function() { return $("#UNPersonalNumber").val(); },
+                                memberID: function() { return id; }
+                            },
+                            xhrFields: { withCredentials: true }
+                        }
+                    },
+                    Code: "required",
+                    UNFileNumber: "required",
+                    UNFirstName: "required",
+                    UNLastName: "required",
+                    Gender: "required",
+                    Birthdate: "required"
+                },
+                messages: {
+                    UNPersonalNumber: { required: "UN Personal Number is required.", remote: "This UN number already exists." }
+                },
+                highlight: function(element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid'); } },
+                errorPlacement: function(error, element) {
+                    if (element.next('.select2-container').length) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent().hasClass('form-floating')) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                submitHandler: async function(form, event) {
+                    event.preventDefault();
+                    showLoading();
+                    await updateMember();
+                    hideLoading();
+                }
             });
 
-            if (!response.ok) {
-                const error = await response.text();
-                throw new Error(error);
-            }
-
-            showSuccessToast("Member Updated successfully!");
-        } catch (err) {
-            console.error("Failed to submit form:", err);
-            throw new Error(error);
-        }
-    }
-
-
-    document.addEventListener("DOMContentLoaded", async function () {
-        showLoading();
-        await loadClasses(apiBaseUrl);
-        await loadMemberData();
-        document.getElementById("UNPersonalNumber").focus();
-
-
-        const baptisedCheckbox = document.getElementById("Baptised");
-        const baptismNameInput = document.getElementById("BaptismName");
-
-        function toggleBaptismName() {
-            baptismNameInput.disabled = !baptisedCheckbox.checked;
-        }
-
-        // Initial state
-        toggleBaptismName();
-
-        // Listen for changes
-        baptisedCheckbox.addEventListener("change", toggleBaptismName);
-        hideLoading();
-        const form = document.getElementById("frmEdit");
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            try{
+            async function initializePage() {
+                var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
                 showLoading();
-                await updateMember();
-                document.getElementById("UNPersonalNumber").focus();
+                if (typeof loadClasses === "function") { await loadClasses(apiBaseUrl); }
+                if (typeof loadMemberData === "function") { await loadMemberData(); } // This will populate the form
+
+                // Set up other page logic after data is loaded
+                const baptisedCheckbox = document.getElementById("Baptised");
+                const baptismNameInput = document.getElementById("BaptismName");
+                function toggleBaptismName() { baptismNameInput.disabled = !baptisedCheckbox.checked; }
+                toggleBaptismName();
+                baptisedCheckbox.addEventListener("change", toggleBaptismName);
+
                 hideLoading();
             }
-            catch (err) {
-            console.error("Failed to submit form:", err);
-            hideLoading();
-            showFailedToast("Failed to update member!");
-            }
-        });
 
-    });
-</script>
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+            // Call the function to load our data
+            initializePage();
+
+            // --- STEP 3: ATTACH OTHER HANDLERS ---
+            $('#drpClasses').on('change', function() {
+                $(this).valid();
+            });
+        });
+    </script>
 }

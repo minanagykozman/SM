@@ -6,7 +6,6 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 5000
 
-
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -28,4 +27,10 @@ RUN dotnet publish "./SM.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# --- NEW STRATEGY: Copy fonts DIRECTLY from the build context to the final image ---
+# This command's source path (SM.API/fonts) is relative to the root of your project
+# where you run the 'docker build' command. This is the most direct and reliable method.
+COPY SM.API/fonts /app/fonts
+
 ENTRYPOINT ["dotnet", "SM.API.dll"]

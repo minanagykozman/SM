@@ -1,0 +1,258 @@
+﻿@page
+@model SM.APP.Pages.Admin.Servants.CreateModel
+@{
+    ViewData["Title"] = "Create Servant";
+}
+<div class="container mt-4" id="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0" id="lblTitle">Create Servant</h4>
+    </div>
+    <partial name="_LoadingPartial" />
+    <partial name="_SuccessToastPartial" />
+    <form id="frmCreate" style="position:relative">
+        <div class="card shadow-lg p-4">
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="ServantName" name="ServantName" placeholder="Enter Servant Name">
+                        <label>Servant Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="Email" name="Email" placeholder="Enter E-mail Address">
+                        <label>E-mail</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="Password" name="Password" placeholder="Enter Password">
+                        <label>Password</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" placeholder="Enter Password">
+                        <label>Confirm Password</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="Mobile" name="Mobile" placeholder="Enter Mobile">
+                        <label>Mobile</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="Mobile2" name="Mobile2" placeholder="Enter Mobile">
+                        <label>Mobile 2</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label floating-label-custom">Roles</label>
+                    <select class="form-select" id="drpRoles" name="drpRoles" multiple required></select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script>
+            const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+            async function loadRoles() {
+                try {
+                    const rolesDropdown = document.getElementById("drpRoles");
+                    const request = `${apiBaseUrl}/Servants/GetSystemRoles`;
+                    const rolesResponse = await fetch(request, {
+                        method: "GET",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    if (!rolesResponse.ok) throw new Error("Failed to fetch roles.");
+                    const rolesList = await rolesResponse.json();
+
+                    // Populate the dropdown
+                    rolesDropdown.innerHTML = "";
+                    rolesList.forEach(role => {
+                        const option = document.createElement("option");
+                        option.value = role.name;
+                        option.textContent = role.name;
+                        rolesDropdown.appendChild(option);
+                    });
+
+                    $('#drpRoles').select2({
+                        placeholder: "Select roles",
+                        allowClear: true,
+                        width: '100%' // Ensures proper styling with Bootstrap
+                    });
+
+                } catch (err) {
+                    console.error("Error loading roles:", err);
+                }
+            }
+
+
+            async function createServant() {
+                const classesDropdown = document.getElementById("drpClasses");
+                const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+                const rolesDropdown = document.getElementById("drpRoles");
+                const selectedRoles = Array.from(rolesDropdown.selectedOptions).map(opt => opt.value);
+
+                const payload = {
+                    email: $("#Email").val(),
+                    password: $("#Password").val(),
+                    roles: selectedRoles,
+                    name: $("#ServantName").val(),
+                    mobile: $("#Mobile").val(),
+                    mobile2: $("#Mobile2").val(),
+                    classes: selectedClasses
+                };
+
+                try {
+                    const request = `${apiBaseUrl}/Servants/Register`;
+                    const response = await fetch(request, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                         throw new Error("Servant creation failed");
+                    }
+
+                    showSuccessToast("Servant created successfully");
+
+                    // Reset logic is now handled inside submitHandler after this function completes
+
+                } catch (err) {
+                    console.error("Error creating servant:", err);
+                    showFailedToast(err.message);
+                }
+            }
+
+            // --- Main document ready function ---
+            $(async function () {
+                showLoading();
+                await loadClasses(apiBaseUrl);
+                await loadRoles();
+                hideLoading();
+                // --- CUSTOM VALIDATION METHOD (Corrected for Razor View Engine) ---
+        $.validator.addMethod("passwordComplexity", function(value, element) {
+            // The '$' is escaped with a '\' as a precaution. This should now be completely safe.
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@\$!%*?&])[A-Za-z\d@@\$!%*?&]{8,}$/;
+
+            return this.optional(element) || passwordRegex.test(value);
+        }, "Password must be at least 8 characters, with 1 uppercase, 1 lowercase, 1 number, and 1 special character.");
+
+                // --- JQUERY VALIDATION INITIALIZATION ---
+                $("#frmCreate").validate({
+                    ignore: [], // Important for validating hidden fields if any, and for select2
+                    errorClass: "is-invalid", // Use bootstrap's invalid class
+                    validClass: "is-valid", // Use bootstrap's valid class
+                    errorElement: "div",
+
+                    rules: {
+                        ServantName: "required",
+                        Email: {
+                            required: true,
+                            email: true, // Built-in email format validation
+                            remote: {   // API validation for existing email
+                                url: `${apiBaseUrl}/Servants/CheckEmail`,
+                                type: "get",
+                                xhrFields: { withCredentials: true },
+                                data: {
+                                    email: function() { return $("#Email").val(); }
+                                }
+                            }
+                        },
+                        Password: {
+                            required: true,
+                            passwordComplexity: true // Our custom rule
+                        },
+                        ConfirmPassword: {
+                            required: true,
+                            equalTo: "#Password" // Built-in rule to match password
+                        },
+                        Mobile: "required",
+                        drpRoles: "required"
+                    },
+                    messages: {
+                        ServantName: "Servant name is required.",
+                        Email: {
+                            required: "E-mail is required.",
+                            email: "Please enter a valid e-mail address.",
+                            remote: "This email address is already in use." // Message for API check
+                        },
+                        Password: {
+                            required: "Password is required."
+                            // The complexity message is defined in addMethod
+                        },
+                        ConfirmPassword: {
+                            required: "Please confirm your password.",
+                            equalTo: "Passwords do not match."
+                        },
+                        Mobile: "Mobile number is required.",
+                        drpRoles: "Please select at least one role."
+                    },
+
+                    // --- STYLING AND ERROR PLACEMENT (As per your example) ---
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                        if ($(element).hasClass('form-select')) {
+                            $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid');
+                        }
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                         if ($(element).hasClass('form-select')) {
+                            $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        error.addClass("invalid-feedback"); // Add bootstrap class to the error div
+                        if (element.next('.select2-container').length) {
+                            error.insertAfter(element.next('.select2-container'));
+                        } else if (element.parent().hasClass('form-floating')) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    },
+
+                    // --- SUBMIT HANDLER ---
+                    submitHandler: async function(form, event) {
+                        event.preventDefault();
+                        // Optionally add a loading indicator here
+                        showLoading();
+
+                        await createServant();
+
+                        // Reset the form and validator after successful submission
+                        form.reset();
+                        $('#drpClasses').val(null).trigger('change');
+                        $('#drpRoles').val(null).trigger('change');
+
+                        var validator = $(form).validate();
+                        validator.resetForm();
+                        $('.form-control, .form-select').removeClass('is-valid');
+                        $('.select2-selection').removeClass('is-invalid');
+
+                        hideLoading();
+                    }
+                });
+            });
+    </script>
+}

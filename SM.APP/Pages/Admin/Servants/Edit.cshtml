@@ -1,0 +1,163 @@
+﻿@page
+@model SM.APP.Pages.Admin.Servants.EditModel
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0" id="lblTitle">Edit Event</h4>
+</div>
+<partial name="_SuccessToastPartial" />
+<form id="eventForm" style="position:relative">
+    <div class="card shadow-lg p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <div class="form-floating">
+                    <input class="form-control" id="EventName" placeholder="Enter Event Name" required />
+                    <label>Event Name</label>
+                </div>
+                <div class="invalid-feedback">This field is required.</div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="datetime-local" class="form-control" id="EventStartDate" placeholder="Select Start Date" required />
+                    <label>Start Date</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="datetime-local" class="form-control" id="EventEndDate" placeholder="Select End Date" required />
+                    <label>End Date</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
+                <select class="form-select" id="EventClasses" multiple required></select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="Index" class="btn btn-outline-secondary">Back to List</a>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const classesDropdown = document.getElementById("EventClasses");
+        const eventID = new URLSearchParams(window.location.search).get("eventID");
+        const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+
+        let allClasses = [];
+
+        try {
+            // Load all available classes
+            const classResponse = await fetch(`${apiBaseUrl}/Meeting/GetServantClasses`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+            allClasses = await classResponse.json();
+
+            // Populate the dropdown
+            classesDropdown.innerHTML = "";
+            allClasses.forEach(cls => {
+                const option = document.createElement("option");
+                option.value = cls.classID;
+                option.textContent = cls.className;
+                classesDropdown.appendChild(option);
+            });
+
+            $('#EventClasses').select2({
+                placeholder: "Select classes",
+                allowClear: true,
+                width: '100%'
+            });
+
+        } catch (err) {
+            console.error("Error loading class list:", err);
+        }
+
+        // Load existing event data
+        if (eventID) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/Events/GetEvent?eventID=${eventID}`, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to load event data");
+                const eventData = await response.json();
+
+                // Fill form with data
+                document.getElementById("EventName").value = eventData.eventName;
+                document.getElementById("EventStartDate").value = eventData.eventStartDate.slice(0, 16);
+                document.getElementById("EventEndDate").value = eventData.eventEndDate.slice(0, 16);
+                document.getElementById("lblTitle").textContent ='Edit Event: ' + eventData.eventName;
+
+                // Set selected classes
+                const classIDs = eventData.classesIDs;
+                
+                $('#EventClasses').val(classIDs).trigger('change');
+
+            } catch (err) {
+                console.error("Error loading event:", err);
+            }
+        }
+
+        // Submit update
+        const form = document.getElementById("eventForm");
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const eventName = document.getElementById("EventName").value;
+            const startDate = document.getElementById("EventStartDate").value;
+            const endDate = document.getElementById("EventEndDate").value;
+            const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+
+            const eventPayload = {
+                event: {
+                    eventID: parseInt(eventID),
+                    eventName: eventName,
+                    eventStartDate: startDate,
+                    eventEndDate: endDate,
+                    isActive: true
+                },
+                classes: selectedClasses
+            };
+
+            try {
+                const updateRequest = `${apiBaseUrl}/Events/UpdateEvent`;
+                const updateResponse = await fetch(updateRequest, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(eventPayload)
+                });
+
+                if (!updateResponse.ok) throw new Error("Update failed");
+
+                showSuccessToast("Event updated successfully");
+
+            } catch (err) {
+                console.error("Error updating event:", err);
+            }
+        });
+    });
+</script>
