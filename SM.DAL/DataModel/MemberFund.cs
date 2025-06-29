@@ -15,7 +15,7 @@ namespace SM.DAL.DataModel
         public string FundCategory { get; set; }
         public int ServantID { get; set; }
         public int? ApproverID { get; set; }
-        public decimal RequestedAmount { get; set; }
+        public decimal? RequestedAmount { get; set; }
         public string RequestDescription { get; set; }
         public decimal ApprovedAmount { get; set; }
         public string ApproverNotes{ get; set; }
