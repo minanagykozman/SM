@@ -38,6 +38,23 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetAllCodes")]
+        public ActionResult<List<object>> GetAllCodes()
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    List<object> members = memberHandler.GetAllCodes();
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpGet("ValidateUNNumber")]
         public ActionResult<bool> ValidateUNNumber(string unFileNumber, int? memberID)
         {

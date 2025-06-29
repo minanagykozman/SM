@@ -1,0 +1,167 @@
+﻿@page
+@model SM.APP.Pages.Funds.CreateModel
+
+@{
+    ViewData["Title"] = "Create Fund Request";
+}
+<partial name="_LoadingPartial" />
+<div class="container mt-4" id="container">
+    <h1 class="text-center">Create Fund Request</h1>
+    <hr />
+    <div class="card shadow-lg p-4">
+        <partial name="_SuccessToastPartial" />
+
+        <form id="frmCreate" style="position:relative">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label for="MemberCode" class="form-label">Member Code</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <select id="MemberCode" name="MemberCode"
+                                class="selectpicker flex-grow-1"
+                                data-live-search="true"
+                                title="Select Member"
+                                data-width="100%"
+                                required>
+                        </select>
+                        <button class="btn btn-outline-secondary d-md-none" type="button" id="btnScanQR" title="Scan QR Code">
+                            <i class="bi bi-qr-code-scan"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input id="MemberName" name="MemberName" class="form-control" disabled />
+                        <label>Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input id="FamilyMembers" class="form-control" placeholder="Enter School" disabled />
+                        <label>Family Members</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input hidden id="OldMobile" class="form-control" />
+                        <input id="Mobile" class="form-control" placeholder="Enter Mobile" />
+                        <label>Mobile</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="Category" name="Category" required>
+                            <option value="">Please Select</option>
+                            <option value="Food Supply">Food Supply</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Furniture">Furniture</option>
+                        </select>
+                        <label>Request Category</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input id="Amount" class="form-control" type="number" placeholder="Enter Requested Amount" />
+                        <label>Amount(optional)</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="AssignTo" name="AssignTo" required>
+                            <option value="">Please Select Servant</option>
+                        </select>
+                        <label>Assign To</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea id="Description" name="Description" class="form-control" placeholder="Enter Description" style="height: 100px;" required></textarea>
+                        <label>Description</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="Index" id="backToList" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+
+        async function loadMemberCodes() {
+            try {
+                const codesDropDown = $("#MemberCode");
+                const request = `${apiBaseUrl}/Member/GetAllCodes`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch member codes.");
+                const codesList = await response.json();
+
+                codesDropDown.empty();
+                codesList.forEach(m => {
+                    codesDropDown.append($('<option>', {
+                        value: m.memberID,
+                        text: m.code
+                    }));
+                });
+
+                // Refresh the picker to show the new options
+                codesDropDown.selectpicker('refresh');
+
+            } catch (err) {
+                console.error("Error loading member codes:", err);
+            }
+        }
+
+        async function getMemberDetails(memberId) {
+            if (!memberId) {
+                $("#MemberName").val('');
+                $("#Mobile").val('');
+                $("#FamilyMembers").val('');
+                return;
+            }
+            try {
+                const request = `${apiBaseUrl}/Member/GetMember?memberID=${memberId}`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+                if (!response.ok) throw new Error("Failed to fetch member details.");
+                const memberData = await response.json();
+                $("#MemberName").val(memberData.fullName);
+                $("#Mobile").val(memberData.mobile);
+                $("#Category").focus();
+            } catch (err) {
+                console.error("Error loading member details:", err);
+                $("#MemberName").val('Error loading data');
+                $("#Mobile").val('');
+                $("#FamilyMembers").val('');
+            }
+        }
+
+        $(async function() {
+            // Initialize bootstrap-select. No extra options are needed.
+            $('#MemberCode').selectpicker();
+
+            await loadMemberCodes();
+
+            // The change event still works perfectly.
+            $("#MemberCode").on('change', function() {
+                const selectedMemberId = $(this).val();
+                getMemberDetails(selectedMemberId);
+            });
+        });
+    </script>
+}

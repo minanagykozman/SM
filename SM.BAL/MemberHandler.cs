@@ -206,7 +206,7 @@ namespace SM.BAL
                     EntityID = code,
                     EntityName = "Member",
                     ServantName = servant.ServantName,
-                    Timestamp=CurrentTime
+                    Timestamp = CurrentTime
                 };
                 _dbcontext.AuditTrail.Add(trail);
             }
@@ -371,9 +371,9 @@ namespace SM.BAL
             List<int> classes,
             string modifiedByUserName)
         {
-            if(_dbcontext.Members.Any(m=>m.UNPersonalNumber == unPersonalNumber))
+            if (_dbcontext.Members.Any(m => m.UNPersonalNumber == unPersonalNumber))
             {
-                var ex= new Exception("UN Personal number already exists!");
+                var ex = new Exception("UN Personal number already exists!");
                 ex.Source = "Show message";
                 throw ex;
             }
@@ -604,6 +604,11 @@ namespace SM.BAL
                 .Where(f => f.MemberID == memberId)
                 .OrderByDescending(f => f.RequestDate)
                 .ToList();
+        }
+
+        public List<object> GetAllCodes()
+        {
+            return _dbcontext.Members.OrderBy(m => m.Sequence).Select(m => new { m.MemberID, m.Code }).Cast<object>().ToList();
         }
 
         public class IamgeProperties
