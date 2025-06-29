@@ -54,6 +54,22 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetServants")]
+        public ActionResult<List<Servant>> GetServants(bool isActive)
+        {
+            try
+            {
+                using (ServantHandler handler = new ServantHandler())
+                {
+                    var servants = handler.GetServants(isActive);
+                    return Ok(servants);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] ServantRegisterModel model)
@@ -66,7 +82,7 @@ namespace SM.API.Controllers
                 {
                     await _userManager.AddToRolesAsync(user, model.Roles);
                 }
-                using (ServantHandler handler=new ServantHandler())
+                using (ServantHandler handler = new ServantHandler())
                 {
                     var servant = handler.CreateServant(model.Name, model.Mobile, model.Mobile2, user.Id, model.Classes);
                     return Ok(servant);
@@ -91,7 +107,7 @@ namespace SM.API.Controllers
             public string Name { get; set; }
             public string Mobile { get; set; }
             public string Mobile2 { get; set; }
-           public List<int> Classes { get; set; }
+            public List<int> Classes { get; set; }
         }
     }
 }

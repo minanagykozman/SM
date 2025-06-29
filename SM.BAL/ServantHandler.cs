@@ -56,5 +56,12 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return servant;
         }
+
+        public List<Servant> GetServants(bool? isActive)
+        {
+            if (isActive.HasValue)
+                return _dbcontext.Servants.Where(s => s.IsActive).ToList();
+            return _dbcontext.Servants.ToList();
+        }
     }
 }

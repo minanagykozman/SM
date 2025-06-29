@@ -11,7 +11,7 @@
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
 
-        <form id="frmCreate" style="position:relative">
+        <form id="frmCreate" style="position:relative" class="needs-validation" novalidate>
             <div class="row g-3">
                 <div class="col-md-12">
                     <label for="MemberCode" class="form-label">Member Code</label>
@@ -27,7 +27,7 @@
                             <i class="bi bi-qr-code-scan"></i>
                         </button>
                     </div>
-                    <div class="invalid-feedback d-block"></div>
+                    <div id="memberCode-error" class="text-danger mt-1"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -52,10 +52,6 @@
                 <div class="col-md-6">
                     <div class="form-floating">
                         <select class="form-select" id="Category" name="Category" required>
-                            <option value="">Please Select</option>
-                            <option value="Food Supply">Food Supply</option>
-                            <option value="Rent">Rent</option>
-                            <option value="Furniture">Furniture</option>
                         </select>
                         <label>Request Category</label>
                     </div>
@@ -68,8 +64,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select class="form-select" id="AssignTo" name="AssignTo" required>
-                            <option value="">Please Select Servant</option>
+                        <select class="form-select" id="AssignTo" name="AssignTo" title="Select Servant" required>
                         </select>
                         <label>Assign To</label>
                     </div>
@@ -116,11 +111,65 @@
                     }));
                 });
 
-                // Refresh the picker to show the new options
                 codesDropDown.selectpicker('refresh');
-
             } catch (err) {
                 console.error("Error loading member codes:", err);
+            }
+        }
+        async function loadServants() {
+            try {
+                const servantsDropDown = $("#AssignTo");
+                const request = `${apiBaseUrl}/Servants/GetServants?isActive=true`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch member codes.");
+                const servantsList = await response.json();
+
+                servantsDropDown.empty();
+                servantsDropDown.append($('<option>', {
+                    value: "",
+                    text: "Select Servant"
+                }));
+                servantsList.forEach(m => {
+                    servantsDropDown.append($('<option>', {
+                        value: m.servantID,
+                        text: m.servantName
+                    }));
+                });
+            } catch (err) {
+                console.error("Error loading servants:", err);
+            }
+        }
+        async function loadCategories() {
+            try {
+                const servantsDropDown = $("#Category");
+                const request = `${apiBaseUrl}/api/Fund/GetFundCategories`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch categories.");
+                const servantsList = await response.json();
+
+                servantsDropDown.empty();
+                servantsDropDown.append($('<option>', {
+                    value: "",
+                    text: "Select Category"
+                }));
+                servantsList.forEach(m => {
+                    servantsDropDown.append($('<option>', {
+                        value: m,
+                        text: m
+                    }));
+                });
+            } catch (err) {
+                console.error("Error loading categories:", err);
             }
         }
 
@@ -151,16 +200,69 @@
             }
         }
 
-        $(async function() {
-            // Initialize bootstrap-select. No extra options are needed.
+        $(async function () {
+
+            showLoading();
             $('#MemberCode').selectpicker();
 
             await loadMemberCodes();
+            await loadServants();
+            await loadCategories();
+            hideLoading();
 
-            // The change event still works perfectly.
-            $("#MemberCode").on('change', function() {
+            $("#MemberCode").on('change', function () {
+                // *** THE FIX FOR CLEARING THE ERROR ***
+                // This line manually tells the validator to re-check the field.
+                // If a value has been selected, the error will be cleared.
+                $(this).valid();
+
                 const selectedMemberId = $(this).val();
                 getMemberDetails(selectedMemberId);
+            });
+
+            // --- JQUERY VALIDATION CONFIGURATION FOR THIS FORM ---
+            $("#frmCreate").validate({
+                ignore: ':hidden:not(.selectpicker)', // Important for bootstrap-select
+                errorElement: 'div',
+                errorClass: 'text-danger', // Use Bootstrap's text color for errors
+
+                // Define rules as needed
+                rules: {
+                    MemberCode: { required: true },
+                    Category: { required: true },
+                    AssignTo: { required: true },
+                    Description: { required: true }
+                },
+
+                // --- THE FIX FOR ERROR PLACEMENT ---
+                // This tells the validator where to put the error message.
+                errorPlacement: function (error, element) {
+                    if (element.attr("name") == "MemberCode") {
+                        error.appendTo("#memberCode-error");
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+
+                // These functions handle adding/removing the red border for bootstrap-select
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                    if ($(element).hasClass('selectpicker')) {
+                        $(element).next('.bootstrap-select').find('.dropdown-toggle').addClass('is-invalid');
+                    }
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                    if ($(element).hasClass('selectpicker')) {
+                        $(element).next('.bootstrap-select').find('.dropdown-toggle').removeClass('is-invalid');
+                    }
+                },
+
+                submitHandler: function (form) {
+                    // Your logic to submit the form data
+                    alert("Form is valid and ready to be submitted!");
+                    // e.g., await createFundRequest();
+                }
             });
         });
     </script>
