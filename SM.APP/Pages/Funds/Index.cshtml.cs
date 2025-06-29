@@ -20,7 +20,7 @@ namespace SM.APP.Pages.Funds
         public List<MemberFund> Funds { get; set; } = new();
         public List<object> AssignableServants { get; set; } = new();
         public List<string> FundStatuses { get; set; } = new() { "Open", "Approved", "Rejected", "Delivered" };
-        public List<string> FundCategories { get; set; } = new() { "Others", "Medical", "Education", "Emergency" };
+        public List<string> FundCategories { get; set; } = new() { "Rent", "ShantatBaraka", "Medical", "SchoolFees", "Others" };
 
         // Filter properties
         [BindProperty(SupportsGet = true)]

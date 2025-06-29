@@ -12,6 +12,14 @@ class FundDetailManager {
             DELIVERED: 3
         };
         
+        this.CATEGORIES = {
+            RENT: 'Rent',
+            SHANTAT_BARAKA: 'ShantatBaraka',
+            MEDICAL: 'Medical',
+            SCHOOL_FEES: 'SchoolFees',
+            OTHERS: 'Others'
+        };
+        
         this.init();
     }
 
