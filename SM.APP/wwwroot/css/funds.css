@@ -27,23 +27,23 @@
     box-shadow: var(--fund-shadow-hover);
 }
 
-.fund-header h1 {
-    margin: 0;
-    font-weight: 600;
-}
+    .fund-header h1 {
+        margin: 0;
+        font-weight: 600;
+    }
 
-.fund-header .btn {
-    border: 2px solid white;
-    color: white;
-    font-weight: 500;
-    transition: var(--fund-transition);
-}
+    .fund-header .btn {
+        border: 2px solid white;
+        color: white;
+        font-weight: 500;
+        transition: var(--fund-transition);
+    }
 
-.fund-header .btn:hover {
-    background: white;
-    color: var(--fund-primary-color);
-    transform: translateY(-2px);
-}
+        .fund-header .btn:hover {
+            background: white;
+            color: var(--fund-primary-color);
+            transform: translateY(-2px);
+        }
 
 /* Filters Section */
 .filters-section,
@@ -69,11 +69,11 @@
     transition: var(--fund-transition);
 }
 
-.filters-section .form-control:focus,
-.filters-section .form-select:focus {
-    border-color: var(--fund-primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
+    .filters-section .form-control:focus,
+    .filters-section .form-select:focus {
+        border-color: var(--fund-primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
 
 .btn-outline-secondary.active {
     background-color: var(--fund-primary-color);
@@ -88,18 +88,18 @@
     padding: 0.25rem;
 }
 
-.view-toggle .btn {
-    border: none;
-    background: transparent;
-    color: #6c757d;
-    font-weight: 500;
-}
+    .view-toggle .btn {
+        border: none;
+        background: transparent;
+        color: #6c757d;
+        font-weight: 500;
+    }
 
-.view-toggle .btn.active {
-    background: white;
-    color: #495057;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+        .view-toggle .btn.active {
+            background: white;
+            color: #495057;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
 
 /* List View Styles */
 .list-view {
@@ -113,23 +113,23 @@
     margin-bottom: 0;
 }
 
-.table thead th {
-    background-color: var(--fund-light-color);
-    border-bottom: 2px solid #dee2e6;
-    font-weight: 600;
-    color: #495057;
-    padding: 1rem 0.75rem;
-}
+    .table thead th {
+        background-color: var(--fund-light-color);
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem 0.75rem;
+    }
 
-.table tbody tr {
-    transition: var(--fund-transition);
-}
+    .table tbody tr {
+        transition: var(--fund-transition);
+    }
 
-.table tbody tr:hover {
-    background-color: var(--fund-light-color);
-    transform: translateY(-1px);
-    box-shadow: var(--fund-shadow-hover);
-}
+        .table tbody tr:hover {
+            background-color: var(--fund-light-color);
+            transform: translateY(-1px);
+            box-shadow: var(--fund-shadow-hover);
+        }
 
 .fund-row td {
     padding: 1rem 0.75rem;
@@ -142,9 +142,9 @@
     transition: background 0.2s;
 }
 
-.clickable-row:hover {
-    background: #f0f4ff;
-}
+    .clickable-row:hover {
+        background: #f0f4ff;
+    }
 
 /* Board View Styles */
 .board-view {
@@ -181,17 +181,17 @@
     border-bottom: 2px solid var(--fund-border-color);
 }
 
-.board-header.open {
-    border-left: 4px solid var(--fund-warning-color);
-}
+    .board-header.open {
+        border-left: 4px solid var(--fund-warning-color);
+    }
 
-.board-header.approved {
-    border-left: 4px solid var(--fund-info-color);
-}
+    .board-header.approved {
+        border-left: 4px solid var(--fund-info-color);
+    }
 
-.board-header.completed {
-    border-left: 4px solid var(--fund-success-color);
-}
+    .board-header.completed {
+        border-left: 4px solid var(--fund-success-color);
+    }
 
 .board-title {
     font-weight: 600;
@@ -212,9 +212,18 @@
     font-weight: 600;
 }
 
-.board-count.warning { background: var(--fund-warning-color); color: #212529; }
-.board-count.success { background: var(--fund-success-color); }
-.board-count.secondary { background: #6c757d; }
+    .board-count.warning {
+        background: var(--fund-warning-color);
+        color: #212529;
+    }
+
+    .board-count.success {
+        background: var(--fund-success-color);
+    }
+
+    .board-count.secondary {
+        background: #6c757d;
+    }
 
 /* Fund Card Styles */
 .fund-card {
@@ -228,20 +237,20 @@
     cursor: pointer;
 }
 
-.fund-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--fund-shadow-hover);
-    border-color: var(--fund-primary-color);
-}
+    .fund-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--fund-shadow-hover);
+        border-color: var(--fund-primary-color);
+    }
 
-.fund-card .card-body {
-    padding: 1rem;
-}
+    .fund-card .card-body {
+        padding: 1rem;
+    }
 
-.fund-card .card-title {
-    color: var(--fund-primary-color);
-    font-weight: 600;
-}
+    .fund-card .card-title {
+        color: var(--fund-primary-color);
+        font-weight: 600;
+    }
 
 .fund-board-card {
     background: white;
@@ -253,10 +262,10 @@
     transition: all 0.2s ease;
 }
 
-.fund-board-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transform: translateY(-1px);
-}
+    .fund-board-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transform: translateY(-1px);
+    }
 
 /* Fund Detail Page Styles */
 .fund-detail-header {
@@ -268,23 +277,23 @@
     box-shadow: var(--fund-shadow-hover);
 }
 
-.fund-detail-header h1 {
-    margin: 0;
-    font-weight: 600;
-}
+    .fund-detail-header h1 {
+        margin: 0;
+        font-weight: 600;
+    }
 
-.fund-detail-header .btn {
-    border: 2px solid white;
-    color: white;
-    margin-right: 0.5rem;
-    transition: var(--fund-transition);
-}
+    .fund-detail-header .btn {
+        border: 2px solid white;
+        color: white;
+        margin-right: 0.5rem;
+        transition: var(--fund-transition);
+    }
 
-.fund-detail-header .btn:hover {
-    background: white;
-    color: var(--fund-primary-color);
-    transform: translateY(-2px);
-}
+        .fund-detail-header .btn:hover {
+            background: white;
+            color: var(--fund-primary-color);
+            transform: translateY(-2px);
+        }
 
 .fund-info-card {
     background: white;
@@ -295,13 +304,13 @@
     margin-bottom: 2rem;
 }
 
-.fund-info-card h5 {
-    color: var(--fund-primary-color);
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--fund-border-color);
-}
+    .fund-info-card h5 {
+        color: var(--fund-primary-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--fund-border-color);
+    }
 
 .info-row {
     display: flex;
@@ -311,9 +320,9 @@
     border-bottom: 1px solid var(--fund-light-color);
 }
 
-.info-row:last-child {
-    border-bottom: none;
-}
+    .info-row:last-child {
+        border-bottom: none;
+    }
 
 .info-label {
     font-weight: 600;
@@ -360,10 +369,21 @@
 }
 
 /* Status-specific border styles for cards */
-.status-open.fund-card { border-left: 4px solid var(--fund-warning-color); }
-.status-approved.fund-card { border-left: 4px solid var(--fund-success-color); }
-.status-rejected.fund-card { border-left: 4px solid var(--fund-danger-color); }
-.status-delivered.fund-card { border-left: 4px solid #6c757d; }
+.status-open.fund-card {
+    border-left: 4px solid var(--fund-warning-color);
+}
+
+.status-approved.fund-card {
+    border-left: 4px solid var(--fund-success-color);
+}
+
+.status-rejected.fund-card {
+    border-left: 4px solid var(--fund-danger-color);
+}
+
+.status-delivered.fund-card {
+    border-left: 4px solid #6c757d;
+}
 
 /* Timeline Styles */
 .timeline {
@@ -371,15 +391,15 @@
     padding-left: 2rem;
 }
 
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.75rem;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--fund-border-color);
-}
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.75rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--fund-border-color);
+    }
 
 .timeline-item {
     position: relative;
@@ -429,10 +449,10 @@
     border: 1px solid var(--fund-border-color);
 }
 
-.timeline-content h6 {
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-}
+    .timeline-content h6 {
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
 
 .timeline-title {
     margin: 0 0 0.5rem 0;
@@ -454,13 +474,13 @@
     border: 1px solid var(--fund-border-color);
 }
 
-.notes-section h5 {
-    color: var(--fund-primary-color);
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--fund-border-color);
-}
+    .notes-section h5 {
+        color: var(--fund-primary-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--fund-border-color);
+    }
 
 .note-item {
     background: var(--fund-light-color);
@@ -471,10 +491,10 @@
     transition: var(--fund-transition);
 }
 
-.note-item:hover {
-    box-shadow: var(--fund-shadow-hover);
-    transform: translateY(-1px);
-}
+    .note-item:hover {
+        box-shadow: var(--fund-shadow-hover);
+        transform: translateY(-1px);
+    }
 
 .note-author {
     color: var(--fund-primary-color);
@@ -530,10 +550,10 @@
     transition: var(--fund-transition);
 }
 
-.hover-shadow:hover {
-    box-shadow: var(--fund-shadow-hover);
-    transform: translateY(-2px);
-}
+    .hover-shadow:hover {
+        box-shadow: var(--fund-shadow-hover);
+        transform: translateY(-2px);
+    }
 
 /* Custom scrollbar for notes section */
 .notes-container {
@@ -541,23 +561,23 @@
     overflow-y: auto;
 }
 
-.notes-container::-webkit-scrollbar {
-    width: 6px;
-}
+    .notes-container::-webkit-scrollbar {
+        width: 6px;
+    }
 
-.notes-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
+    .notes-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
 
-.notes-container::-webkit-scrollbar-thumb {
-    background: var(--fund-primary-color);
-    border-radius: 3px;
-}
+    .notes-container::-webkit-scrollbar-thumb {
+        background: var(--fund-primary-color);
+        border-radius: 3px;
+    }
 
-.notes-container::-webkit-scrollbar-thumb:hover {
-    background: #5a6fd8;
-}
+        .notes-container::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
+        }
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -565,60 +585,60 @@
         padding: 1.5rem;
         text-align: center;
     }
-    
-    .fund-header .btn {
-        margin-top: 1rem;
-        width: 100%;
-    }
-    
+
+        .fund-header .btn {
+            margin-top: 1rem;
+            width: 100%;
+        }
+
     .filters-section,
     .filters-card {
         padding: 1rem;
     }
-    
+
     .board-container {
         flex-direction: column;
     }
-    
+
     .board-column {
         min-width: auto;
         margin-bottom: 1rem;
     }
-    
+
     .fund-detail-header {
         padding: 1.5rem;
         text-align: center;
     }
-    
-    .fund-detail-header .btn {
-        margin: 0.25rem;
-        width: calc(50% - 0.5rem);
-    }
-    
+
+        .fund-detail-header .btn {
+            margin: 0.25rem;
+            width: calc(50% - 0.5rem);
+        }
+
     .timeline {
         padding-left: 1.5rem;
     }
-    
+
     .timeline-marker {
         left: -1.5rem;
         width: 1.5rem;
         height: 1.5rem;
     }
-    
+
     .timeline-line {
         left: -0.875rem;
     }
-    
+
     .info-row {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .info-value {
         text-align: left;
         margin-top: 0.25rem;
     }
-    
+
     .fund-info-card {
         padding: 1rem;
     }
@@ -630,8 +650,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .slide-in {
@@ -639,6 +666,50 @@
 }
 
 @keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-} 
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Custom styles for the Funds Listing Page */
+
+body {
+    /* Using standard Bootstrap font stack */
+    background-color: #f8f9fa;
+}
+
+/* Styling for the new Category Filter Pills */
+.category-filter-nav .nav-link {
+    border-radius: 50rem; /* Fully rounded */
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 500;
+    margin: 0.25rem;
+    transition: all 0.2s ease-in-out;
+}
+
+    .category-filter-nav .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+    }
+
+    .category-filter-nav .nav-link:hover:not(.active) {
+        background-color: #d8dde2;
+    }
+
+.list-group-item {
+    transition: all 0.3s ease-in-out;
+    opacity: 1;
+}
+
+    .list-group-item.hidden {
+        display: none;
+        opacity: 0;
+    }

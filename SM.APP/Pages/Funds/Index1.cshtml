@@ -2,39 +2,41 @@
 @model SM.APP.Pages.Funds.Index1Model
 @{
 }
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+<link rel="stylesheet" href="~/css/funds.css" asp-append-version="true" />
+
+<div class="container my-4 my-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h1 class="mb-0">Fund Requests</h1>
-        <a href="/Funds/Create" class="btn btn-primary">
+        <a href="#" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> Create New Request
         </a>
     </div>
-    <hr />
 
+    <!-- ==== MAIN FILTER SECTION ==== -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6">
                     <label for="filterMemberCode" class="form-label">Member Code</label>
                     <input type="text" class="form-control" id="filterMemberCode" placeholder="Enter member code...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <label for="filterAssignedTo" class="form-label">Assigned To</label>
                     <select id="filterAssignedTo" class="selectpicker" data-live-search="true" title="Any Servant" data-width="100%">
                         <option value="1">John Doe</option>
                         <option value="2">Jane Smith</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <label for="filterStatus" class="form-label">Status</label>
                     <select id="filterStatus" class="selectpicker" title="Any Status" multiple data-width="100%">
-                        <option>Open</option>
-                        <option>Approved</option>
+                        <option>New</option>
+                        <option>In Progress</option>
+                        <option>Completed</option>
                         <option>Rejected</option>
-                        <option>Delivered</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-lg-2 col-md-6">
                     <div class="d-grid d-md-flex gap-2">
                         <button class="btn btn-primary flex-grow-1" type="button"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
                         <button class="btn btn-outline-secondary" type="button" title="Clear Filters"><i class="bi bi-x-lg"></i></button>
@@ -44,127 +46,220 @@
         </div>
     </div>
 
-    <div class="accordion" id="fundsAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingFood">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFood" aria-expanded="true" aria-controls="collapseFood">
-                    <div class="d-flex justify-content-between w-100 align-items-center pe-3">
-                        <span class="fw-bold fs-5">Food Supply</span>
-                        <div>
-                            <span class="badge bg-secondary rounded-pill me-3">2 Fund Requests</span>
-                            <span class="badge bg-success rounded-pill">Total:EGP 150.00</span>
-                        </div>
+    <!-- ==== NEW CATEGORY FILTER PILLS ==== -->
+    <div class="mb-4">
+        <ul class="nav nav-pills category-filter-nav nav-fill flex-wrap">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-category="all">All (10)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-category="Food Supply">Food Supply (4)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-category="Rent">Rent (4)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-category="Furniture">Furniture (2)</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ==== FLAT FUND LIST ==== -->
+    <div class="list-group shadow-sm" id="fund-list">
+
+        <!-- Fund Item 1 -->
+        <div class="list-group-item" data-category="Food Supply">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-101 (John Wick)</h5>
+                    <p class="mb-2 text-muted">Monthly food supply for family of 4.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 30 Jun 2025</small>
+                        <span class="badge bg-primary">New</span>
                     </div>
-                </button>
-            </h2>
-            <div id="collapseFood" class="accordion-collapse collapse show" aria-labelledby="headingFood" data-bs-parent="#fundsAccordion">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 flex-wrap justify-content-between align-items-center">
-                            <div class="me-3 mb-2 mb-md-0">
-                                <h5 class="mb-1">Member: M-101 (John Wick)</h5>
-                                <p class="mb-1 text-muted">Monthly food supply for family.</p>
-                            </div>
-                            <div class="d-flex align-items-center text-nowrap">
-                                <small class="me-3 text-muted">
-                                    <i class="bi bi-calendar-event"></i> 25 Jun 2025
-                                </small>
-                                <span class="badge bg-primary me-3">New</span>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>View</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-check2-square me-2"></i>Update Status</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 flex-wrap justify-content-between align-items-center">
-                            <div class="me-3 mb-2 mb-md-0">
-                                <h5 class="mb-1">Member: M-102 (Jane Doe)</h5>
-                                <p class="mb-1 text-muted">Emergency food aid.</p>
-                            </div>
-                            <div class="d-flex align-items-center text-nowrap">
-                                <small class="me-3 text-muted">
-                                    <i class="bi bi-calendar-event"></i> 24 Jun 2025
-                                </small>
-                                <span class="badge bg-warning text-dark me-3">In Progress</span>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#">View</a></li>
-                                        <li><a class="dropdown-item" href="#">Edit</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>View</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingRent">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRent" aria-expanded="false" aria-controls="collapseRent">
-                    <div class="d-flex justify-content-between w-100 align-items-center pe-3">
-                        <span class="fw-bold fs-5">Rent</span>
-                        <div>
-                            <span class="badge bg-secondary rounded-pill me-3">1 Fund</span>
-                            <span class="badge bg-success rounded-pill">Total: $500.00</span>
-                        </div>
+        <!-- Fund Item 2 -->
+        <div class="list-group-item" data-category="Rent">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-103 (Peter Parker)</h5>
+                    <p class="mb-2 text-muted">Assistance with July rent.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 29 Jun 2025</small>
+                        <span class="badge bg-warning text-dark">In Progress</span>
                     </div>
-                </button>
-            </h2>
-            <div id="collapseRent" class="accordion-collapse collapse" aria-labelledby="headingRent" data-bs-parent="#fundsAccordion">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 flex-wrap justify-content-between align-items-center">
-                            <div class="me-3 mb-2 mb-md-0">
-                                <h5 class="mb-1">Member: M-103 (Peter Parker)</h5>
-                                <p class="mb-1 text-muted">Assistance with July rent.</p>
-                            </div>
-                            <div class="d-flex align-items-center text-nowrap">
-                                <small class="me-3 text-muted">
-                                    <i class="bi bi-calendar-event"></i> 22 Jun 2025
-                                </small>
-                                <span class="badge bg-success me-3">Completed</span>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#">View</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">View</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        @* RAZOR EXAMPLE END *@
+        <!-- Fund Item 3 -->
+        <div class="list-group-item" data-category="Food Supply">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-102 (Jane Doe)</h5>
+                    <p class="mb-2 text-muted">Emergency food aid.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 28 Jun 2025</small>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 4 -->
+        <div class="list-group-item" data-category="Furniture">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-104 (Sarah Connor)</h5>
+                    <p class="mb-2 text-muted">Request for a new bed for child.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 27 Jun 2025</small>
+                        <span class="badge bg-primary">New</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 5 -->
+        <div class="list-group-item" data-category="Rent">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-105 (Bruce Wayne)</h5>
+                    <p class="mb-2 text-muted">Rent arrears payment plan.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 26 Jun 2025</small>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 6 -->
+        <div class="list-group-item" data-category="Rent">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-106 (Clark Kent)</h5>
+                    <p class="mb-2 text-muted">Deposit for new apartment.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 25 Jun 2025</small>
+                        <span class="badge bg-danger">Rejected</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 7 -->
+        <div class="list-group-item" data-category="Food Supply">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-107 (Diana Prince)</h5>
+                    <p class="mb-2 text-muted">Nutritional supplements for elder.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 24 Jun 2025</small>
+                        <span class="badge bg-primary">New</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 8 -->
+        <div class="list-group-item" data-category="Furniture">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-108 (Barry Allen)</h5>
+                    <p class="mb-2 text-muted">Replacement refrigerator.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 23 Jun 2025</small>
+                        <span class="badge bg-warning text-dark">In Progress</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 9 -->
+        <div class="list-group-item" data-category="Food Supply">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-109 (Arthur Curry)</h5>
+                    <p class="mb-2 text-muted">Holiday season food basket.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 22 Jun 2025</small>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
+            </div>
+        </div>
+
+        <!-- Fund Item 10 -->
+        <div class="list-group-item" data-category="Rent">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="me-3">
+                    <h5 class="mb-1">M-110 (Victor Stone)</h5>
+                    <p class="mb-2 text-muted">Cover for rent increase.</p>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 21 Jun 2025</small>
+                        <span class="badge bg-primary">New</span>
+                    </div>
+                </div>
+                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
+            </div>
+        </div>
 
     </div>
 </div>
-
 @section Scripts {
+    <style>
+        
+    </style>
     <script>
         $(function () {
-            // Initialize all bootstrap-select dropdowns on the page
+            // Initialize bootstrap-select dropdowns
             $('.selectpicker').selectpicker();
 
-            // TODO: Add event listeners for filter buttons
-            // e.g., $("#filterButton").on('click', function() { ... });
+            // --- JAVASCRIPT FOR CATEGORY FILTERING ---
+            $('.category-filter-nav .nav-link').on('click', function (e) {
+                e.preventDefault(); // Prevent page jump
+
+                const category = $(this).data('category');
+                const $fundListItems = $('#fund-list .list-group-item');
+
+                // Update active state on the pills
+                $('.category-filter-nav .nav-link').removeClass('active');
+                $(this).addClass('active');
+
+                if (category === 'all') {
+                    // Show all items
+                    $fundListItems.removeClass('hidden');
+                } else {
+                    // Hide all items first
+                    $fundListItems.addClass('hidden');
+                    // Then show only the items with the matching data-category
+                    $fundListItems.filter('[data-category="' + category + '"]').removeClass('hidden');
+                }
+            });
         });
     </script>
 }
