@@ -1,265 +1,403 @@
 ﻿@page
 @model SM.APP.Pages.Funds.Index1Model
 @{
+
 }
 <link rel="stylesheet" href="~/css/funds.css" asp-append-version="true" />
 
 <div class="container my-4 my-md-5">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h1 class="mb-0">Fund Requests</h1>
-        <a href="#" class="btn btn-primary shadow-sm">
+        <a href="/Funds/Create" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> Create New Request
         </a>
     </div>
 
-    <!-- ==== MAIN FILTER SECTION ==== -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-lg-4 col-md-6">
                     <label for="filterMemberCode" class="form-label">Member Code</label>
-                    <input type="text" class="form-control" id="filterMemberCode" placeholder="Enter member code...">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="filterMemberCode" placeholder="Enter member code...">
+                        <button class="btn btn-outline-secondary d-md-none" type="button" id="scanMemberCodeBtn" title="Scan QR Code">
+                            <i class="bi bi-qr-code-scan"></i>
+                        </button>
+                    </div>
+                    <div id="qrScannerContainer" class="mt-3 d-none">
+                        <div id="reader" style="width: 100%;"></div>
+                        <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+                    </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <label for="filterAssignedTo" class="form-label">Assigned To</label>
                     <select id="filterAssignedTo" class="selectpicker" data-live-search="true" title="Any Servant" data-width="100%">
-                        <option value="1">John Doe</option>
-                        <option value="2">Jane Smith</option>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <label for="filterStatus" class="form-label">Status</label>
                     <select id="filterStatus" class="selectpicker" title="Any Status" multiple data-width="100%">
-                        <option>New</option>
-                        <option>In Progress</option>
-                        <option>Completed</option>
-                        <option>Rejected</option>
+                        <option value="Open" selected>Open</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Delivered">Delivered</option>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <div class="d-grid d-md-flex gap-2">
-                        <button class="btn btn-primary flex-grow-1" type="button"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
-                        <button class="btn btn-outline-secondary" type="button" title="Clear Filters"><i class="bi bi-x-lg"></i></button>
+                        <button class="btn btn-primary flex-grow-1" type="button" id="applyFiltersBtn"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
+                        <button class="btn btn-outline-secondary" type="button" id="clearFiltersBtn" title="Clear Filters"><i class="bi bi-x-lg"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==== NEW CATEGORY FILTER PILLS ==== -->
     <div class="mb-4">
-        <ul class="nav nav-pills category-filter-nav nav-fill flex-wrap">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" data-category="all">All (10)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-category="Food Supply">Food Supply (4)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-category="Rent">Rent (4)</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-category="Furniture">Furniture (2)</a>
-            </li>
+        <ul class="nav nav-pills category-filter-nav nav-fill flex-wrap" id="category-pills-container">
         </ul>
     </div>
 
-    <!-- ==== FLAT FUND LIST ==== -->
+    <!-- ==== UPDATED SUMMARY BOX ==== -->
+    <div class="row g-3 mb-4" id="summary-container">
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body d-flex justify-content-around text-center p-3">
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Total Fund Requests</h6>
+                        <h2 class="card-text fw-bold" id="total-requests-count">0</h2>
+                    </div>
+                    <div class="border-start"></div>
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Total Approved Amount</h6>
+                        <h2 class="card-text fw-bold" id="total-approved-amount">0 EGP</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="list-group shadow-sm" id="fund-list">
-
-        <!-- Fund Item 1 -->
-        <div class="list-group-item" data-category="Food Supply">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-101 (John Wick)</h5>
-                    <p class="mb-2 text-muted">Monthly food supply for family of 4.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 30 Jun 2025</small>
-                        <span class="badge bg-primary">New</span>
+        <div class="list-group-item text-center p-5" id="loading-indicator">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 mb-0">Loading Funds...</p>
+        </div>
+    </div>
+</div>
+<!-- Edit Fund Modal -->
+<div class="modal fade" id="editFundModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit text-primary me-2"></i>
+                    Edit Fund Request
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFundForm">
+                    <input type="hidden" id="editFundId">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editAssigneeSelect" class="form-label">Assign To</label>
+                            <select class="form-select" id="editAssigneeSelect">
+                                <!-- Will be populated via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editFundCategory" class="form-label">Category</label>
+                            <select class="form-select" id="editFundCategory">
+                                <option value="Rent">Rent</option>
+                                <option value="ShantatBaraka">Shantat Baraka</option>
+                                <option value="Medical">Medical</option>
+                                <option value="SchoolFees">School Fees</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="editRequestDescription" class="form-label">Request Description</label>
+                            <textarea class="form-control" id="editRequestDescription" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editRequestAmount" class="form-label">Requested Amount (optional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="editRequestAmount" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label for="editNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="editNotes" rows="2"
+                                      placeholder="Add notes about this update..."></textarea>
+                        </div>
                     </div>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>View</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                    </ul>
-                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">
+                    <i class="fas fa-save me-1"></i>
+                    Save Changes
+                </button>
             </div>
         </div>
-
-        <!-- Fund Item 2 -->
-        <div class="list-group-item" data-category="Rent">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-103 (Peter Parker)</h5>
-                    <p class="mb-2 text-muted">Assistance with July rent.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 29 Jun 2025</small>
-                        <span class="badge bg-warning text-dark">In Progress</span>
+    </div>
+</div>
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exchange-alt text-warning me-2"></i>
+                    Update Fund Status
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStatusForm">
+                    <input type="hidden" id="statusFundId">
+                    <div class="mb-3">
+                        <label for="newStatus" class="form-label">New Status</label>
+                        <select class="form-select" id="newStatus" required>
+                            <option value="">Select Status</option>
+                            <option value="Open">Open</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
                     </div>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">View</a></li>
-                    </ul>
-                </div>
+                    <div class="mb-3" id="approvedAmountGroup" style="display: none;">
+                        <label for="newApprovedAmount" class="form-label">Approved Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="newApprovedAmount" step="0.01" min="0">
+                        </div>
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="statusNotes" rows="3"
+                                  placeholder="Add notes about this status change..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="saveUpdateStatusBtn">
+                    <i class="fas fa-check me-1"></i>
+                    Update Status
+                </button>
             </div>
         </div>
-
-        <!-- Fund Item 3 -->
-        <div class="list-group-item" data-category="Food Supply">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-102 (Jane Doe)</h5>
-                    <p class="mb-2 text-muted">Emergency food aid.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 28 Jun 2025</small>
-                        <span class="badge bg-success">Completed</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 4 -->
-        <div class="list-group-item" data-category="Furniture">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-104 (Sarah Connor)</h5>
-                    <p class="mb-2 text-muted">Request for a new bed for child.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 27 Jun 2025</small>
-                        <span class="badge bg-primary">New</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 5 -->
-        <div class="list-group-item" data-category="Rent">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-105 (Bruce Wayne)</h5>
-                    <p class="mb-2 text-muted">Rent arrears payment plan.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 26 Jun 2025</small>
-                        <span class="badge bg-success">Completed</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 6 -->
-        <div class="list-group-item" data-category="Rent">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-106 (Clark Kent)</h5>
-                    <p class="mb-2 text-muted">Deposit for new apartment.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 25 Jun 2025</small>
-                        <span class="badge bg-danger">Rejected</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 7 -->
-        <div class="list-group-item" data-category="Food Supply">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-107 (Diana Prince)</h5>
-                    <p class="mb-2 text-muted">Nutritional supplements for elder.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 24 Jun 2025</small>
-                        <span class="badge bg-primary">New</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 8 -->
-        <div class="list-group-item" data-category="Furniture">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-108 (Barry Allen)</h5>
-                    <p class="mb-2 text-muted">Replacement refrigerator.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 23 Jun 2025</small>
-                        <span class="badge bg-warning text-dark">In Progress</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 9 -->
-        <div class="list-group-item" data-category="Food Supply">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-109 (Arthur Curry)</h5>
-                    <p class="mb-2 text-muted">Holiday season food basket.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 22 Jun 2025</small>
-                        <span class="badge bg-success">Completed</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li></ul></div>
-            </div>
-        </div>
-
-        <!-- Fund Item 10 -->
-        <div class="list-group-item" data-category="Rent">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="me-3">
-                    <h5 class="mb-1">M-110 (Victor Stone)</h5>
-                    <p class="mb-2 text-muted">Cover for rent increase.</p>
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted me-3"><i class="bi bi-calendar-event"></i> 21 Jun 2025</small>
-                        <span class="badge bg-primary">New</span>
-                    </div>
-                </div>
-                <div class="dropdown"><button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="#">View</a></li><li><a class="dropdown-item" href="#">Edit</a></li></ul></div>
-            </div>
-        </div>
-
     </div>
 </div>
 @section Scripts {
-    <style>
-        
-    </style>
     <script>
-        $(function () {
-            // Initialize bootstrap-select dropdowns
-            $('.selectpicker').selectpicker();
+        (async function() {
+            let allFunds = [];
+            const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
 
-            // --- JAVASCRIPT FOR CATEGORY FILTERING ---
-            $('.category-filter-nav .nav-link').on('click', function (e) {
-                e.preventDefault(); // Prevent page jump
+            //Scanning code
+            const scanButton = document.getElementById("scanMemberCodeBtn");
+            const qrScannerContainer = document.getElementById("qrScannerContainer");
+            const stopScanButton = document.getElementById("btnStopScan");
+            const searchInput = document.getElementById("filterMemberCode");
+            if (scanButton) {
+                let html5QrCode;
+                scanButton.addEventListener("click", function () {
+                    qrScannerContainer.classList.remove("d-none");
 
-                const category = $(this).data('category');
-                const $fundListItems = $('#fund-list .list-group-item');
+                    html5QrCode = new Html5Qrcode("reader");
+                    html5QrCode.start(
+                        { facingMode: "environment" }, // Use back camera
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 }
+                        },
+                        (decodedText) => {
+                            searchInput.value = decodedText;
+                            document.getElementById('applyFiltersBtn').click();
 
-                // Update active state on the pills
-                $('.category-filter-nav .nav-link').removeClass('active');
-                $(this).addClass('active');
+                            html5QrCode.stop();
+                            qrScannerContainer.classList.add("d-none");
+                        },
+                        (errorMessage) => {
+                            console.warn("QR Code scan error: ", errorMessage);
+                        }
+                    ).catch((err) => {
+                        console.error("QR Code scanning failed: ", err);
+                    });
+                });
+                // Stop scanning
+                stopScanButton.addEventListener("click", function () {
+                    if (html5QrCode) {
+                        html5QrCode.stop();
+                    }
+                    qrScannerContainer.classList.add("d-none");
+                });
+            }
 
-                if (category === 'all') {
-                    // Show all items
-                    $fundListItems.removeClass('hidden');
-                } else {
-                    // Hide all items first
-                    $fundListItems.addClass('hidden');
-                    // Then show only the items with the matching data-category
-                    $fundListItems.filter('[data-category="' + category + '"]').removeClass('hidden');
+
+            // --- ACTION FUNCTIONS ---
+            function editFund(fund) { alert(`Editing fund for: ${fund.member.fullName}`); }
+            function updateFundStatus(fund) { alert(`Updating status for: ${fund.member.fullName}`); }
+            function deleteFund(fund) { if (confirm(`Are you sure you want to delete the fund request for ${fund.member.fullName}?`)) { alert('Deleting fund...'); } }
+
+            // --- HELPER & DATA LOADING FUNCTIONS ---
+            function formatDate(dateString) { return !dateString ? '' : new Date(dateString).toLocaleDateString('en-GB'); }
+
+            async function loadServants() {
+                try {
+                    const dropdown = $("#filterAssignedTo");
+                    const response = await fetch(`${apiBaseUrl}/Servants/GetServants`, { method: "GET", credentials: "include" });
+                    if (!response.ok) throw new Error("Failed to fetch servants.");
+                    const servants = await response.json();
+                    dropdown.empty();
+                    servants.forEach(s => dropdown.append($('<option>', { value: s.servantID, text: s.servantName })));
+                    dropdown.selectpicker('refresh');
+                } catch (err) { console.error("Error loading servants:", err); }
+            }
+
+            async function loadFunds() {
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/Fund/GetAllFunds`, { method: "GET", credentials: "include" });
+                    if (!response.ok) throw new Error("Failed to fetch funds.");
+                    allFunds = await response.json();
+                    applyFilters();
+                } catch (err) {
+                    console.error("Error loading funds:", err);
+                    $("#fund-list").html('<div class="list-group-item text-center text-danger p-5">Failed to load fund requests.</div>');
                 }
+            }
+
+            // --- RENDERING FUNCTIONS ---
+            function renderCategoryPills(funds, activeCategory) {
+                const categories = {};
+                funds.forEach(fund => {
+                    const category = fund.fundCategory;
+                    if (!categories[category]) { categories[category] = { count: 0 }; }
+                    categories[category].count++;
+                });
+                const pillsContainer = $('#category-pills-container');
+                pillsContainer.empty();
+                const finalActiveCategory = (activeCategory && categories[activeCategory]) ? activeCategory : 'all';
+                pillsContainer.append(`<li class="nav-item"><a class="nav-link ${finalActiveCategory === 'all' ? 'active' : ''}" href="#" data-category="all">All (${funds.length})</a></li>`);
+                for (const categoryName in categories) {
+                    pillsContainer.append(`<li class="nav-item"><a class="nav-link ${finalActiveCategory === categoryName ? 'active' : ''}" href="#" data-category="${categoryName}">${categoryName} (${categories[categoryName].count})</a></li>`);
+                }
+            }
+
+            function renderSummary(funds) {
+                const totalRequests = funds.length;
+                const totalAmount = funds.reduce((sum, fund) => sum + (fund.approvedAmount || 0), 0);
+
+                $('#total-requests-count').text(totalRequests);
+                $('#total-approved-amount').text(`${totalAmount.toLocaleString('en-US')} EGP`);
+            }
+
+            function renderFunds(funds) {
+                const fundListContainer = $('#fund-list');
+                fundListContainer.empty();
+                if (funds.length === 0) {
+                    fundListContainer.html('<div class="list-group-item text-center p-5">No fund requests match your criteria.</div>');
+                    return;
+                }
+                funds.forEach(fund => {
+                    const fundItemHtml = `
+                        <div class="list-group-item" data-fund-id="${fund.fundID}">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="me-3">
+        @* THE FIX: Separated Code and Name for better mobile view *@
+                                    <h5 class="mb-0">${fund.member.code}</h5>
+                                    <small class="text-muted d-block mb-1">${fund.member.fullName}</small>
+                                    <p class="mb-1 text-muted">${fund.requestDescription}</p>
+                                    <small class="text-muted"><i class="bi bi-calendar-event"></i> ${formatDate(fund.requestDate)}</small>
+                                </div>
+                                <div class="d-flex align-items-center text-nowrap">
+                                    <span class="badge bg-primary me-2">${fund.fundCategory}</span>
+        @* THE FIX: Changed status badge color to yellow *@
+                                    <span class="badge bg-warning text-dark me-3">${fund.statusName}</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="/Funds/Details?fundID=${fund.fundID}"><i class="bi bi-eye me-2"></i>View</a></li>
+                                            <li><button class="dropdown-item edit-btn" type="button"><i class="bi bi-pencil me-2"></i>Edit</button></li>
+                                            <li><button class="dropdown-item update-status-btn" type="button"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><button class="dropdown-item text-danger delete-btn" type="button"><i class="bi bi-trash me-2"></i>Delete</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    fundListContainer.append(fundItemHtml);
+                });
+            }
+
+            // --- FILTERING LOGIC ---
+            function applyFilters() {
+                const codeFilter = $('#filterMemberCode').val().toLowerCase();
+                const assignedToFilter = $('#filterAssignedTo').val();
+                const statusFilter = $('#filterStatus').val();
+                let activeCategory = $('#category-pills-container .nav-link.active').data('category');
+
+                let mainFilteredFunds = allFunds.filter(fund => {
+                    const codeMatch = !codeFilter || fund.member.code.toLowerCase().includes(codeFilter);
+                    const assignedToMatch = !assignedToFilter || fund.approverID == assignedToFilter;
+                    const statusMatch = statusFilter.length === 0 || statusFilter.includes(fund.statusName);
+                    return codeMatch && assignedToMatch && statusMatch;
+                });
+
+                renderCategoryPills(mainFilteredFunds, activeCategory);
+                const finalActiveCategory = $('#category-pills-container .nav-link.active').data('category');
+
+                let finalFilteredFunds = mainFilteredFunds;
+                if (finalActiveCategory && finalActiveCategory !== 'all') {
+                     finalFilteredFunds = mainFilteredFunds.filter(fund => fund.fundCategory === finalActiveCategory);
+                }
+
+                renderFunds(finalFilteredFunds);
+                renderSummary(finalFilteredFunds);
+            }
+
+            // --- EVENT HANDLERS ---
+            $('#applyFiltersBtn').on('click', applyFilters);
+
+            $('#clearFiltersBtn').on('click', function() {
+                $('#filterMemberCode').val('');
+                $('#filterAssignedTo').selectpicker('val', '');
+                $('#filterStatus').selectpicker('val', '');
+                $('#category-pills-container .nav-link').removeClass('active');
+                $('#category-pills-container .nav-link[data-category="all"]').addClass('active');
+                applyFilters();
             });
-        });
+
+            $('#category-pills-container').on('click', '.nav-link', function (e) {
+                e.preventDefault();
+                $('#category-pills-container .nav-link').removeClass('active');
+                $(this).addClass('active');
+                applyFilters();
+            });
+
+            $('#fund-list').on('click', '.edit-btn, .update-status-btn, .delete-btn', function() {
+                const fundId = $(this).closest('.list-group-item').data('fund-id');
+                const fund = allFunds.find(f => f.fundID == fundId);
+                if (!fund) return;
+                if ($(this).hasClass('edit-btn')) editFund(fund);
+                else if ($(this).hasClass('update-status-btn')) updateFundStatus(fund);
+                else if ($(this).hasClass('delete-btn')) deleteFund(fund);
+            });
+
+            // --- INITIAL PAGE LOAD ---
+            $('.selectpicker').selectpicker();
+            await loadServants();
+            await loadFunds();
+        })();
     </script>
 }

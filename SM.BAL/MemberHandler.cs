@@ -27,13 +27,21 @@ namespace SM.BAL
             return _dbcontext.Members.FirstOrDefault(m => m.Code.Contains(memberCode));
         }
 
-        public Member GetMember(int memberID)
+        public Member GetMember(int memberID, bool? includeFamilyCount)
         {
-            return _dbcontext.Members.Include(m => m.ClassMembers).First(m => m.MemberID == memberID);
+            var member = _dbcontext.Members.Include(m => m.ClassMembers).First(m => m.MemberID == memberID);
+
+            if (includeFamilyCount.HasValue && includeFamilyCount.Value)
+            {
+                int count = _dbcontext.Members.Count(m => m.UNFileNumber == member.UNFileNumber);
+                member.FamilyCount = count - 1;
+            }
+
+            return member;
         }
         public List<Member> GetMembersCardData(List<int> memberIDs)
         {
-            return _dbcontext.Members.Where(m=>memberIDs.Contains(m.MemberID)).ToList();
+            return _dbcontext.Members.Where(m => memberIDs.Contains(m.MemberID)).ToList();
         }
 
         public void UpdateMember(int memberID, string code,
@@ -627,6 +635,42 @@ namespace SM.BAL
         public List<object> GetAllCodes()
         {
             return _dbcontext.Members.OrderBy(m => m.Sequence).Select(m => new { m.MemberID, m.Code }).Cast<object>().ToList();
+        }
+
+        public void UpdateMemberMobile(int memberID, string mobile, string? modifiedByUserName)
+        {
+            Servant servant = GetServantByUsername(modifiedByUserName);
+            Member originalMember = _dbcontext.Members.First(m => m.MemberID == memberID);
+            Dictionary<string, string> auditTrail = new Dictionary<string, string>();
+            if (originalMember == null)
+            {
+                throw new Exception("Member not found");
+            }
+            bool isChanged = false;
+            if (mobile != originalMember.Mobile)
+            {
+                auditTrail.Add("Mobile", string.Format("Old value: {0} new value:{1}", originalMember.Mobile, mobile));
+                originalMember.Mobile = mobile;
+                isChanged = true;
+            }
+
+            if (isChanged)
+            {
+                originalMember.ModifiedBy = servant.ServantID;
+                originalMember.ModifiedAt = CurrentTime;
+                originalMember.ModifiedLog = JsonSerializer.Serialize(auditTrail);
+
+                AuditTrail trail = new AuditTrail()
+                {
+                    AiditTrail = JsonSerializer.Serialize(auditTrail),
+                    EntityID = originalMember.Code,
+                    EntityName = "Member",
+                    ServantName = servant.ServantName,
+                    Timestamp = CurrentTime
+                };
+                _dbcontext.AuditTrail.Add(trail);
+                _dbcontext.SaveChanges();
+            }
         }
 
         public class IamgeProperties

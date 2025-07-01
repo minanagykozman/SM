@@ -12,15 +12,16 @@ namespace SM.API.Controllers
     [Authorize]
     public class FundController(ILogger<FundController> logger) : SMControllerBase(logger)
     {
-        // GET: api/Fund
-        [HttpGet]
+        [HttpGet("GetAllFunds")]
         public ActionResult<List<MemberFund>> GetAllFunds(int? assigneeId = null, string? status = null)
         {
             try
             {
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                var funds = fundHandler.GetAllFunds(assigneeId, status, User.Identity.Name);
-                return Ok(funds);
+                using (FundHandler fundHandler = new SM.BAL.FundHandler())
+                {
+                    var funds = fundHandler.GetAllFunds(assigneeId, status, User.Identity.Name);
+                    return Ok(funds);
+                }
             }
             catch (Exception ex)
             {
@@ -87,14 +88,16 @@ namespace SM.API.Controllers
         }
 
         // POST: api/Fund
-        [HttpPost]
+        [HttpPost("CreateFund")]
         public IActionResult CreateFund([FromBody] CreateFundRequest request)
         {
             try
             {
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                var fundId = fundHandler.CreateFund(request, User.Identity.Name);
-                return Ok(new { FundID = fundId, Message = "Fund created successfully" });
+                using (FundHandler fundHandler = new SM.BAL.FundHandler())
+                {
+                    var fundId = fundHandler.CreateFund(request, User.Identity.Name);
+                    return Ok(new { FundID = fundId, Message = "Fund created successfully" });
+                }
             }
             catch (Exception ex)
             {

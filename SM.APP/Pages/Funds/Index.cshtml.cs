@@ -81,7 +81,7 @@ namespace SM.APP.Pages.Funds
                 {
                     MemberID = memberID,
                     RequestDescription = requestDescription,
-                    ServantID = servantID,
+                    ApproverID = servantID,
                     RequestedAmount = requestedAmount,
                     FundCategory = fundCategory
                 };

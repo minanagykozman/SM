@@ -17,12 +17,20 @@ namespace SM.DAL.DataModel
         public int? ApproverID { get; set; }
         public decimal? RequestedAmount { get; set; }
         public string RequestDescription { get; set; }
-        public decimal ApprovedAmount { get; set; }
-        public string ApproverNotes{ get; set; }
+        public decimal? ApprovedAmount { get; set; }
+        public string? ApproverNotes { get; set; }
         public FundStatus Status { get; set; }
         public DateTime RequestDate { get; set; }
         public virtual Member Member { get; set; }
         public virtual Servant Servant { get; set; }
         public virtual Servant? Approver { get; set; }
+
+        public virtual string StatusName
+        {
+            get
+            {
+                return Status.ToString();
+            }
+        }
     }
 }

@@ -55,7 +55,7 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("GetServants")]
-        public ActionResult<List<Servant>> GetServants(bool isActive)
+        public ActionResult<List<Servant>> GetServants(bool? isActive)
         {
             try
             {

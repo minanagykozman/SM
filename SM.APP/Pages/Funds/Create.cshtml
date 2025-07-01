@@ -11,7 +11,7 @@
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
 
-        <form id="frmCreate" style="position:relative" class="needs-validation" novalidate>
+        <form id="frmCreate" style="position:relative" class="needs-validation">
             <div class="row g-3">
                 <div class="col-md-12">
                     <label for="MemberCode" class="form-label">Member Code</label>
@@ -21,13 +21,18 @@
                                 data-live-search="true"
                                 title="Select Member"
                                 data-width="100%"
-                                required>
+                                required
+                                >
                         </select>
-                        <button class="btn btn-outline-secondary d-md-none" type="button" id="btnScanQR" title="Scan QR Code">
+                        <button class="btn btn-outline-secondary d-md-none" type="button" id="scanMemberCodeBtn" title="Scan QR Code">
                             <i class="bi bi-qr-code-scan"></i>
                         </button>
                     </div>
                     <div id="memberCode-error" class="text-danger mt-1"></div>
+                    <div id="qrScannerContainer" class="mt-3 d-none">
+                        <div id="reader" style="width: 100%;"></div>
+                        <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -181,7 +186,7 @@
                 return;
             }
             try {
-                const request = `${apiBaseUrl}/Member/GetMember?memberID=${memberId}`;
+                const request = `${apiBaseUrl}/Member/GetMember?memberID=${memberId}&includeFamilyCount=true`;
                 const response = await fetch(request, {
                     method: "GET",
                     credentials: "include",
@@ -191,6 +196,8 @@
                 const memberData = await response.json();
                 $("#MemberName").val(memberData.fullName);
                 $("#Mobile").val(memberData.mobile);
+                $("#OldMobile").val(memberData.mobile);
+                $("#FamilyMembers").val(memberData.familyCount);
                 $("#Category").focus();
             } catch (err) {
                 console.error("Error loading member details:", err);
@@ -199,71 +206,147 @@
                 $("#FamilyMembers").val('');
             }
         }
+        async function createFundRequest(form){
+            const amountValue = document.getElementById("Amount").value;
+            const fundPayload = {
+                memberID: $('#MemberCode').val(),
+                requestDescription: document.getElementById("Description").value,
+                approverID: $('#AssignTo').val(),
+                approverNotes: null,
+                requestedAmount: amountValue ? parseFloat(amountValue) : null,
+                fundCategory: $('#Category').val()
+            };
+            try {
+                const request = `${apiBaseUrl}/api/Fund/CreateFund`;
+                const response = await fetch(request, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(fundPayload)
+                });
 
+                if (!response.ok)
+                    throw new Error("Fund creation failed");
+
+                if($('#Mobile').val()!=$('#OldMobile').val()){
+                    const mobilePayload = {
+                        memberID: $('#MemberCode').val(),
+                        mobile: $('#Mobile').val()
+                    };
+                    const requestMobile = `${apiBaseUrl}/Member/UpdateMemberMobile`;
+                    const responseMobile = await fetch(requestMobile, {
+                        method: "PUT",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(mobilePayload)
+                    });
+
+                    if (!responseMobile.ok)
+                        throw new Error("Failed to update member mobile");
+                }
+                // Reset the form and clear selectpickers
+                form.reset();
+                $('#MemberCode').selectpicker('val', '');
+                $('#AssignTo').val('');
+                $('#Category').val('');
+                $('#MemberName').val('');
+
+            } catch (err) {
+                console.error("Error creating fund:", err);
+                throw err;
+            }
+        }
+        function initializeScanning(){
+             //Scanning code
+            const scanButton = document.getElementById("scanMemberCodeBtn");
+            const qrScannerContainer = document.getElementById("qrScannerContainer");
+            const stopScanButton = document.getElementById("btnStopScan");
+            if (scanButton) {
+                let html5QrCode;
+                scanButton.addEventListener("click", function () {
+                    qrScannerContainer.classList.remove("d-none");
+
+                    html5QrCode = new Html5Qrcode("reader");
+                    html5QrCode.start(
+                        { facingMode: "environment" }, // Use back camera
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 }
+                        },
+                        (decodedText) => {
+                            const scannedCode = decodedText.trim();
+                            const targetOption = $('#MemberCode option').filter(function () {
+                                return $(this).text().trim() === scannedCode;
+                            });
+
+                            // Check if a matching option was found.
+                            if (targetOption.length > 0) {
+                                const memberId = targetOption.val();
+                                $("#MemberCode").selectpicker('val', memberId);
+                                $("#MemberCode").trigger('change');
+                            } else {
+                                alert(`Error: Member code "${scannedCode}" was not found in the list.`);
+                                console.error("Scanned member code not found:", scannedCode);
+                            }
+                            html5QrCode.stop();
+                            qrScannerContainer.classList.add("d-none");
+                        },
+                        (errorMessage) => {
+                            console.warn("QR Code scan error: ", errorMessage);
+                        }
+                    ).catch((err) => {
+                        console.error("QR Code scanning failed: ", err);
+                    });
+                });
+                // Stop scanning
+                stopScanButton.addEventListener("click", function () {
+                    if (html5QrCode) {
+                        html5QrCode.stop();
+                    }
+                    qrScannerContainer.classList.add("d-none");
+                });
+            }
+        }
         $(async function () {
+           
 
             showLoading();
             $('#MemberCode').selectpicker();
-
+            initializeScanning();
             await loadMemberCodes();
             await loadServants();
             await loadCategories();
             hideLoading();
 
             $("#MemberCode").on('change', function () {
-                // *** THE FIX FOR CLEARING THE ERROR ***
-                // This line manually tells the validator to re-check the field.
-                // If a value has been selected, the error will be cleared.
                 $(this).valid();
-
                 const selectedMemberId = $(this).val();
                 getMemberDetails(selectedMemberId);
             });
 
-            // --- JQUERY VALIDATION CONFIGURATION FOR THIS FORM ---
-            $("#frmCreate").validate({
-                ignore: ':hidden:not(.selectpicker)', // Important for bootstrap-select
-                errorElement: 'div',
-                errorClass: 'text-danger', // Use Bootstrap's text color for errors
 
-                // Define rules as needed
-                rules: {
-                    MemberCode: { required: true },
-                    Category: { required: true },
-                    AssignTo: { required: true },
-                    Description: { required: true }
-                },
+            $("#frmCreate").on('submit', async function(event) {
+            event.preventDefault();
 
-                // --- THE FIX FOR ERROR PLACEMENT ---
-                // This tells the validator where to put the error message.
-                errorPlacement: function (error, element) {
-                    if (element.attr("name") == "MemberCode") {
-                        error.appendTo("#memberCode-error");
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
-
-                // These functions handle adding/removing the red border for bootstrap-select
-                highlight: function (element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                    if ($(element).hasClass('selectpicker')) {
-                        $(element).next('.bootstrap-select').find('.dropdown-toggle').addClass('is-invalid');
-                    }
-                },
-                unhighlight: function (element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                    if ($(element).hasClass('selectpicker')) {
-                        $(element).next('.bootstrap-select').find('.dropdown-toggle').removeClass('is-invalid');
-                    }
-                },
-
-                submitHandler: function (form) {
-                    // Your logic to submit the form data
-                    alert("Form is valid and ready to be submitted!");
-                    // e.g., await createFundRequest();
+            if ($(this).valid()) {
+                showLoading();
+                try {
+                    await createFundRequest(this); // 'this' is the form element
+                } catch (error) {
+                    console.error("Submission failed:", error);
+                    showFailedToast("Error creating fund");
+                } finally {
+                    hideLoading();
+                    showSuccessToast("Fund created successfully");
                 }
-            });
+            } else {
+                console.log("Submit blocked: Form is not valid.");
+            }
+        });
         });
     </script>
 }

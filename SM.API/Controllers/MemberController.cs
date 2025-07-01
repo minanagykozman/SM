@@ -60,10 +60,10 @@ namespace SM.API.Controllers
         {
             try
             {
-                using ( SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
                     bool result = memberHandler.ValidateUNNumber(unFileNumber, memberID);
-                    var json= new JsonResult(result);
+                    var json = new JsonResult(result);
                     return json;
                 }
 
@@ -108,13 +108,13 @@ namespace SM.API.Controllers
             }
         }
         [HttpGet("GetMember")]
-        public ActionResult<Member> GetMember(int memberID)
+        public ActionResult<Member> GetMember(int memberID,bool? includeFamilyCount)
         {
             try
             {
                 using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
-                    Member member = memberHandler.GetMember(memberID);
+                    Member member = memberHandler.GetMember(memberID, includeFamilyCount);
                     return Ok(member);
                 }
 
@@ -150,6 +150,24 @@ namespace SM.API.Controllers
                 {
                     ValidateServant();
                     eventHandler.UpdateMember(member, User.Identity.Name);
+                    return Ok("Member updated");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [HttpPut("UpdateMemberMobile")]
+        public ActionResult<string> UpdateMemberMobile([FromBody] UpdateMemberMobileParams member)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
+                {
+                    ValidateServant();
+                    eventHandler.UpdateMemberMobile(member.MemberID, member.Mobile, User.Identity.Name);
                     return Ok("Member updated");
                 }
 
@@ -377,5 +395,11 @@ namespace SM.API.Controllers
             public string? CardStatus { get; set; }
             public List<int>? Classes { get; set; }
         }
+    }
+
+    public class UpdateMemberMobileParams
+    {
+        public int MemberID { get; set; }
+        public string? Mobile { get; set; }
     }
 }

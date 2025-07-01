@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -82,6 +83,8 @@ namespace SM.DAL.DataModel
                 return string.Format("{0} {1}", UNFirstName, UNLastName);
             }
         }
+        [NotMapped]
+        public int FamilyCount { get; set; }
         public List<int> ClassesIDs
         {
             get

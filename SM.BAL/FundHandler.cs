@@ -68,7 +68,7 @@ namespace SM.BAL
             // Search term filtering
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                query = query.Where(f => f.Member.FullName.Contains(searchTerm) || 
+                query = query.Where(f => f.Member.FullName.Contains(searchTerm) ||
                                        f.RequestDescription.Contains(searchTerm));
             }
 
@@ -106,11 +106,12 @@ namespace SM.BAL
         {
             try
             {
+                Servant servant = GetServantByUsername(username);
                 // Validate assignee exists
-                var assignee = _dbcontext.Servants.FirstOrDefault(s => s.ServantID == request.ServantID);
+                var assignee = _dbcontext.Servants.FirstOrDefault(s => s.ServantID == request.ApproverID);
                 if (assignee == null)
                 {
-                    throw new ArgumentException($"Invalid assignee ID: {request.ServantID}");
+                    throw new ArgumentException($"Invalid assignee ID: {request.ApproverID}");
                 }
 
                 // Validate member exists
@@ -124,13 +125,14 @@ namespace SM.BAL
                 {
                     MemberID = request.MemberID,
                     RequestDescription = request.RequestDescription ?? string.Empty,
-                    ServantID = request.ServantID,
+                    ServantID = servant.ServantID,
+                    ApproverID = request.ApproverID,
                     RequestedAmount = request.RequestedAmount,
                     FundCategory = request.FundCategory ?? "Others",
                     Status = FundStatus.Open,
-                    RequestDate = DateTime.Now,
+                    RequestDate = CurrentTime,
                     ApproverNotes = request.ApproverNotes ?? string.Empty,
-                    ApprovedAmount = 0 
+                    ApprovedAmount = 0
                 };
 
                 _dbcontext.MemberFunds.Add(fund);
@@ -178,7 +180,7 @@ namespace SM.BAL
             {
                 var timestamp = CurrentTime.ToString("yyyy-MM-dd HH:mm");
                 var noteEntry = $"[{timestamp} - {servant.ServantName}]: {request.ApproverNotes}";
-                
+
                 if (string.IsNullOrEmpty(fund.ApproverNotes))
                 {
                     fund.ApproverNotes = noteEntry;
@@ -259,7 +261,7 @@ namespace SM.BAL
 
             if (!string.IsNullOrEmpty(request.ApproverNotes))
             {
-                var servant = GetServantByUsername(username); 
+                var servant = GetServantByUsername(username);
                 var timestamp = CurrentTime.ToString("yyyy-MM-dd HH:mm");
                 var noteEntry = $"[{timestamp} - {servant.ServantName}]: {request.ApproverNotes}";
 
@@ -321,7 +323,7 @@ namespace SM.BAL
     {
         public int MemberID { get; set; }
         public string RequestDescription { get; set; } = string.Empty;
-        public int ServantID { get; set; }
+        public int ApproverID { get; set; }
         public string? ApproverNotes { get; set; }
         public decimal? RequestedAmount { get; set; }
         public string? FundCategory { get; set; }
@@ -350,4 +352,4 @@ namespace SM.BAL
         public decimal? RequestedAmount { get; set; }
         public string? FundCategory { get; set; }
     }
-} 
+}

@@ -32,7 +32,7 @@ namespace SM.APP.Pages.Admin.Members
                 using (var memberHandler = new MemberHandler())
                 {
                     // Get member details
-                    Member = memberHandler.GetMember(id.Value);
+                    Member = memberHandler.GetMember(id.Value, false);
                     if (Member == null)
                     {
                         return NotFound();
