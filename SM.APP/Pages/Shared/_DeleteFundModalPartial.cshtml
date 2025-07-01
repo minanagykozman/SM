@@ -1,0 +1,66 @@
+﻿<div class="modal fade" id="deleteFundModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="myModalLabel">Delete Fund</h5>
+                <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <input type="hidden" id="ID" value="" />
+                <!-- Status -->
+                <div class="form-floating mb-3" >
+                    <p>Are you sure you want to delete this fund?</p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="submit" id="btnDelete" class="btn btn-outline-danger">
+                    <i class="bi bi-x-circle"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const apiBaseUrlDelete = '@Services.SMConfigurationManager.ApiBase';
+
+    async function showDeleteFundModal(fund) {
+        $('#ID').val(fund.fundID);
+        
+        const modal = new bootstrap.Modal(document.getElementById("deleteFundModal"));
+        modal.show();
+    }
+    async function deleteFund() {
+        try {
+            const fundId=$('#ID').val();
+            const response = await fetch(`${apiBaseUrlDelete}/api/Fund/${fundId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+
+            if (!response.ok) {
+                throw new Error('Failed to delete fund');
+            }
+            $(document).trigger('fundDataChanged');
+            // Close modal and reload data
+            bootstrap.Modal.getInstance(document.getElementById('deleteFundModal')).hide();
+
+        } catch (error) {
+            console.error("Failed to update fund status:", err);
+        }
+    }
+
+    (async function() {
+
+        $('#btnDelete').on('click', function () {
+            deleteFund();
+            });
+    })();
+</script>

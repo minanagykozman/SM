@@ -1,0 +1,179 @@
+﻿<div class="modal fade" id="editFundModal" tabindex="-1" aria-labelledby="editFundModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="editFundModalLabel">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>
+                    Edit Fund Request
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="editFundForm">
+                    <input type="hidden" id="editFundId" />
+
+                    <div class="row g-3">
+                        <!-- Assign To -->
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select class="form-select" id="editAssigneeSelect">
+                                    <!-- Populated via JavaScript -->
+                                </select>
+                                <label for="editAssigneeSelect">Assign To</label>
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select class="form-select" id="editFundCategory">
+                                </select>
+                                <label for="editFundCategory">Category</label>
+                            </div>
+                        </div>
+                        <!-- Requested Amount -->
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input class="form-control" id="editRequestAmount" type="number" step="0.01" min="0" placeholder="0.00">
+                                <label id="lblBus" for="Bus">Requested Amount (optional)</label>
+                            </div>
+                        </div>
+                        <!-- Request Description -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="editRequestDescription" style="height: 100px"></textarea>
+                                <label for="editRequestDescription">Request Description</label>
+                            </div>
+                        </div>
+                        <!-- Additional Notes -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="editNotes" style="height: 80px" placeholder="Add notes about this update..."></textarea>
+                                <label for="editNotes">Additional Notes</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="saveEditBtn">
+                    <i class="bi bi-check-circle"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const apiBaseUrlEidt = '@Services.SMConfigurationManager.ApiBase';
+    async function loadEditServants() {
+            try {
+                const servantsDropDown = $("#editAssigneeSelect");
+                const request = `${apiBaseUrlEidt}/Servants/GetServants?isActive=true`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch member codes.");
+                const servantsList = await response.json();
+
+                servantsDropDown.empty();
+               
+                servantsList.forEach(m => {
+                    servantsDropDown.append($('<option>', {
+                        value: m.servantID,
+                        text: m.servantName
+                    }));
+                });
+            } catch (err) {
+                console.error("Error loading servants:", err);
+            }
+        }
+        async function loadEditCategories() {
+            try {
+                const servantsDropDown = $("#editFundCategory");
+                const request = `${apiBaseUrlEidt}/api/Fund/GetFundCategories`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch categories.");
+                const servantsList = await response.json();
+
+                servantsDropDown.empty();
+                
+                servantsList.forEach(m => {
+                    servantsDropDown.append($('<option>', {
+                        value: m,
+                        text: m
+                    }));
+                });
+            } catch (err) {
+                console.error("Error loading categories:", err);
+            }
+        }
+        async function showEditModal(fund) {
+            $('#editAssigneeSelect').val(fund.servantID);
+            $('#editFundCategory').val(fund.fundCategory);
+            $('#editRequestAmount').val(fund.requestedAmount);
+            $('#editRequestDescription').val(fund.requestDescription);
+            $('#editFundId').val(fund.fundID);
+            //$('#editNotes').val('Urgent case, please prioritize.');
+            const modal = new bootstrap.Modal(document.getElementById("editFundModal"));
+            modal.show();
+        }
+        async function saveFundEdit() {
+            try {
+                const requestedAmountValue = document.getElementById('editRequestAmount').value;
+                const formData = {
+                    fundID: parseInt(document.getElementById('editFundId').value),
+                    servantID: parseInt(document.getElementById('editAssigneeSelect').value),
+                    fundCategory: document.getElementById('editFundCategory').value,
+                    requestDescription: document.getElementById('editRequestDescription').value,
+                    requestedAmount: requestedAmountValue ? parseFloat(requestedAmountValue) : null,
+                    approverNotes: document.getElementById('editNotes').value
+                };
+                const fundId=$('#editFundId').val();
+
+                const response = await fetch(`${apiBaseUrlEidt}/api/Fund/${fundId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update fund');
+                }
+                $(document).trigger('fundDataChanged');
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('editFundModal')).hide();
+                
+
+            } catch (error) {
+                console.error("Failed to update fund:", err);
+            }
+        }
+    (async function() {
+        await loadEditCategories();
+        await loadEditServants();
+
+        $('#saveEditBtn').on('click', function () {
+            saveFundEdit();
+            });
+    })();
+</script>

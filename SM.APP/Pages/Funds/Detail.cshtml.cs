@@ -22,12 +22,7 @@ namespace SM.APP.Pages.Funds
             {
                 return RedirectToPage("/Funds/Index");
             }
-
-            // Ensure API token is set for JavaScript calls
             await GetAPIToken();
-
-            // The actual fund data loading will be handled via JavaScript/AJAX
-            // This allows for real-time updates and better user experience
             return Page();
         }
     }

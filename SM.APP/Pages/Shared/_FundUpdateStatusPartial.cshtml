@@ -1,0 +1,119 @@
+﻿<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="updateStatusModalLabel">
+                    <i class="bi bi-arrow-repeat text-warning me-2"></i>
+                    Update Fund Status
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="updateStatusForm">
+                    <input type="hidden" id="statusFundId">
+
+                    <!-- New Status -->
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="newStatus" required>
+                            <option value="" selected>Select Status</option>
+                            <option value="Open">Open</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                        <label for="newStatus">New Status</label>
+                    </div>
+                    <!-- Approved Amount -->
+                    <div class="form-floating mb-3" id="approvedAmountGroup" style="display: none;">
+                        <div class="form-floating">
+                            <input class="form-control" id="newApprovedAmount" type="number" step="0.01" min="0" placeholder="0.00">
+                            <label id="lblBus" for="Bus">Approved Amount</label>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-floating">
+                        <textarea class="form-control" id="statusNotes" style="height: 100px;" placeholder="Add notes about this status change..."></textarea>
+                        <label for="statusNotes">Notes</label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="saveUpdateStatusBtn">
+                    <i class="bi bi-check-circle"></i> Update Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const apiBaseUrlUpdate = '@Services.SMConfigurationManager.ApiBase';
+    
+    async function showUpdateStatusModal(fund) {
+        $('#newStatus').val(fund.status);
+        $('#statusFundId').val(fund.fundID);
+        if ($('#newStatus').val() === 'Approved') {
+            $('#approvedAmountGroup').slideDown();
+        } else {
+            $('#approvedAmountGroup').slideUp();
+        }
+        const modal = new bootstrap.Modal(document.getElementById("updateStatusModal"));
+        modal.show();
+    }
+    async function updateFundStatus() {
+        try {
+            const fundId=$('#statusFundId').val();
+            const formData = {
+                fundID: parseInt(fundId),
+                status: document.getElementById('newStatus').value,
+                approverNotes: document.getElementById('statusNotes').value,
+                approvedAmount: document.getElementById('newApprovedAmount').value ?
+                    parseFloat(document.getElementById('newApprovedAmount').value) : null
+            };
+
+            const response = await fetch(`${apiBaseUrlUpdate}/api/Fund/${fundId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update status');
+            }
+            $(document).trigger('fundDataChanged');
+            // Close modal and reload data
+            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
+
+        } catch (error) {
+            console.error("Failed to update fund status:", err);
+        }
+    }
+    
+    (async function() {
+        $('#newStatus').on('change', function() {
+        if ($(this).val() === 'Approved') {
+            $('#approvedAmountGroup').slideDown();
+            $('#newApprovedAmount').focus();
+        } else {
+            $('#approvedAmountGroup').slideUp();
+        }
+    });
+
+        $('#saveUpdateStatusBtn').on('click', function () {
+            updateFundStatus();
+            });
+    })();
+</script>
