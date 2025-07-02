@@ -1,0 +1,105 @@
+<div class="modal fade" id="addNotesModal" tabindex="-1" aria-labelledby="addNotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="addNotesModalLabel">
+                    <i class="bi bi-sticky text-info me-2"></i>
+                    Add Notes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="addNotesForm">
+                    <input type="hidden" id="notesFundId">
+
+                    <!-- Notes -->
+                    <div class="form-floating">
+                        <textarea class="form-control" id="newNotes" style="height: 120px;" placeholder="Enter your notes here..." required></textarea>
+                        <label for="newNotes">Notes</label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-info" id="saveNotesBtn">
+                    <span class="btn-text">
+                        <i class="bi bi-check-circle"></i> Add Notes
+                    </span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Adding...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const apiBaseUrlNotes = '@Services.SMConfigurationManager.ApiBase';
+    
+    async function showAddNotesModal(fund) {
+        $('#notesFundId').val(fund.fundID);
+        $('#newNotes').val('');
+        
+        const modal = new bootstrap.Modal(document.getElementById("addNotesModal"));
+        modal.show();
+    }
+
+    async function saveNotes() {
+        const saveBtn = document.getElementById('saveNotesBtn');
+        const btnText = saveBtn.querySelector('.btn-text');
+        const btnLoading = saveBtn.querySelector('.btn-loading');
+        
+        try {
+            // Show loading state
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+            saveBtn.disabled = true;
+            
+            const fundId = $('#notesFundId').val();
+            const formData = {
+                fundID: parseInt(fundId),
+                approverNotes: document.getElementById('newNotes').value
+            };
+
+            const response = await fetch(`${apiBaseUrlNotes}/api/Fund/${fundId}/notes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add notes');
+            }
+
+            $(document).trigger('fundDataChanged');
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addNotesModal')).hide();
+
+        } catch (error) {
+            console.error("Failed to add notes:", error);
+        } finally {
+            // Reset button state
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            saveBtn.disabled = false;
+        }
+    }
+    
+    (async function() {
+        $('#saveNotesBtn').on('click', function () {
+            saveNotes();
+        });
+    })();
+</script> 

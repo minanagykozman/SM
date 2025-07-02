@@ -32,6 +32,7 @@ class FundDetailManager {
         this.bindEvents();
         this.loadFundDetails();
         this.loadAssignableServants();
+        this.setupFundDataListener();
     }
 
     getFundIdFromUrl() {
@@ -40,43 +41,95 @@ class FundDetailManager {
     }
 
     bindEvents() {
-        // Action buttons
+        // Action buttons - Desktop
         document.getElementById('editFundBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log('Edit button clicked');
             this.showEditModal();
         });
         document.getElementById('updateStatusBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.showUpdateStatusModal();
-        });
-        document.getElementById('addNotesBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showAddNotesModal();
+            console.log('Update status button clicked');
+            // Use the global function from the partial
+            if (typeof showUpdateStatusModal === 'function') {
+                showUpdateStatusModal(this.fund);
+            } else {
+                this.showUpdateStatusModal();
+            }
         });
         document.getElementById('addNoteBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.showAddNotesModal();
+            console.log('Add note button clicked');
+            // Use the global function from the partial
+            if (typeof showAddNotesModal === 'function') {
+                showAddNotesModal(this.fund);
+            } else {
+                this.showAddNotesModal();
+            }
         });
         document.getElementById('deleteFundBtn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            this.deleteFund();
-        });
-
-        // Modal save buttons
-        document.getElementById('saveEditBtn')?.addEventListener('click', () => this.saveFundEdit());
-        document.getElementById('saveUpdateStatusBtn')?.addEventListener('click', () => this.updateFundStatus());
-        document.getElementById('saveNotesBtn')?.addEventListener('click', () => this.saveNotes());
-
-        // Status change handler
-        document.getElementById('newStatus')?.addEventListener('change', (e) => {
-            const approvedAmountGroup = document.getElementById('approvedAmountGroup');
-            if (approvedAmountGroup) {
-                approvedAmountGroup.style.display = e.target.value === 'Approved' ? 'block' : 'none';
+            console.log('Delete button clicked');
+            // Use the global function from the partial
+            if (typeof showDeleteFundModal === 'function') {
+                showDeleteFundModal(this.fund);
+            } else {
+                this.handleDeleteFund();
             }
         });
 
+        // Action buttons - Mobile
+        document.getElementById('editFundBtnMobile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Edit button clicked (mobile)');
+            this.showEditModal();
+        });
+        document.getElementById('updateStatusBtnMobile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Update status button clicked (mobile)');
+            // Use the global function from the partial
+            if (typeof showUpdateStatusModal === 'function') {
+                showUpdateStatusModal(this.fund);
+            } else {
+                this.showUpdateStatusModal();
+            }
+        });
+        document.getElementById('addNoteBtnMobile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Add note button clicked (mobile)');
+            // Use the global function from the partial
+            if (typeof showAddNotesModal === 'function') {
+                showAddNotesModal(this.fund);
+            } else {
+                this.showAddNotesModal();
+            }
+        });
+        document.getElementById('deleteFundBtnMobile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Delete button clicked (mobile)');
+            // Use the global function from the partial
+            if (typeof showDeleteFundModal === 'function') {
+                showDeleteFundModal(this.fund);
+            } else {
+                this.handleDeleteFund();
+            }
+        });
+
+        // Modal save buttons - these are now handled by the partials
+        // document.getElementById('saveEditBtn')?.addEventListener('click', () => this.saveFundEdit());
+        // document.getElementById('saveUpdateStatusBtn')?.addEventListener('click', () => this.updateFundStatus());
+        // document.getElementById('saveNotesBtn')?.addEventListener('click', () => this.saveNotes());
+
+        // Status change handler - this is now handled by the partial
+        // document.getElementById('newStatus')?.addEventListener('change', (e) => {
+        //     const approvedAmountGroup = document.getElementById('approvedAmountGroup');
+        //     if (approvedAmountGroup) {
+        //         approvedAmountGroup.style.display = e.target.value === 'Approved' ? 'block' : 'none';
+        //     }
+        // });
+
         // Back button
-        document.querySelector('.btn-outline-light')?.addEventListener('click', () => {
+        document.querySelector('.btn-outline-secondary')?.addEventListener('click', () => {
             window.location.href = '/Funds';
         });
     }
@@ -98,11 +151,89 @@ class FundDetailManager {
             }
 
             this.fund = await response.json();
+            console.log('Fund data loaded:', this.fund);
             this.populateFundDetails();
+            await this.loadMemberDetails();
         } catch (error) {
+            console.error('Error loading fund details:', error);
             this.showError('Failed to load fund details');
         } finally {
             this.showLoading(false);
+        }
+    }
+
+    async loadMemberDetails() {
+        if (!this.fund?.member?.memberID) return;
+        
+        try {
+            // Load member history data in parallel
+            await Promise.all([
+                this.loadMemberFundsHistory(),
+                this.loadMemberAidsHistory(),
+                this.loadMemberAttendanceHistory(),
+                this.loadFamilyMemberCount()
+            ]);
+        } catch (error) {
+            console.error('Error loading member details:', error);
+        }
+    }
+
+    async loadMemberFundsHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberFunds?memberID=${this.fund.member.memberID}`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const funds = await response.json();
+                // Filter out the current fund - ensure both values are compared as integers
+                const filteredFunds = funds.filter(fund => parseInt(fund.fundID) !== parseInt(this.fundId));
+                this.populateFundsHistory(filteredFunds);
+            }
+        } catch (error) {
+            console.error('Error loading funds history:', error);
+        }
+    }
+
+    async loadMemberAidsHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberAids?memberID=${this.fund.member.memberID}`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const aids = await response.json();
+                this.populateAidsHistory(aids);
+            }
+        } catch (error) {
+            console.error('Error loading aids history:', error);
+        }
+    }
+
+    async loadMemberAttendanceHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetAttendanceHistory?memberID=${this.fund.member.memberID}`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const attendance = await response.json();
+                this.populateAttendanceHistory(attendance);
+            }
+        } catch (error) {
+            console.error('Error loading attendance history:', error);
+        }
+    }
+
+    async loadFamilyMemberCount() {
+        try {
+            if (this.fund.member?.familyCount !== undefined) {
+                console.log('Family member count from fund data:', this.fund.member.familyCount);
+                document.getElementById('familyMembers').value = this.fund.member.familyCount.toString();
+            } else {
+                console.log('No family count available in fund data');
+                document.getElementById('familyMembers').value = 'N/A';
+            }
+        } catch (error) {
+            console.error('Error setting family member count:', error);
+            document.getElementById('familyMembers').value = 'N/A';
         }
     }
 
@@ -123,7 +254,7 @@ class FundDetailManager {
     populateFundDetails() {
         if (!this.fund) return;
 
-        // Map status numbers to names
+        // Map status numbers to names for display
         const statusMap = {
             0: 'Open',
             1: 'Approved',
@@ -135,99 +266,183 @@ class FundDetailManager {
             statusText = statusMap[statusText] || statusText;
         }
 
-        // Header information
-        document.getElementById('fundNumber').textContent = this.fund.fundID;
-        document.getElementById('fundStatus').textContent = statusText;
-        document.getElementById('fundStatus').className = `badge ${this.getStatusBadgeClass(statusText)}`;
-        document.getElementById('creationDate').textContent = this.formatDate(this.fund.requestDate);
-
-        // Fund information
-        document.getElementById('memberName').textContent = this.fund.member?.fullName || 'Unknown Member';
-        document.getElementById('memberCode').textContent = this.fund.member?.code || 'N/A';
-        document.getElementById('requestDescription').textContent = this.fund.requestDescription || 'No description';
-        document.getElementById('requestedAmount').textContent = this.formatCurrency(this.fund.requestedAmount);
-        document.getElementById('approvedAmount').textContent = this.fund.approvedAmount ? 
-            this.formatCurrency(this.fund.approvedAmount) : 'Not set';
-        document.getElementById('fundCategory').textContent = this.fund.fundCategory || 'Other';
-        document.getElementById('assignedTo').textContent = this.fund.servant?.servantName || 'Unassigned';
-
-        // Timeline - Use numeric status values (1=Approved, 3=Delivered)
-        document.getElementById('createdDate').textContent = this.formatDate(this.fund.requestDate);
+        // Fund Details Tab - using correct MemberFund properties
+        const statusBadge = document.getElementById('requestStatusBadge');
+        if (statusBadge) {
+            statusBadge.textContent = statusText;
+            statusBadge.className = `badge ${this.getStatusBadgeClass(this.fund.status)}`;
+        }
         
-        if (this.fund.status === this.STATUS.APPROVED || this.fund.status === this.STATUS.DELIVERED) {
-            const approvedTimeline = document.getElementById('approvedTimeline');
-            if (approvedTimeline) {
-                approvedTimeline.style.display = 'block';
-                document.getElementById('approverName').textContent = this.fund.approver?.servantName || 'Unknown';
-                // Note: We'd need approval date from the backend
+        // Update Fund ID title
+        const fundIdTitle = document.getElementById('fundIdTitle');
+        if (fundIdTitle) {
+            fundIdTitle.textContent = `Fund ${this.fund.fundID}`;
+        }
+        
+        document.getElementById('memberCode').value = this.fund.member?.code || '';
+        
+        // Use correct Member property names
+        let memberName = this.fund.member?.fullName || 
+            `${this.fund.member?.unFirstName || ''} ${this.fund.member?.unLastName || ''}`.trim() ||
+            this.fund.member?.baptismName || '';
+        document.getElementById('memberName').value = memberName;
+        
+        document.getElementById('memberMobile').value = this.fund.member?.mobile || '';
+        document.getElementById('requestType').value = this.fund.fundCategory || '';
+        document.getElementById('requestedAmount').value = this.fund.requestedAmount ? 
+            this.formatCurrency(this.fund.requestedAmount) : '';
+        document.getElementById('requestDescription').value = this.fund.requestDescription || '';
+        document.getElementById('createdBy').value = this.fund.servant?.servantName || 'Unknown';
+        document.getElementById('assignedTo').value = this.fund.approver?.servantName || 'Unassigned';
+        document.getElementById('creationDate').value = this.formatDate(this.fund.requestDate);
+        
+        // For last update, use requestDate as fallback since there's no updatedAt in MemberFund
+        document.getElementById('lastUpdateDate').value = this.formatDate(this.fund.requestDate);
+        
+        // Member Notes
+        document.getElementById('memberNotes').value = this.fund.member?.notes || '';
+        
+        // Fund Notes (ApproverNotes)
+        const notesContainer = document.getElementById('fundNotes');
+        if (notesContainer) {
+            if (this.fund.approverNotes && this.fund.approverNotes.trim()) {
+                // Parse notes (assuming they're in format: [timestamp - user]: note)
+                const notes = this.parseNotes(this.fund.approverNotes);
+                notesContainer.innerHTML = notes.map(note => `
+                    <div class="note-item border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>${note.author}</strong>
+                            <small class="text-muted">${note.timestamp}</small>
+                        </div>
+                        <p class="mb-0" style="white-space: pre-wrap;">${note.content.replace(/\n/g, '<br>')}</p>
+                    </div>
+                `).join('');
+            } else {
+                notesContainer.innerHTML = '<p class="text-muted mb-0">No notes available</p>';
             }
         }
 
-        if (this.fund.status === this.STATUS.DELIVERED) {
-            const completedTimeline = document.getElementById('completedTimeline');
-            if (completedTimeline) {
-                completedTimeline.style.display = 'block';
-                // Note: We'd need completion date from the backend
+        // Member Image
+        const memberImage = document.getElementById('memberImage');
+        const memberImagePlaceholder = document.getElementById('memberImagePlaceholder');
+        if (memberImage && memberImagePlaceholder) {
+            if (this.fund.member?.imageURL) {
+                memberImage.src = this.fund.member.imageURL;
+                memberImage.style.display = 'block';
+                memberImagePlaceholder.style.display = 'none';
+            } else {
+                memberImage.style.display = 'none';
+                memberImagePlaceholder.style.display = 'block';
             }
         }
 
-        // Notes
-        this.populateNotes();
-
-        // Update action buttons based on status and permissions
-        this.updateActionButtons();
-    }
-
-    populateNotes() {
-        const notesContainer = document.getElementById('notesContainer');
-        if (!notesContainer) return;
-
-        if (!this.fund.approverNotes || this.fund.approverNotes.trim() === '') {
-            notesContainer.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="fas fa-sticky-note fa-2x mb-2"></i>
-                    <p>No notes available</p>
-                </div>
-            `;
-            return;
-        }
-
-        // Parse notes (assuming they're in format: [timestamp - user]: note)
-        const notes = this.parseNotes(this.fund.approverNotes);
-        notesContainer.innerHTML = notes.map(note => `
-            <div class="note-item mb-3 p-3 border rounded">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <strong class="text-primary">${note.author}</strong>
-                    <small class="text-muted">${note.timestamp}</small>
-                </div>
-                <p class="mb-0">${note.content}</p>
-            </div>
-        `).join('');
+        // Member Details Tab
+        document.getElementById('memberCreationDate').value = this.fund.member?.createdAt ? 
+            this.formatDate(this.fund.member.createdAt) : 'Not Set';
+        
+        // Update form elements for editing
+        this.updateEditForm();
     }
 
     parseNotes(notesString) {
         const lines = notesString.split('\n');
         const notes = [];
+        let currentNote = null;
         
         for (const line of lines) {
             const match = line.match(/^\[(.*?) - (.*?)\]: (.*)$/);
             if (match) {
-                notes.push({
+                // Save previous note if exists
+                if (currentNote) {
+                    notes.push(currentNote);
+                }
+                // Start new note
+                currentNote = {
                     timestamp: match[1],
                     author: match[2],
                     content: match[3]
-                });
+                };
             } else if (line.trim()) {
-                // Fallback for notes without proper format
-                notes.push({
-                    timestamp: 'Unknown',
-                    author: 'System',
-                    content: line.trim()
-                });
+                if (currentNote) {
+                    // Add line to current note content
+                    currentNote.content += '\n' + line.trim();
+                } else {
+                    // Fallback for notes without proper format
+                    currentNote = {
+                        timestamp: 'Unknown',
+                        author: 'System',
+                        content: line.trim()
+                    };
+                }
             }
         }
         
+        // Don't forget to add the last note
+        if (currentNote) {
+            notes.push(currentNote);
+        }
+        
         return notes;
+    }
+
+    populateFundsHistory(funds) {
+        const tbody = document.getElementById('fundsHistoryBody');
+        if (!tbody) return;
+
+        if (funds && funds.length > 0) {
+            // Sort funds by date descending
+            funds.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+            
+            tbody.innerHTML = funds.map(fund => `
+                <tr>
+                    <td>${fund.requestDate ? new Date(fund.requestDate).toLocaleDateString() : ''}</td>
+                    <td>${fund.fundCategory || ''}</td>
+                    <td>${fund.requestDescription || ''}</td>
+                    <td>
+                        <span class="badge ${this.getStatusBadgeClass(fund.status)}">${this.getFundStatusText(fund.status)}</span>
+                    </td>
+                    <td>${fund.requestedAmount || ''}</td>
+                    <td>${fund.approvedAmount || ''}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No funds history available</td></tr>';
+        }
+    }
+
+    populateAidsHistory(aids) {
+        const tbody = document.getElementById('aidsHistoryBody');
+        if (!tbody) return;
+
+        if (aids && aids.length > 0) {
+            tbody.innerHTML = aids.map(aid => `
+                <tr>
+                    <td>${aid.aid?.aidName || ''}</td>
+                    <td>${aid.timeStamp ? new Date(aid.timeStamp).toLocaleDateString() : ''}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">No aids history available</td></tr>';
+        }
+    }
+
+    populateAttendanceHistory(attendance) {
+        const tbody = document.getElementById('attendanceHistoryBody');
+        if (!tbody) return;
+
+        if (attendance && attendance.length > 0) {
+            tbody.innerHTML = attendance.map(record => `
+                <tr>
+                    <td>${record.classOccurrence?.className || ''}</td>
+                    <td>${record.timeStamp ? new Date(record.timeStamp).toLocaleDateString() : ''}</td>
+                    <td>
+                        <span class="badge bg-success">Present</span>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No attendance history available</td></tr>';
+        }
     }
 
     populateAssigneeDropdowns() {
@@ -240,61 +455,60 @@ class FundDetailManager {
         }
     }
 
-    updateActionButtons() {
-        const editBtn = document.getElementById('editFundBtn');
-        const updateStatusBtn = document.getElementById('updateStatusBtn');
-        const deleteBtn = document.getElementById('deleteFundBtn');
+    updateEditForm() {
+        if (!this.fund) return;
 
-        // Only allow editing of open funds
-        if (editBtn) {
-            editBtn.style.display = this.fund.status === this.STATUS.OPEN ? 'block' : 'none';
+        // Update edit modal with current fund data - using correct MemberFund properties
+        const editForm = document.getElementById('editFundForm');
+        if (editForm) {
+            const descriptionField = editForm.querySelector('#editRequestDescription');
+            const amountField = editForm.querySelector('#editRequestedAmount');
+            const categoryField = editForm.querySelector('#editFundCategory');
+
+            if (descriptionField) descriptionField.value = this.fund.requestDescription || '';
+            if (amountField) amountField.value = this.fund.requestedAmount || '';
+            if (categoryField) categoryField.value = this.fund.fundCategory || '';
         }
 
-        // Only allow deletion of open funds (and only for admins - this would need server-side check)
-        if (deleteBtn) {
-            deleteBtn.style.display = this.fund.status === this.STATUS.OPEN ? 'block' : 'none';
+        // Update status modal with current status
+        const statusForm = document.getElementById('updateStatusForm');
+        if (statusForm) {
+            const statusField = statusForm.querySelector('#newStatus');
+            const notesField = statusForm.querySelector('#statusNotes');
+            
+            // Convert numeric status to string for the dropdown
+            let statusValue = '';
+            if (typeof this.fund.status === 'number') {
+                const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered' };
+                statusValue = statusMap[this.fund.status] || '';
+            } else {
+                statusValue = this.fund.status || '';
+            }
+            
+            if (statusField) statusField.value = statusValue;
+            if (notesField) notesField.value = '';
         }
     }
 
-    showEditModal() {
-        if (!this.fund) return;
+    showEditModal(fund) {
+        const fundData = fund || this.fund;
+        if (!fundData) return;
 
         // Populate edit form
-        document.getElementById('editFundId').value = this.fund.fundID;
-        document.getElementById('editAssigneeSelect').value = this.fund.servantID || '';
-        document.getElementById('editFundCategory').value = this.fund.fundCategory || '';
-        document.getElementById('editRequestDescription').value = this.fund.requestDescription || '';
-        document.getElementById('editRequestAmount').value = this.fund.requestedAmount || '';
+        document.getElementById('editFundId').value = fundData.fundID;
+        document.getElementById('editAssigneeSelect').value = fundData.servantID || '';
+        document.getElementById('editFundCategory').value = fundData.fundCategory || '';
+        document.getElementById('editRequestDescription').value = fundData.requestDescription || '';
+        document.getElementById('editRequestAmount').value = fundData.requestedAmount || '';
 
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editFundModal'));
         modal.show();
     }
 
-    showUpdateStatusModal() {
-        if (!this.fund) return;
-
-        document.getElementById('statusFundId').value = this.fund.fundID;
-        document.getElementById('newStatus').value = '';
-        document.getElementById('newApprovedAmount').value = '';
-        document.getElementById('statusNotes').value = '';
-        
-        // Hide approved amount initially
-        document.getElementById('approvedAmountGroup').style.display = 'none';
-
-        const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-        modal.show();
-    }
-
-    showAddNotesModal() {
-        if (!this.fund) return;
-
-        document.getElementById('notesFundId').value = this.fund.fundID;
-        document.getElementById('newNotes').value = '';
-
-        const modal = new bootstrap.Modal(document.getElementById('addNotesModal'));
-        modal.show();
-    }
+    // showUpdateStatusModal - now handled by _FundUpdateStatusPartial
+    // showAddNotesModal - now handled by _FundAddNotesPartial  
+    // showDeleteFundModal - now handled by _DeleteFundModalPartial
 
     async saveFundEdit() {
         try {
@@ -325,106 +539,130 @@ class FundDetailManager {
             bootstrap.Modal.getInstance(document.getElementById('editFundModal')).hide();
             this.showSuccess('Fund updated successfully');
             this.loadFundDetails();
+            
+            // Trigger fund data changed event
+            $(document).trigger('fundDataChanged');
 
         } catch (error) {
             this.showError('Failed to update fund');
         }
     }
 
-    async updateFundStatus() {
-        try {
-            const formData = {
-                fundID: parseInt(document.getElementById('statusFundId').value),
-                status: document.getElementById('newStatus').value,
-                approverNotes: document.getElementById('statusNotes').value,
-                approvedAmount: document.getElementById('newApprovedAmount').value ? 
-                    parseFloat(document.getElementById('newApprovedAmount').value) : null
-            };
+    // updateFundStatus API method - now handled by _FundUpdateStatusPartial
+    // async updateFundStatus() {
+    //     try {
+    //         const formData = {
+    //             fundID: parseInt(document.getElementById('statusFundId').value),
+    //             status: parseInt(document.getElementById('newStatus').value),
+    //             approverNotes: document.getElementById('statusNotes').value
+    //         };
 
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
+    //         const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/status`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(formData),
+    //             credentials: 'include'
+    //         });
 
-            if (!response.ok) {
-                throw new Error('Failed to update status');
-            }
+    //         if (!response.ok) {
+    //             throw new Error('Failed to update status');
+    //         }
 
-            // Close modal and reload data
-            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
-            this.showSuccess('Status updated successfully');
-            this.loadFundDetails();
+    //         // Close modal and reload data
+    //         bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
+    //         this.showSuccess('Status updated successfully');
+    //         this.loadFundDetails();
+            
+    //         // Trigger fund data changed event
+    //         $(document).trigger('fundDataChanged');
 
-        } catch (error) {
-            this.showError('Failed to update status');
-        }
+    //     } catch (error) {
+    //         this.showError('Failed to update status');
+    //     }
+    // }
+
+    // saveNotes API method - now handled by _FundAddNotesPartial
+    // async saveNotes() {
+    //     try {
+    //         const formData = {
+    //             fundID: parseInt(document.getElementById('notesFundId').value),
+    //             approverNotes: document.getElementById('newNotes').value
+    //         };
+
+    //         const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/notes`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(formData),
+    //             credentials: 'include'
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to add notes');
+    //         }
+
+    //         // Close modal and reload data
+    //         bootstrap.Modal.getInstance(document.getElementById('addNotesModal')).hide();
+    //         this.showSuccess('Notes added successfully');
+    //         this.loadFundDetails();
+            
+    //         // Trigger fund data changed event
+    //         $(document).trigger('fundDataChanged');
+
+    //     } catch (error) {
+    //         this.showError('Failed to add notes');
+    //     }
+    // }
+
+    getFundStatusText(status) {
+        const statusMap = {
+            0: 'Open',
+            1: 'Approved', 
+            2: 'Rejected',
+            3: 'Delivered'
+        };
+        return statusMap[status] || status;
     }
 
-    async saveNotes() {
-        try {
-            const formData = {
-                fundID: parseInt(document.getElementById('notesFundId').value),
-                approverNotes: document.getElementById('newNotes').value
-            };
-
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/notes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add notes');
-            }
-
-            // Close modal and reload data
-            bootstrap.Modal.getInstance(document.getElementById('addNotesModal')).hide();
-            this.showSuccess('Notes added successfully');
-            this.loadFundDetails();
-
-        } catch (error) {
-            this.showError('Failed to add notes');
-        }
-    }
-
-    async deleteFund() {
-        if (!confirm('Are you sure you want to delete this fund request? This action cannot be undone.')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete fund');
-            }
-
-            this.showSuccess('Fund deleted successfully');
-            setTimeout(() => window.location.href = '/Funds', 1500);
-
-        } catch (error) {
-            this.showError('Failed to delete fund');
+    getFundStatusBadgeClass(status) {
+        switch (status) {
+            case 0: // Open
+                return 'bg-warning text-dark';
+            case 1: // Approved
+                return 'bg-success';
+            case 2: // Rejected
+                return 'bg-danger';
+            case 3: // Delivered
+                return 'bg-info';
+            default:
+                return 'bg-secondary';
         }
     }
 
     getStatusBadgeClass(status) {
-        const classes = {
-            'Open': 'bg-warning text-dark',
-            'Approved': 'bg-success',
-            'Rejected': 'bg-danger',
-            'Delivered': 'bg-info'
-        };
-        return classes[status] || 'bg-secondary';
+        // Generic method for other status displays
+        if (typeof status === 'string') {
+            switch (status.toLowerCase()) {
+                case 'open':
+                    return 'bg-warning text-dark';
+                case 'approved':
+                    return 'bg-success';
+                case 'rejected':
+                    return 'bg-danger';
+                case 'delivered':
+                    return 'bg-info';
+                case 'pending':
+                    return 'bg-warning text-dark';
+                case 'in progress':
+                    return 'bg-primary';
+                default:
+                    return 'bg-secondary';
+            }
+        }
+        return this.getFundStatusBadgeClass(status);
     }
 
     formatDate(dateString) {
@@ -481,6 +719,73 @@ class FundDetailManager {
                 alert.parentNode.removeChild(alert);
             }
         }, 5000);
+    }
+
+    // Action functions as requested
+    editFund(fund) {
+        this.showEditModal(fund);
+    }
+
+    updateFundStatus(fund) {
+        // Use the global function from the partial
+        if (typeof showUpdateStatusModal === 'function') {
+            showUpdateStatusModal(fund);
+        } else {
+            this.showUpdateStatusModal(fund);
+        }
+    }
+
+    async deleteFund(fund) {
+        // Use the global function from the partial
+        if (typeof showDeleteFundModal === 'function') {
+            showDeleteFundModal(fund);
+        } else {
+            this.showDeleteFundModal(fund);
+        }
+    }
+
+    // Setup event listener for fund data changes
+    setupFundDataListener() {
+        $(document).on('fundDataChanged', () => {
+            console.log('Fund data changed, reloading fund details...');
+            this.loadFundDetails();
+        });
+    }
+
+    // Handle delete button click from UI
+    handleDeleteFund() {
+        console.log('handleDeleteFund called');
+        this.showDeleteFundModal();
+    }
+
+    // Delete fund API call
+    async performDeleteFund() {
+        console.log('performDeleteFund called');
+        if (!confirm('Are you sure you want to delete this fund request? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete fund');
+            }
+
+            this.showSuccess('Fund deleted successfully');
+            
+            // Trigger fund data changed event
+            $(document).trigger('fundDataChanged');
+            
+            setTimeout(() => window.location.href = '/Funds', 1500);
+
+        } catch (error) {
+            console.error('Delete fund error:', error);
+            this.showError('Failed to delete fund');
+        }
     }
 }
 

@@ -21,7 +21,13 @@
                     <i class="bi bi-x-circle"></i> Cancel
                 </button>
                 <button type="submit" id="btnDelete" class="btn btn-outline-danger">
-                    <i class="bi bi-x-circle"></i> Delete
+                    <span class="btn-text">
+                        <i class="bi bi-x-circle"></i> Delete
+                    </span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Deleting...
+                    </span>
                 </button>
             </div>
         </div>
@@ -35,32 +41,49 @@
         
         const modal = new bootstrap.Modal(document.getElementById("deleteFundModal"));
         modal.show();
-    }
+    }   
     async function deleteFund() {
+        const deleteBtn = document.getElementById('btnDelete');
+        const btnText = deleteBtn.querySelector('.btn-text');
+        const btnLoading = deleteBtn.querySelector('.btn-loading');
+        
         try {
-            const fundId=$('#ID').val();
+            // Show loading state
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+            deleteBtn.disabled = true;
+            
+            const fundId = $('#ID').val();
             const response = await fetch(`${apiBaseUrlDelete}/api/Fund/${fundId}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
 
-
             if (!response.ok) {
                 throw new Error('Failed to delete fund');
             }
-            $(document).trigger('fundDataChanged');
-            // Close modal and reload data
+            
+            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('deleteFundModal')).hide();
+            
+            // Navigate to funds list after successful deletion
+            setTimeout(() => {
+                window.location.href = '/Funds';
+            }, 500);
 
         } catch (error) {
-            console.error("Failed to update fund status:", err);
+            console.error("Failed to delete fund:", error);
+        } finally {
+            // Reset button state
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            deleteBtn.disabled = false;
         }
     }
 
     (async function() {
-
         $('#btnDelete').on('click', function () {
             deleteFund();
-            });
+        });
     })();
 </script>

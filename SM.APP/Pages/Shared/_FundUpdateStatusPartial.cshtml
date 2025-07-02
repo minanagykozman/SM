@@ -49,7 +49,13 @@
                     <i class="bi bi-x-circle"></i> Cancel
                 </button>
                 <button type="button" class="btn btn-success" id="saveUpdateStatusBtn">
-                    <i class="bi bi-check-circle"></i> Update Status
+                    <span class="btn-text">
+                        <i class="bi bi-check-circle"></i> Update Status
+                    </span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Updating...
+                    </span>
                 </button>
             </div>
         </div>
@@ -71,7 +77,16 @@
         modal.show();
     }
     async function updateFundStatus() {
+        const saveBtn = document.getElementById('saveUpdateStatusBtn');
+        const btnText = saveBtn.querySelector('.btn-text');
+        const btnLoading = saveBtn.querySelector('.btn-loading');
+        
         try {
+            // Show loading state
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+            saveBtn.disabled = true;
+            
             const fundId=$('#statusFundId').val();
             const formData = {
                 fundID: parseInt(fundId),
@@ -93,12 +108,18 @@
             if (!response.ok) {
                 throw new Error('Failed to update status');
             }
+            
             $(document).trigger('fundDataChanged');
-            // Close modal and reload data
+            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
 
         } catch (error) {
-            console.error("Failed to update fund status:", err);
+            console.error("Failed to update fund status:", error);
+        } finally {
+            // Reset button state
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            saveBtn.disabled = false;
         }
     }
     
