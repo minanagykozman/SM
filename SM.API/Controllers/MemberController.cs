@@ -279,7 +279,7 @@ namespace SM.API.Controllers
 
         // Get member class memberships
         [HttpGet("GetMemberClasses")]
-        public ActionResult<IEnumerable<MemberClassOverview>> GetMemberClasses(int memberID)
+        public ActionResult<IEnumerable<ClassMember>> GetMemberClasses(int memberID)
         {
             try
             {
@@ -287,6 +287,24 @@ namespace SM.API.Controllers
                 {
                     var memberships = memberHandler.GetMemberClasses(memberID);
                     return Ok(memberships);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        // Get member class attendance overview
+        [HttpGet("GetMemberClassOverview")]
+        public ActionResult<IEnumerable<MemberClassOverview>> GetMemberClassOverview(int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    var overview = memberHandler.GetMemberClassses(memberID);
+                    return Ok(overview);
                 }
             }
             catch (Exception ex)
