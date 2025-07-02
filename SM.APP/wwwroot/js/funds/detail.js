@@ -210,12 +210,12 @@ class FundDetailManager {
 
     async loadMemberAttendanceHistory() {
         try {
-            const response = await fetch(`${apiBaseUrl}/Member/GetAttendanceHistory?memberID=${this.fund.member.memberID}`, {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberClassOverviews?memberID=${this.fund.member.memberID}`, {
                 credentials: 'include'
             });
             if (response.ok) {
-                const attendance = await response.json();
-                this.populateAttendanceHistory(attendance);
+                const memberClasses = await response.json();
+                this.populateAttendanceHistory(memberClasses);
             }
         } catch (error) {
             console.error('Error loading attendance history:', error);
@@ -426,22 +426,49 @@ class FundDetailManager {
         }
     }
 
-    populateAttendanceHistory(attendance) {
+    populateAttendanceHistory(memberClasses) {
         const tbody = document.getElementById('attendanceHistoryBody');
         if (!tbody) return;
 
-        if (attendance && attendance.length > 0) {
-            tbody.innerHTML = attendance.map(record => `
-                <tr>
-                    <td>${record.classOccurrence?.className || ''}</td>
-                    <td>${record.timeStamp ? new Date(record.timeStamp).toLocaleDateString() : ''}</td>
-                    <td>
-                        <span class="badge bg-success">Present</span>
-                    </td>
-                </tr>
-            `).join('');
+        if (memberClasses && memberClasses.length > 0) {
+            tbody.innerHTML = memberClasses.map(classData => {
+                // Parse attendance string like "05/12" to calculate percentage
+                let attendanceText = 'N/A';
+                let percentage = 0;
+                let badgeClass = 'bg-secondary';
+                
+                if (classData.attendance && classData.attendance.includes('/')) {
+                    const [attended, total] = classData.attendance.split('/').map(n => parseInt(n));
+                    if (total > 0) {
+                        percentage = Math.round((attended / total) * 100);
+                        attendanceText = `${attended}/${total} (${percentage}%)`;
+                        
+                        // Color coding based on percentage
+                        if (percentage >= 80) {
+                            badgeClass = 'bg-success';
+                        } else if (percentage >= 50) {
+                            badgeClass = 'bg-warning';
+                        } else {
+                            badgeClass = 'bg-danger';
+                        }
+                    }
+                }
+                
+                const lastPresent = classData.lastPresentDate ? 
+                    new Date(classData.lastPresentDate).toLocaleDateString() : 'Never';
+                
+                return `
+                    <tr>
+                        <td>${classData.className || ''}</td>
+                        <td>${lastPresent}</td>
+                        <td>
+                            <span class="badge ${badgeClass}">${attendanceText}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } else {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No attendance history available</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No class attendance data available</td></tr>';
         }
     }
 

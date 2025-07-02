@@ -62,7 +62,7 @@ namespace SM.API.Controllers
                 }
                 using (SM.BAL.MemberHandler meetingHandler = new SM.BAL.MemberHandler())
                 {
-                    memberClasses = meetingHandler.GetMemberClassses(member.MemberID);
+                    memberClasses = meetingHandler.GetMemberClassOverviews(member.MemberID);
                 }
                 RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status, MemberClasses = memberClasses };
                 return Ok(response);
