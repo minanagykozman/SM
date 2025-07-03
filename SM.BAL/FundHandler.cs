@@ -98,7 +98,15 @@ namespace SM.BAL
                 query = query.Where(f => f.ServantID == servant.ServantID);
             }
 
-            return query.FirstOrDefault();
+            var fund = query.FirstOrDefault();
+            
+            if (fund?.Member != null)
+            {
+                int familyCount = _dbcontext.Members.Count(m => m.UNFileNumber == fund.Member.UNFileNumber);
+                fund.Member.FamilyCount = familyCount - 1;
+            }
+
+            return fund;
         }
 
         // Create a new fund

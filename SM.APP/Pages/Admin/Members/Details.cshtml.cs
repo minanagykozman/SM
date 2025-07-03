@@ -53,7 +53,7 @@ namespace SM.APP.Pages.Admin.Members
                     }
 
                     // Get attendance statistics
-                    var attendanceStats = memberHandler.GetMemberClassses(id.Value);
+                    var attendanceStats = memberHandler.GetMemberClassOverviews(id.Value);
                     if (attendanceStats != null)
                     {
                         ClassAttendanceStats = attendanceStats.Cast<MemberClassOverview>().ToList();

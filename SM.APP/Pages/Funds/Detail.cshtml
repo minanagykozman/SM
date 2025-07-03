@@ -4,299 +4,198 @@
     ViewData["Title"] = "Fund Details";
 }
 
-<!-- Back to List Button -->
-<div class="mb-3">
-    <a href="/Funds" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Back to List
-    </a>
-</div>
+<partial name="_LoadingPartial" />
+<div class="container mt-4" id="container">
+    <h1 class="text-center">Fund Details</h1>
+    <hr />
+    <div class="card shadow-lg p-4">
+        <partial name="_SuccessToastPartial" />
 
-<!-- Fund Detail Header -->
-<div class="fund-detail-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="mb-1">
-                Fund Request #<span id="fundNumber">Loading...</span>
-            </h1>
-            <p class="mb-0 opacity-75">
-                <span id="fundStatus" class="badge bg-light text-dark">Loading...</span>
-                <span class="ms-2">Created on <span id="creationDate">Loading...</span></span>
-            </p>
+        <div id="loadingSpinner" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading fund details...</p>
         </div>
-        <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-cog me-1"></i>
-                Actions
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" id="editFundBtn">
-                    <i class="fas fa-edit me-2"></i>Edit Details
-                </a></li>
-                <li><a class="dropdown-item" href="#" id="updateStatusBtn">
-                    <i class="fas fa-exchange-alt me-2"></i>Update Status
-                </a></li>
-                <li><a class="dropdown-item" href="#" id="addNotesBtn">
-                    <i class="fas fa-sticky-note me-2"></i>Add Notes
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#" id="deleteFundBtn">
-                    <i class="fas fa-trash me-2"></i>Delete Fund
-                </a></li>
-            </ul>
-        </div>
-    </div>
-</div>
 
-<!-- Loading Spinner -->
-<div id="loadingSpinner" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-2 text-muted">Loading fund details...</p>
-</div>
-
-<!-- Main Content -->
-<div id="fundContent" style="display: none;">
-    <div class="row g-4">
-        <!-- Fund Information Card -->
-        <div class="col-lg-8">
-            <div class="fund-info-card">
-                <h5 class="mb-4">
-                    <i class="fas fa-info-circle text-primary me-2"></i>
-                    Fund Information
-                </h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Member Name</label>
-                        <p class="fw-bold mb-0" id="memberName">Loading...</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Member Code</label>
-                        <p class="fw-bold mb-0" id="memberCode">Loading...</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Assigned To</label>
-                        <p class="fw-bold mb-0" id="assignedTo">Loading...</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Category</label>
-                        <p class="fw-bold mb-0" id="fundCategory">Loading...</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Requested Amount</label>
-                        <p class="fw-bold text-primary mb-0" id="requestedAmount">Loading...</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">Approved Amount</label>
-                        <p class="fw-bold text-success mb-0" id="approvedAmount">Loading...</p>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label text-muted">Request Description</label>
-                        <p class="mb-0" id="requestDescription">Loading...</p>
+        <div id="fundContent" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <ul class="nav nav-tabs" id="fundTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="fund-details-tab" data-bs-toggle="tab" data-bs-target="#fund-details" type="button" role="tab">
+                            Member Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="member-details-tab" data-bs-toggle="tab" data-bs-target="#member-details" type="button" role="tab">
+                           Fund Details
+                        </button>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span id="requestStatusBadge" class="badge bg-secondary fs-4 px-3 py-2 me-3">Loading...</span>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><button class="dropdown-item" type="button" id="editFundBtn"><i class="bi bi-pencil me-2"></i>Edit</button></li>
+                            <li><button class="dropdown-item" type="button" id="updateStatusBtn"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
+                            <li><button class="dropdown-item" type="button" id="addNoteBtn"><i class="bi bi-sticky me-2"></i>Add Note</button></li>
+                            <li id="deleteFundSeparator"><hr class="dropdown-divider"></li>
+                            <li id="deleteFundLi"><button class="dropdown-item text-danger" type="button" id="deleteFundBtn"><i class="bi bi-trash me-2"></i>Delete</button></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Status & Timeline Card -->
-        <div class="col-lg-4">
-            <div class="fund-info-card">
-                <h5 class="mb-4">
-                    <i class="fas fa-clock text-warning me-2"></i>
-                    Status & Timeline
-                </h5>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker bg-primary"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Request Created</h6>
-                            <p class="text-muted mb-0" id="createdDate">Loading...</p>
+            <div class="tab-content" id="fundTabsContent">
+                <div class="tab-pane fade show active" id="fund-details" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-12 text-center mb-4">
+                            <div id="memberImageContainer">
+                                <img id="memberImage" class="img-thumbnail shadow-sm mx-auto d-block d-none" alt="Member Photo" style="max-height: 200px;" />
+                                <i id="memberImagePlaceholder" class="fas fa-user-circle fa-5x text-secondary mx-auto d-block d-none"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberCode" class="form-control" readonly />
+                                <label>Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberName" class="form-control" readonly />
+                                <label>Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberMobile" class="form-control" readonly />
+                                <label>Mobile</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="familyMembers" class="form-control" readonly />
+                                <label>Family Members</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="lastUpdateDate" class="form-control" readonly />
+                                <label>Last Update Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberCreationDate" class="form-control" readonly />
+                                <label>Member Creation Date</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea id="memberNotes" class="form-control" readonly style="height: 100px;"></textarea>
+                                <label>Member Notes</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="fas fa-calendar-check text-info me-2"></i>
+                                Attendance History
+                            </h5>
+                            <div id="attendanceHistoryList" class="list-group">
+                            </div>
                         </div>
                     </div>
-                    <div class="timeline-item" id="approvedTimeline" style="display: none;">
-                        <div class="timeline-marker bg-success"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Approved</h6>
-                            <p class="text-muted mb-1">By: <span id="approverName">-</span></p>
-                            <p class="text-muted mb-0" id="approvedDate">-</p>
+                </div>
+
+                <div class="tab-pane fade" id="member-details" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="requestType" class="form-control" readonly />
+                                <label>Request Type</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="timeline-item" id="completedTimeline" style="display: none;">
-                        <div class="timeline-marker bg-secondary"></div>
-                        <div class="timeline-content">
-                            <h6 class="mb-1">Completed</h6>
-                            <p class="text-muted mb-0" id="completedDate">-</p>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="requestedAmount" class="form-control" readonly />
+                                <label>Requested Amount</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea id="requestDescription" class="form-control" readonly style="height: 80px;"></textarea>
+                                <label>Request Description</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="createdBy" class="form-control" readonly />
+                                <label>Created By</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="assignedTo" class="form-control" readonly />
+                                <label>Assigned To</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="creationDate" class="form-control" readonly />
+                                <label>Creation Date</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-2">
+                                <i class="fas fa-sticky-note text-info me-2"></i>
+                                Fund Notes
+                            </h6>
+                            <div id="fundNotes" class="border rounded p-3 bg-light" style="min-height: 100px;">
+                                <p class="text-muted mb-0">Loading notes...</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                Old Funds History
+                            </h5>
+                            <div id="fundsHistoryList" class="list-group">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                General Aids History
+                            </h5>
+                            <div id="aidsHistoryList" class="list-group">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Notes Section -->
-        <div class="col-12">
-            <div class="fund-info-card">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="mb-0">
-                        <i class="fas fa-comments text-info me-2"></i>
-                        Notes & Comments
-                    </h5>
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="addNoteBtn">
-                        <i class="fas fa-plus me-1"></i>Add Note
-                    </button>
-                </div>
-                <div id="notesContainer">
-                    <div class="text-center text-muted py-3">
-                        <i class="fas fa-sticky-note fa-2x mb-2"></i>
-                        <p>No notes available</p>
-                    </div>
-                </div>
+            <div class="mt-4">
+                <a href="/Funds" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to List
+                </a>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Edit Fund Modal -->
-<div class="modal fade" id="editFundModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-edit text-primary me-2"></i>
-                    Edit Fund Request
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editFundForm">
-                    <input type="hidden" id="editFundId">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="editAssigneeSelect" class="form-label">Assign To</label>
-                            <select class="form-select" id="editAssigneeSelect">
-                                <!-- Will be populated via JavaScript -->
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editFundCategory" class="form-label">Category</label>
-                            <select class="form-select" id="editFundCategory">
-                                <option value="Rent">Rent</option>
-                                <option value="ShantatBaraka">Shantat Baraka</option>
-                                <option value="Medical">Medical</option>
-                                <option value="SchoolFees">School Fees</option>
-                                <option value="Others">Others</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="editRequestDescription" class="form-label">Request Description</label>
-                            <textarea class="form-control" id="editRequestDescription" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="editRequestAmount" class="form-label">Requested Amount (optional)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="editRequestAmount" step="0.01" min="0">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label for="editNotes" class="form-label">Additional Notes</label>
-                            <textarea class="form-control" id="editNotes" rows="2" 
-                                      placeholder="Add notes about this update..."></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">
-                    <i class="fas fa-save me-1"></i>
-                    Save Changes
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<partial name="_FundEditPartial" />
 <!-- Update Status Modal -->
-<div class="modal fade" id="updateStatusModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-exchange-alt text-warning me-2"></i>
-                    Update Fund Status
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateStatusForm">
-                    <input type="hidden" id="statusFundId">
-                    <div class="mb-3">
-                        <label for="newStatus" class="form-label">New Status</label>
-                        <select class="form-select" id="newStatus" required>
-                            <option value="">Select Status</option>
-                            <option value="Open">Open</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
-                            <option value="Delivered">Delivered</option>
-                        </select>
-                    </div>
-                    <div class="mb-3" id="approvedAmountGroup" style="display: none;">
-                        <label for="newApprovedAmount" class="form-label">Approved Amount</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="newApprovedAmount" step="0.01" min="0">
-                        </div>
-
-                    </div>
-                    <div class="mb-3">
-                        <label for="statusNotes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="statusNotes" rows="3" 
-                                  placeholder="Add notes about this status change..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" id="saveUpdateStatusBtn">
-                    <i class="fas fa-check me-1"></i>
-                    Update Status
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<partial name="_FundUpdateStatusPartial" />
 <!-- Add Notes Modal -->
-<div class="modal fade" id="addNotesModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-sticky-note text-info me-2"></i>
-                    Add Notes
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addNotesForm">
-                    <input type="hidden" id="notesFundId">
-                    <div class="mb-3">
-                        <label for="newNotes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="newNotes" rows="4" required
-                                  placeholder="Enter your notes here..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-info" id="saveNotesBtn">
-                    <i class="fas fa-save me-1"></i>
-                    Add Notes
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_FundAddNotesPartial" />
+<!-- Delete Modal -->
+<partial name="_DeleteFundModalPartial" />
 
 @section Scripts {
     <script>

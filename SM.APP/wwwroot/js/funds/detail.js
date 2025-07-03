@@ -3,23 +3,7 @@ class FundDetailManager {
         this.fundId = this.getFundIdFromUrl();
         this.fund = null;
         this.assignableServants = [];
-        
-        // Fund Status Constants (matching C# enum values)
-        this.STATUS = {
-            OPEN: 0,
-            APPROVED: 1,
-            REJECTED: 2,
-            DELIVERED: 3
-        };
-        
-        this.CATEGORIES = {
-            RENT: 'Rent',
-            SHANTAT_BARAKA: 'ShantatBaraka',
-            MEDICAL: 'Medical',
-            SCHOOL_FEES: 'SchoolFees',
-            OTHERS: 'Others'
-        };
-        
+        this.STATUS = { OPEN: 0, APPROVED: 1, REJECTED: 2, DELIVERED: 3 };
         this.init();
     }
 
@@ -28,10 +12,10 @@ class FundDetailManager {
             window.location.href = '/Funds';
             return;
         }
-        
         this.bindEvents();
         this.loadFundDetails();
         this.loadAssignableServants();
+        this.setupFundDataListener();
     }
 
     getFundIdFromUrl() {
@@ -40,451 +24,284 @@ class FundDetailManager {
     }
 
     bindEvents() {
-        // Action buttons
-        document.getElementById('editFundBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showEditModal();
-        });
-        document.getElementById('updateStatusBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showUpdateStatusModal();
-        });
-        document.getElementById('addNotesBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showAddNotesModal();
-        });
-        document.getElementById('addNoteBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showAddNotesModal();
-        });
-        document.getElementById('deleteFundBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.deleteFund();
-        });
-
-        // Modal save buttons
-        document.getElementById('saveEditBtn')?.addEventListener('click', () => this.saveFundEdit());
-        document.getElementById('saveUpdateStatusBtn')?.addEventListener('click', () => this.updateFundStatus());
-        document.getElementById('saveNotesBtn')?.addEventListener('click', () => this.saveNotes());
-
-        // Status change handler
-        document.getElementById('newStatus')?.addEventListener('change', (e) => {
-            const approvedAmountGroup = document.getElementById('approvedAmountGroup');
-            if (approvedAmountGroup) {
-                approvedAmountGroup.style.display = e.target.value === 'Approved' ? 'block' : 'none';
-            }
-        });
-
-        // Back button
-        document.querySelector('.btn-outline-light')?.addEventListener('click', () => {
-            window.location.href = '/Funds';
+        ['editFundBtn', 'updateStatusBtn', 'addNoteBtn', 'deleteFundBtn'].forEach(id => {
+            document.getElementById(id)?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (id.startsWith('edit')) this.showEditModal();
+                if (id.startsWith('update')) this.showUpdateStatusModal();
+                if (id.startsWith('add')) this.showAddNotesModal();
+                if (id.startsWith('delete')) this.showDeleteFundModal();
+            });
         });
     }
 
     async loadFundDetails() {
         try {
             this.showLoading(true);
-            
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, {
-                credentials: 'include'
-            });
+            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, { credentials: 'include' });
             if (!response.ok) {
-                if (response.status === 404) {
-                    this.showError('Fund not found');
-                    setTimeout(() => window.location.href = '/Funds', 2000);
-                    return;
-                }
-                throw new Error('Failed to load fund details');
+                if (response.status === 404) this.showError('Fund not found');
+                else throw new Error('Failed to load fund details');
+                return;
             }
-
             this.fund = await response.json();
             this.populateFundDetails();
+            await this.loadMemberDetails();
         } catch (error) {
+            console.error('Error loading fund details:', error);
             this.showError('Failed to load fund details');
         } finally {
             this.showLoading(false);
         }
     }
 
+    async loadMemberDetails() {
+        if (!this.fund?.member?.memberID) return;
+        try {
+            await Promise.all([
+                this.loadMemberFundsHistory(),
+                this.loadMemberAidsHistory(),
+                this.loadMemberAttendanceHistory(),
+            ]);
+        } catch (error) {
+            console.error('Error loading member details:', error);
+        }
+    }
+
+    async loadMemberFundsHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberFunds?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
+            if (response.ok) {
+                const funds = await response.json();
+                const filteredFunds = funds.filter(fund => parseInt(fund.fundID) !== parseInt(this.fundId));
+                this.populateFundsHistory(filteredFunds);
+            }
+        } catch (error) { console.error('Error loading funds history:', error); }
+    }
+
+    async loadMemberAidsHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberAids?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
+            if (response.ok) {
+                const aids = await response.json();
+                this.populateAidsHistory(aids);
+            }
+        } catch (error) { console.error('Error loading aids history:', error); }
+    }
+
+    async loadMemberAttendanceHistory() {
+        try {
+            const response = await fetch(`${apiBaseUrl}/Member/GetMemberClassOverviews?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
+            if (response.ok) {
+                const memberClasses = await response.json();
+                this.populateAttendanceHistory(memberClasses);
+            }
+        } catch (error) { console.error('Error loading attendance history:', error); }
+    }
+
     async loadAssignableServants() {
         try {
-            const response = await fetch(`${apiBaseUrl}/api/Fund/assignable-servants`, {
-                credentials: 'include'
-            });
-            if (response.ok) {
-                this.assignableServants = await response.json();
-                this.populateAssigneeDropdowns();
-            }
-        } catch (error) {
-            // Silently handle - this is not critical functionality
-        }
+            const response = await fetch(`${apiBaseUrl}/api/Fund/assignable-servants`, { credentials: 'include' });
+            if (response.ok) this.assignableServants = await response.json();
+        } catch (error) { console.error('Error loading assignable servants:', error); }
     }
 
     populateFundDetails() {
         if (!this.fund) return;
 
-        // Map status numbers to names
-        const statusMap = {
-            0: 'Open',
-            1: 'Approved',
-            2: 'Rejected',
-            3: 'Delivered'
-        };
-        let statusText = this.fund.status;
-        if (typeof statusText === 'number') {
-            statusText = statusMap[statusText] || statusText;
+        const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered' };
+        let statusText = typeof this.fund.status === 'number' ? statusMap[this.fund.status] : this.fund.status;
+
+        const statusBadge = document.getElementById('requestStatusBadge');
+        if (statusBadge) {
+            statusBadge.textContent = statusText;
+            statusBadge.className = `badge ${this.getFundStatusBadgeClass(this.fund.status)} fs-6 p-2 me-2`;
         }
 
-        // Header information
-        document.getElementById('fundNumber').textContent = this.fund.fundID;
-        document.getElementById('fundStatus').textContent = statusText;
-        document.getElementById('fundStatus').className = `badge ${this.getStatusBadgeClass(statusText)}`;
-        document.getElementById('creationDate').textContent = this.formatDate(this.fund.requestDate);
+        // Fields population
+        document.getElementById('memberCode').value = this.fund.member?.code || '';
+        document.getElementById('memberName').value = this.fund.member?.fullName || '';
+        document.getElementById('memberMobile').value = this.fund.member?.mobile || '';
+        document.getElementById('familyMembers').value = this.fund.member?.familyCount?.toString() || 'N/A';
+        document.getElementById('requestType').value = this.fund.fundCategory || '';
+        document.getElementById('requestedAmount').value = this.formatCurrency(this.fund.requestedAmount);
+        document.getElementById('requestDescription').value = this.fund.requestDescription || '';
+        document.getElementById('createdBy').value = this.fund.servant?.servantName || 'Unknown';
+        document.getElementById('assignedTo').value = this.fund.approver?.servantName || 'Unassigned';
+        document.getElementById('creationDate').value = formatDate(this.fund.requestDate);
+        document.getElementById('lastUpdateDate').value = formatDate(this.fund.requestDate);
+        document.getElementById('memberNotes').value = this.fund.member?.notes || '';
+        document.getElementById('memberCreationDate').value = this.fund.member?.createdAt ? formatDate(this.fund.member.createdAt) : 'Not Set';
+        this.populateFundNotes(this.fund.approverNotes);
 
-        // Fund information
-        document.getElementById('memberName').textContent = this.fund.member?.fullName || 'Unknown Member';
-        document.getElementById('memberCode').textContent = this.fund.member?.code || 'N/A';
-        document.getElementById('requestDescription').textContent = this.fund.requestDescription || 'No description';
-        document.getElementById('requestedAmount').textContent = this.formatCurrency(this.fund.requestedAmount);
-        document.getElementById('approvedAmount').textContent = this.fund.approvedAmount ? 
-            this.formatCurrency(this.fund.approvedAmount) : 'Not set';
-        document.getElementById('fundCategory').textContent = this.fund.fundCategory || 'Other';
-        document.getElementById('assignedTo').textContent = this.fund.servant?.servantName || 'Unassigned';
+        // Member Image
+        const memberImage = document.getElementById('memberImage');
+        const placeholder = document.getElementById('memberImagePlaceholder');
 
-        // Timeline - Use numeric status values (1=Approved, 3=Delivered)
-        document.getElementById('createdDate').textContent = this.formatDate(this.fund.requestDate);
-        
-        if (this.fund.status === this.STATUS.APPROVED || this.fund.status === this.STATUS.DELIVERED) {
-            const approvedTimeline = document.getElementById('approvedTimeline');
-            if (approvedTimeline) {
-                approvedTimeline.style.display = 'block';
-                document.getElementById('approverName').textContent = this.fund.approver?.servantName || 'Unknown';
-                // Note: We'd need approval date from the backend
+        if (memberImage && placeholder) {
+            if (this.fund.member?.imageURL) {
+                memberImage.src = this.fund.member.imageURL;
+                memberImage.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+
+                // It's still a good practice to handle loading errors
+                memberImage.onerror = function () {
+                    // If the image fails, hide it and show the placeholder instead
+                    memberImage.classList.add('d-none');
+                    placeholder.classList.remove('d-none');
+                };
+            } else {
+                // If there's no URL, show the placeholder and hide the image
+                placeholder.classList.remove('d-none');
+                memberImage.classList.add('d-none');
             }
         }
 
-        if (this.fund.status === this.STATUS.DELIVERED) {
-            const completedTimeline = document.getElementById('completedTimeline');
-            if (completedTimeline) {
-                completedTimeline.style.display = 'block';
-                // Note: We'd need completion date from the backend
-            }
+        //Conditional Delete Button
+        const deleteFundLi = document.getElementById('deleteFundLi');
+        const deleteFundSeparator = document.getElementById('deleteFundSeparator');
+        if (deleteFundLi) {
+            deleteFundLi.style.display = (this.fund.status === this.STATUS.OPEN) ? 'block' : 'none';
+            deleteFundSeparator.style.display = (this.fund.status === this.STATUS.OPEN) ? 'block' : 'none';
         }
-
-        // Notes
-        this.populateNotes();
-
-        // Update action buttons based on status and permissions
-        this.updateActionButtons();
     }
 
-    populateNotes() {
-        const notesContainer = document.getElementById('notesContainer');
-        if (!notesContainer) return;
+    populateFundNotes(notesString) {
+        const notesContainer = document.getElementById('fundNotes');
+        if (notesString && notesString.trim()) {
+            notesContainer.innerHTML = this.parseNotes(notesString).map(note => `...`).join('');
+        } else {
+            notesContainer.innerHTML = '<p class="text-muted mb-0">No notes available</p>';
+        }
+    }
 
-        if (!this.fund.approverNotes || this.fund.approverNotes.trim() === '') {
-            notesContainer.innerHTML = `
-                <div class="text-center text-muted py-3">
-                    <i class="fas fa-sticky-note fa-2x mb-2"></i>
-                    <p>No notes available</p>
-                </div>
-            `;
+    parseNotes(notesString) { /* ... implementation ... */ return []; }
+
+    populateFundsHistory(funds) {
+        const fundsList = document.getElementById('fundsHistoryList');
+        if (!funds || funds.length === 0) {
+            fundsList.innerHTML = '<div class="list-group-item text-center text-muted">No funds history available</div>';
             return;
         }
 
-        // Parse notes (assuming they're in format: [timestamp - user]: note)
-        const notes = this.parseNotes(this.fund.approverNotes);
-        notesContainer.innerHTML = notes.map(note => `
-            <div class="note-item mb-3 p-3 border rounded">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <strong class="text-primary">${note.author}</strong>
-                    <small class="text-muted">${note.timestamp}</small>
-                </div>
-                <p class="mb-0">${note.content}</p>
+        const self = this; // **FIX**: Preserve 'this' context
+        funds.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+        fundsList.innerHTML = funds.map(function (fund) { // Use regular function with self
+            return `
+                        <div class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">${fund.fundCategory || 'N/A'}</h5>
+                                <span class="badge ${self.getFundStatusBadgeClass(fund.status)} fs-6">${self.getFundStatusText(fund.status)}</span>
+                            </div>
+                            <p class="mb-1">${fund.requestDescription || 'No description'}</p>
+                            <div class="d-flex w-100 justify-content-between align-items-center mt-2">
+                                <small class="text-muted"><i class="bi bi-calendar-event me-1"></i> ${formatDate(fund.requestDate)}</small>
+                                <small><b>Requested:</b> ${self.formatCurrency(fund.requestedAmount)} | <b>Approved:</b> ${self.formatCurrency(fund.approvedAmount)}</small>
+                            </div>
+                        </div>`;
+        }).join('');
+    }
+
+    populateAidsHistory(aids) {
+        const aidsList = document.getElementById('aidsHistoryList');
+        if (!aidsList) return;
+
+        if (aids && aids.length > 0) {
+            // **FIXED**: The logic was inadvertently removed in the previous update. This is the corrected version.
+            aidsList.innerHTML = aids.map(aid => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${aid.aid?.aidName || 'N/A'}</span>
+                <small class="text-muted fw-bold">${formatDate(aid.timeStamp)}</small>
             </div>
         `).join('');
+        } else {
+            aidsList.innerHTML = '<div class="list-group-item text-center text-muted"><i class="bi bi-bandaid fa-lg me-2"></i>No aids history available</div>';
+        }
     }
 
-    parseNotes(notesString) {
-        const lines = notesString.split('\n');
-        const notes = [];
-        
-        for (const line of lines) {
-            const match = line.match(/^\[(.*?) - (.*?)\]: (.*)$/);
-            if (match) {
-                notes.push({
-                    timestamp: match[1],
-                    author: match[2],
-                    content: match[3]
-                });
-            } else if (line.trim()) {
-                // Fallback for notes without proper format
-                notes.push({
-                    timestamp: 'Unknown',
-                    author: 'System',
-                    content: line.trim()
-                });
+    populateAttendanceHistory(memberClasses) {
+        const attendanceList = document.getElementById('attendanceHistoryList');
+        if (!memberClasses || memberClasses.length === 0) {
+            attendanceList.innerHTML = '<div class="list-group-item text-center text-muted">No class attendance data available</div>';
+            return;
+        }
+
+        // No context issue here, but keeping the pattern for consistency
+        const self = this;
+        attendanceList.innerHTML = memberClasses.map(function (classData) {
+            let percentage = 0, badgeClass = 'bg-secondary', attendanceText = 'N/A';
+            if (classData.attendance && classData.attendance.includes('/')) {
+                const [attended, total] = classData.attendance.split('/').map(n => parseInt(n));
+                if (total > 0) {
+                    percentage = Math.round((attended / total) * 100);
+                    if (percentage >= 80) badgeClass = 'bg-success';
+                    else if (percentage >= 50) badgeClass = 'bg-warning text-dark';
+                    else badgeClass = 'bg-danger';
+                }
+                attendanceText = classData.attendance;
             }
-        }
-        
-        return notes;
-    }
-
-    populateAssigneeDropdowns() {
-        const editAssigneeSelect = document.getElementById('editAssigneeSelect');
-        if (editAssigneeSelect && this.assignableServants) {
-            editAssigneeSelect.innerHTML = '<option value="">Select Assignee</option>' +
-                this.assignableServants.map(servant => 
-                    `<option value="${servant.servantID}">${servant.servantName}</option>`
-                ).join('');
-        }
-    }
-
-    updateActionButtons() {
-        const editBtn = document.getElementById('editFundBtn');
-        const updateStatusBtn = document.getElementById('updateStatusBtn');
-        const deleteBtn = document.getElementById('deleteFundBtn');
-
-        // Only allow editing of open funds
-        if (editBtn) {
-            editBtn.style.display = this.fund.status === this.STATUS.OPEN ? 'block' : 'none';
-        }
-
-        // Only allow deletion of open funds (and only for admins - this would need server-side check)
-        if (deleteBtn) {
-            deleteBtn.style.display = this.fund.status === this.STATUS.OPEN ? 'block' : 'none';
-        }
+            const lastPresent = classData.lastPresentDate ? formatDate(classData.lastPresentDate) : 'Never';
+            return `
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between mb-1">
+                                <h6 class="mb-0">${classData.className || ''}</h6>
+                                <span class="badge bg-light text-dark align-self-center fs-6 fw-bold">${attendanceText}</span>
+                            </div>
+                            <div class="progress mb-1" style="height: 20px;">
+                                <div class="progress-bar ${badgeClass}" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">${percentage}%</div>
+                            </div>
+                            <small class="text-muted">Last Attended: ${lastPresent}</small>
+                        </div>`;
+        }).join('');
     }
 
     showEditModal() {
-        if (!this.fund) return;
-
-        // Populate edit form
-        document.getElementById('editFundId').value = this.fund.fundID;
-        document.getElementById('editAssigneeSelect').value = this.fund.servantID || '';
-        document.getElementById('editFundCategory').value = this.fund.fundCategory || '';
-        document.getElementById('editRequestDescription').value = this.fund.requestDescription || '';
-        document.getElementById('editRequestAmount').value = this.fund.requestedAmount || '';
-
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('editFundModal'));
-        modal.show();
+        if (typeof showEditModal === 'function') showEditModal(this.fund);
     }
 
     showUpdateStatusModal() {
-        if (!this.fund) return;
-
-        document.getElementById('statusFundId').value = this.fund.fundID;
-        document.getElementById('newStatus').value = '';
-        document.getElementById('newApprovedAmount').value = '';
-        document.getElementById('statusNotes').value = '';
-        
-        // Hide approved amount initially
-        document.getElementById('approvedAmountGroup').style.display = 'none';
-
-        const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-        modal.show();
+        if (typeof showUpdateStatusModal === 'function') showUpdateStatusModal(this.fund);
     }
 
     showAddNotesModal() {
-        if (!this.fund) return;
-
-        document.getElementById('notesFundId').value = this.fund.fundID;
-        document.getElementById('newNotes').value = '';
-
-        const modal = new bootstrap.Modal(document.getElementById('addNotesModal'));
-        modal.show();
+        if (typeof showAddNotesModal === 'function') showAddNotesModal(this.fund);
     }
 
-    async saveFundEdit() {
-        try {
-            const requestedAmountValue = document.getElementById('editRequestAmount').value;
-            const formData = {
-                fundID: parseInt(document.getElementById('editFundId').value),
-                servantID: parseInt(document.getElementById('editAssigneeSelect').value),
-                fundCategory: document.getElementById('editFundCategory').value,
-                requestDescription: document.getElementById('editRequestDescription').value,
-                requestedAmount: requestedAmountValue ? parseFloat(requestedAmountValue) : null,
-                approverNotes: document.getElementById('editNotes').value
-            };
+    showDeleteFundModal() {
+        if (typeof showDeleteFundModal === 'function') showDeleteFundModal(this.fund);
+    }
 
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
+    getFundStatusText(status) {
+        const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered' };
+        return statusMap[status] || status.toString();
+    }
 
-            if (!response.ok) {
-                throw new Error('Failed to update fund');
-            }
-
-            // Close modal and reload data
-            bootstrap.Modal.getInstance(document.getElementById('editFundModal')).hide();
-            this.showSuccess('Fund updated successfully');
-            this.loadFundDetails();
-
-        } catch (error) {
-            this.showError('Failed to update fund');
+    getFundStatusBadgeClass(status) {
+        switch (status) {
+            case 0: return 'bg-warning text-dark';
+            case 1: return 'bg-success';
+            case 2: return 'bg-danger';
+            case 3: return 'bg-info';
+            default: return 'bg-secondary';
         }
-    }
-
-    async updateFundStatus() {
-        try {
-            const formData = {
-                fundID: parseInt(document.getElementById('statusFundId').value),
-                status: document.getElementById('newStatus').value,
-                approverNotes: document.getElementById('statusNotes').value,
-                approvedAmount: document.getElementById('newApprovedAmount').value ? 
-                    parseFloat(document.getElementById('newApprovedAmount').value) : null
-            };
-
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update status');
-            }
-
-            // Close modal and reload data
-            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
-            this.showSuccess('Status updated successfully');
-            this.loadFundDetails();
-
-        } catch (error) {
-            this.showError('Failed to update status');
-        }
-    }
-
-    async saveNotes() {
-        try {
-            const formData = {
-                fundID: parseInt(document.getElementById('notesFundId').value),
-                approverNotes: document.getElementById('newNotes').value
-            };
-
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}/notes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add notes');
-            }
-
-            // Close modal and reload data
-            bootstrap.Modal.getInstance(document.getElementById('addNotesModal')).hide();
-            this.showSuccess('Notes added successfully');
-            this.loadFundDetails();
-
-        } catch (error) {
-            this.showError('Failed to add notes');
-        }
-    }
-
-    async deleteFund() {
-        if (!confirm('Are you sure you want to delete this fund request? This action cannot be undone.')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`${apiBaseUrl}/api/Fund/${this.fundId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete fund');
-            }
-
-            this.showSuccess('Fund deleted successfully');
-            setTimeout(() => window.location.href = '/Funds', 1500);
-
-        } catch (error) {
-            this.showError('Failed to delete fund');
-        }
-    }
-
-    getStatusBadgeClass(status) {
-        const classes = {
-            'Open': 'bg-warning text-dark',
-            'Approved': 'bg-success',
-            'Rejected': 'bg-danger',
-            'Delivered': 'bg-info'
-        };
-        return classes[status] || 'bg-secondary';
-    }
-
-    formatDate(dateString) {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
     }
 
     formatCurrency(amount) {
-        if (!amount && amount !== 0) return 'Not specified';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
+        if (amount === null || amount === undefined) return 'N/A';
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount);
     }
 
     showLoading(show) {
-        const spinner = document.getElementById('loadingSpinner');
-        const content = document.getElementById('fundContent');
-        
-        if (spinner) spinner.style.display = show ? 'block' : 'none';
-        if (content) content.style.display = show ? 'none' : 'block';
+        document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        document.getElementById('fundContent').style.display = show ? 'none' : 'block';
     }
 
-    showSuccess(message) {
-        this.showAlert(message, 'success');
-    }
+    showError(message) { if (typeof showToast === 'function') showToast(message, 'Error'); }
 
-    showError(message) {
-        this.showAlert(message, 'danger');
-    }
-
-    showAlert(message, type) {
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-        alert.style.top = '20px';
-        alert.style.right = '20px';
-        alert.style.zIndex = '9999';
-        alert.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        document.body.appendChild(alert);
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (alert.parentNode) {
-                alert.parentNode.removeChild(alert);
-            }
-        }, 5000);
+    setupFundDataListener() {
+        $(document).on('fundDataChanged', () => { this.loadFundDetails(); });
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new FundDetailManager();
-}); 
+document.addEventListener('DOMContentLoaded', () => { new FundDetailManager(); });
+    

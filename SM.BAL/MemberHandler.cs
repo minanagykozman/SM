@@ -540,7 +540,7 @@ namespace SM.BAL
                 .ToList();
         }
 
-        public List<MemberClassOverview> GetMemberClassses(int memberID)
+        public List<MemberClassOverview> GetMemberClassOverviews(int memberID)
         {
             var memberClasses = _dbcontext.ClassMembers.Include(cm => cm.Class).Where(mc => mc.MemberID == memberID).ToList();
             if (memberClasses == null)
