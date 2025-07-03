@@ -254,9 +254,9 @@ namespace SM.BAL
                 {
                     throw new ArgumentException("Invalid assignee ID");
                 }
-                fund.ServantID = request.ServantID.Value;
+                fund.ApproverID = request.ServantID.Value;
             }
-
+            
             if (request.RequestedAmount.HasValue)
             {
                 fund.RequestedAmount = request.RequestedAmount.Value;
