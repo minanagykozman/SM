@@ -124,13 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
-    const year = String(date.getFullYear());
-    return `${day}-${month}-${year}`;
-}
+function formatDate(dateString) { return !dateString ? '' : new Date(dateString).toLocaleDateString('en-GB'); }
 // Function to Sort Table Columns
 function sortTable(columnIndex, thElement) {
     let table = document.getElementById("dataTable");

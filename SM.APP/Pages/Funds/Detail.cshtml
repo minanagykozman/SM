@@ -10,8 +10,7 @@
     <hr />
     <div class="card shadow-lg p-4">
         <partial name="_SuccessToastPartial" />
-        
-        <!-- Loading Spinner -->
+
         <div id="loadingSpinner" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -19,283 +18,171 @@
             <p class="mt-2 text-muted">Loading fund details...</p>
         </div>
 
-        <!-- Main Content -->
         <div id="fundContent" style="display: none;">
-            <!-- Tab Navigation -->
-            <ul class="nav nav-tabs mb-4" id="fundTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="fund-details-tab" data-bs-toggle="tab" data-bs-target="#fund-details" type="button" role="tab">
-                        <i class="fas fa-dollar-sign me-2"></i>Fund Details
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="member-details-tab" data-bs-toggle="tab" data-bs-target="#member-details" type="button" role="tab">
-                        <i class="fas fa-user me-2"></i>Member Details
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Tab Content -->
-            <div class="tab-content" id="fundTabsContent">
-                <!-- Fund Details Tab -->
-                <div class="tab-pane fade show active" id="fund-details" role="tabpanel">
-                    <form id="fundDetailsForm" class="needs-validation">
-                        <!-- Header with integrated status -->
-                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-hash text-primary me-2 fs-4"></i>
-                                <h4 class="mb-0 text-primary fw-bold" id="fundIdTitle">Fund ID</h4>
-                            </div>
-                            <span id="requestStatusBadge" class="badge bg-secondary fs-6 px-3 py-2">Loading...</span>
-                        </div>
-                        
-                        <div class="row g-3">
-                            <!-- Member Image -->
-                            <div class="col-12 d-flex justify-content-center align-items-center mb-3">
-                                <div id="memberImageContainer">
-                                    <img id="memberImage" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; display: none;" alt="Member Photo" />
-                                    <i id="memberImagePlaceholder" class="fas fa-user-circle fa-5x text-secondary"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="memberCode" class="form-control" readonly />
-                                    <label>Code</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="memberName" class="form-control" readonly />
-                                    <label>Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="memberMobile" class="form-control" readonly />
-                                    <label>Mobile</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="familyMembers" class="form-control" readonly />
-                                    <label>Family Members</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="requestType" class="form-control" readonly />
-                                    <label>Request Type</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="requestedAmount" class="form-control" readonly />
-                                    <label>Requested Amount</label>
-                                </div>
-                            </div>
-                            
-                            <!-- Request Description -->
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <textarea id="requestDescription" class="form-control" readonly style="height: 80px;"></textarea>
-                                    <label>Request Description</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="createdBy" class="form-control" readonly />
-                                    <label>Created By</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="assignedTo" class="form-control" readonly />
-                                    <label>Assigned To</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="creationDate" class="form-control" readonly />
-                                    <label>Creation Date</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input id="lastUpdateDate" class="form-control" readonly />
-                                    <label>Last Update Date</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6"></div>
-                            
-                            <!-- Fund Notes -->
-                            <div class="col-12">
-                                <h6 class="mb-2">
-                                    <i class="fas fa-sticky-note text-info me-2"></i>
-                                    Fund Notes
-                                </h6>
-                                <div id="fundNotes" class="border rounded p-3 bg-light" style="min-height: 100px;">
-                                    <p class="text-muted mb-0">Loading notes...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <ul class="nav nav-tabs" id="fundTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="fund-details-tab" data-bs-toggle="tab" data-bs-target="#fund-details" type="button" role="tab">
+                            Member Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="member-details-tab" data-bs-toggle="tab" data-bs-target="#member-details" type="button" role="tab">
+                           Fund Details
+                        </button>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span id="requestStatusBadge" class="badge bg-secondary fs-4 px-3 py-2 me-3">Loading...</span>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><button class="dropdown-item" type="button" id="editFundBtn"><i class="bi bi-pencil me-2"></i>Edit</button></li>
+                            <li><button class="dropdown-item" type="button" id="updateStatusBtn"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
+                            <li><button class="dropdown-item" type="button" id="addNoteBtn"><i class="bi bi-sticky me-2"></i>Add Note</button></li>
+                            <li id="deleteFundSeparator"><hr class="dropdown-divider"></li>
+                            <li id="deleteFundLi"><button class="dropdown-item text-danger" type="button" id="deleteFundBtn"><i class="bi bi-trash me-2"></i>Delete</button></li>
+                        </ul>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Member Details Tab -->
-                <div class="tab-pane fade" id="member-details" role="tabpanel">
+            <div class="tab-content" id="fundTabsContent">
+                <div class="tab-pane fade show active" id="fund-details" role="tabpanel">
                     <div class="row g-3">
-                        <!-- Member Creation Date -->
+                        <div class="col-12 text-center mb-4">
+                            <div id="memberImageContainer">
+                                <img id="memberImage" class="img-thumbnail shadow-sm mx-auto d-block d-none" alt="Member Photo" style="max-height: 200px;" />
+                                <i id="memberImagePlaceholder" class="fas fa-user-circle fa-5x text-secondary mx-auto d-block d-none"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberCode" class="form-control" readonly />
+                                <label>Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberName" class="form-control" readonly />
+                                <label>Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="memberMobile" class="form-control" readonly />
+                                <label>Mobile</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="familyMembers" class="form-control" readonly />
+                                <label>Family Members</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="lastUpdateDate" class="form-control" readonly />
+                                <label>Last Update Date</label>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-floating">
                                 <input id="memberCreationDate" class="form-control" readonly />
                                 <label>Member Creation Date</label>
                             </div>
                         </div>
-                        <div class="col-md-6"></div>
-                        
-                        <!-- Member Notes -->
                         <div class="col-12">
                             <div class="form-floating">
                                 <textarea id="memberNotes" class="form-control" readonly style="height: 100px;"></textarea>
                                 <label>Member Notes</label>
                             </div>
                         </div>
-                        
-                        <!-- Funds History -->
-                        <div class="col-12">
-                            <h5 class="mb-3">
-                                <i class="fas fa-history text-primary me-2"></i>
-                                Funds History
-                            </h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="fundsHistoryTable">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Category</th>
-                                            <th>Description</th>
-                                            <th>Status</th>
-                                            <th>Requested Amount</th>
-                                            <th>Approved Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="fundsHistoryBody">
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted py-3">
-                                                <i class="fas fa-history fa-2x mb-2 d-block"></i>
-                                                No funds history available
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Aids History -->
-                        <div class="col-12">
-                            <h5 class="mb-3">
-                                <i class="fas fa-gift text-success me-2"></i>
-                                Aids History
-                            </h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="aidsHistoryTable">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Aid Name</th>
-                                            <th>Aid Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="aidsHistoryBody">
-                                        <tr>
-                                            <td colspan="2" class="text-center text-muted py-3">
-                                                <i class="fas fa-gift fa-2x mb-2 d-block"></i>
-                                                No aids history available
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Attendance History -->
                         <div class="col-12">
                             <h5 class="mb-3">
                                 <i class="fas fa-calendar-check text-info me-2"></i>
                                 Attendance History
                             </h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="attendanceHistoryTable">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Class Name</th>
-                                            <th>Last Attended Date</th>
-                                            <th>Attendance Percentage</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="attendanceHistoryBody">
-                                        <tr>
-                                            <td colspan="3" class="text-center text-muted py-3">
-                                                <i class="fas fa-calendar-check fa-2x mb-2 d-block"></i>
-                                                No attendance history available
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div id="attendanceHistoryList" class="list-group">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="member-details" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="requestType" class="form-control" readonly />
+                                <label>Request Type</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="requestedAmount" class="form-control" readonly />
+                                <label>Requested Amount</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea id="requestDescription" class="form-control" readonly style="height: 80px;"></textarea>
+                                <label>Request Description</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="createdBy" class="form-control" readonly />
+                                <label>Created By</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="assignedTo" class="form-control" readonly />
+                                <label>Assigned To</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="creationDate" class="form-control" readonly />
+                                <label>Creation Date</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-2">
+                                <i class="fas fa-sticky-note text-info me-2"></i>
+                                Fund Notes
+                            </h6>
+                            <div id="fundNotes" class="border rounded p-3 bg-light" style="min-height: 100px;">
+                                <p class="text-muted mb-0">Loading notes...</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                Old Funds History
+                            </h5>
+                            <div id="fundsHistoryList" class="list-group">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                General Aids History
+                            </h5>
+                            <div id="aidsHistoryList" class="list-group">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Action Buttons -->
+
             <div class="mt-4">
-                <!-- Mobile Layout -->
-                <div class="d-block d-md-none">
-                    <div class="d-grid gap-2 mb-3">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="actionDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i> Actions
-                            </button>
-                            <ul class="dropdown-menu w-100">
-                                <li><button class="dropdown-item" type="button" id="editFundBtnMobile"><i class="bi bi-pencil me-2"></i>Edit</button></li>
-                                <li><button class="dropdown-item" type="button" id="updateStatusBtnMobile"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
-                                <li><button class="dropdown-item" type="button" id="addNoteBtnMobile"><i class="bi bi-sticky me-2"></i>Add Note</button></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><button class="dropdown-item text-danger" type="button" id="deleteFundBtnMobile"><i class="bi bi-trash me-2"></i>Delete</button></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <a href="/Funds" class="btn btn-outline-secondary">
-                            <i class="fas me-1"></i>Back to List
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Desktop Layout -->
-                <div class="d-none d-md-flex justify-content-between align-items-center">
-                    <a href="/Funds" class="btn btn-outline-secondary">
-                        <i class="fas me-1"></i>Back to List
-                    </a>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi"></i> Actions
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><button class="dropdown-item" type="button" id="editFundBtn"><i class="bi bi-pencil me-2"></i>Edit</button></li>
-                            <li><button class="dropdown-item" type="button" id="updateStatusBtn"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
-                            <li><button class="dropdown-item" type="button" id="addNoteBtn"><i class="bi bi-sticky me-2"></i>Add Note</button></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item text-danger" type="button" id="deleteFundBtn"><i class="bi bi-trash me-2"></i>Delete</button></li>
-                        </ul>
-                    </div>
-                </div>
+                <a href="/Funds" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to List
+                </a>
             </div>
         </div>
     </div>
