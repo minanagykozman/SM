@@ -145,29 +145,25 @@
 @section Scripts {
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-                function back() {
-            // Get the current value from the input field
-            const code = document.getElementById("Code").value;
+        function back() {
+            const params = new URLSearchParams(window.location.search);
+            const returnURL = params.get('returnURL');
 
-            // Log the value to the console for debugging
-            console.log("Value in 'Code' input field when back() was called:", code);
-
-            // Check if the code variable actually has a value
-            if (code && code.trim() !== '') {
-                // If it has a value, build the full URL
-                const url = `/Index?userCode=${encodeURIComponent(code)}`;
-
-                // THIS ALERT WILL PAUSE EXECUTION so you can see the URL
-                alert(`The browser will now try to redirect to this URL:\n\n${url}`);
-
-                // Perform the redirect
-                window.location.href = url;
+            if (returnURL) {
+                // If returnURL is present in the query string, redirect to it
+                window.location.href = returnURL;
             } else {
-                // If it's empty, null, or just whitespace, redirect to the base Index page
-                alert("The 'Code' field is empty. Redirecting to /Index.");
-                window.location.href = '/Index';
+                // Existing logic
+                const code = document.getElementById("Code").value;
+                if (code && code.trim() !== '') {
+                    const url = `/Index?userCode=${encodeURIComponent(code)}`;
+                    window.location.href = url;
+                } else {
+                    window.location.href = '/Index';
+                }
             }
         }
+
         async function loadMemberData()
         {
             const id = new URLSearchParams(window.location.search).get("id");
@@ -209,7 +205,7 @@
                     $('#drpClasses').val(classIDs).trigger('change');
 
                 } catch (err) {
-                    console.error("Error loading event:", err);
+                    console.error("Error loading member details:", err);
                 }
             }
         }

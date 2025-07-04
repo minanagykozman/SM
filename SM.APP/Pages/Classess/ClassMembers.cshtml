@@ -3,269 +3,76 @@
 @{
     ViewData["Title"] = "Class Members";
 }
+
 <partial name="_LoadingPartial" />
 <div class="container mt-4" id="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <h4 class="mb-0">Class Members</h4>
-        <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
+        <div>
+            <button class="btn btn-outline-primary" id="download-excel">
+                <i class="bi bi-download me-1"></i>Download as Excel
+            </button>
+            <span id="counter" class="badge bg-success px-3 py-2 fs-6 ms-2">Members: 0</span>
+        </div>
     </div>
-    <input type="hidden" name="classID" value="@ViewContext.HttpContext.Request.Query["classID"]" />
-    <!-- Table for Larger Screens -->
+    <input type="hidden" id="classID" name="classID" value="@ViewContext.HttpContext.Request.Query["classID"]" />
 
-    <div class="d-none d-md-block">
+    <div class="d-flex flex-wrap align-items-end gap-3 mb-4 p-3 border rounded bg-light">
+        <div class="flex-grow-1" style="min-width: 200px;">
+            <label for="search-filter" class="form-label small">Search</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="search-filter" placeholder="Code, Name, Age...">
+            </div>
+        </div>
 
-        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-            <table class="table table-hover table-striped  align-middle" id="dataTable">
-                <thead class="table-primary">
-                    <tr>
-                        <th onclick="sortBySequence(this)">
-                            Code
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
-                        </th>
-                        <th onclick="sortTable(1,this)">
-                            Name
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
-                        </th>
-                        <th onclick="sortTable(2,this)">
-                            Age
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search Age">
-                        </th>
-                        <th>
-                            UN File Number
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search File Number">
-                        </th>
-                        <th>
-                            UN Number
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Personal Number">
-                        </th>
-                        <th>
-                            Mobile
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Mobile">
-                        </th>
-                        <th onclick="sortTable(6,this)">
-                            Attendance
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Attendance">
-                        </th>
-                        <th onclick="sortTable(7,this)">
-                            Last Present
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="">
-                        </th>
-                        <th onclick="sortTable(8,this)">
-                            Servant
-                            <i class="fa-solid fa-sort"></i>
-                            <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search by servant">
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        <div>
+            <label for="active-filter" class="form-label small">Active Status</label>
+            <select id="active-filter" class="form-select">
+                <option value="true" selected>Active Only</option>
+                <option value="false">Inactive Only</option>
+                <option value="all">Show All</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="baptised-filter" class="form-label small">Baptism Status</label>
+            <select id="baptised-filter" class="form-select">
+                <option value="all" selected>Show All</option>
+                <option value="true">Baptised Only</option>
+                <option value="false">Not Baptised Only</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="sort-by" class="form-label small">Sort by</label>
+            <div class="input-group">
+                <select class="form-select" id="sort-by">
+                    <option value="sequence">Sequence</option>
+                    <option value="lastPresentDate">Last Present Date</option>
+                    <option value="age">Age</option>
+                    <option value="attendanceCounter">Numbers Attended</option>
+                </select>
+                <button class="btn btn-outline-secondary" id="sort-direction">
+                    <i class="bi bi-arrow-down"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <partial name="_MobileViewPartial" />
 
+    <div class="row g-4" id="members-grid">
+    </div>
 </div>
-<script>
-    var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchClassMembers();
-    });
-
-    // Function to fetch attended members
-    async function fetchClassMembers() {
-        const url = `${apiBaseUrl}/Meeting/GetClassMembers`;
-        const classID = document.querySelector('input[name="classID"]').value;
-        if (!classID) {
-            console.error("Class ID is missing");
-            showErrorMessage("Class ID is missing. Cannot fetch data.");
-            return;
-        }
-
-        try {
-            showLoading();
-            const response = await fetch(`${url}?classID=${classID}`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (!response.ok) {
-                handleHTTPError(response);
-                return;
-            }
-
-            const members = await response.json();
-
-            if (!Array.isArray(members) || members.length === 0) {
-                showWarningMessage("No members found for this class.");
-                return;
-            }
-
-            document.getElementById("counter").textContent = `Members: ${members.length}`;
-            populateTable(members);
-        } catch (error) {
-            console.error("Network error:", error);
-            showErrorMessage("Failed to fetch data. Please try again later.");
-        }
-        finally {
-            hideLoading();
-        }
-    }
-
-
-    function populateTable(members) {
-        const tableBody = document.querySelector("#dataTable tbody");
-        tableBody.innerHTML = ""; // Clear existing rows
-
-        const mobileList = document.getElementById("mobileList");
-        mobileList.innerHTML = ""; // Clear existing list items
-
-        members.forEach(member => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
-                <td>${member.fullName}</td>
-                <td>${member.age}</td>
-                <td>${member.unFileNumber}</td>
-                <td>${member.unPersonalNumber}</td>
-                <td>${member.mobile}</td>
-                <td>${member.attendance}</td>
-                <td>${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}</td>
-                <td><span class="servant-name" data-member-id="${member.memberID}">${member.servant}</span></td>
-                    <td>
-      <div class="dropdown">
-        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-three-dots-vertical"></i>
-        </button>
-        <ul class="dropdown-menu">
-          <li>
-            <a class="dropdown-item assign-btn ${member.showAssign ? 'text-success' : 'text-danger'}"
-               href="#"
-               data-member-id="${member.memberID}"
-               onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
-              ${member.showAssign ? "Assign" : "Unassign"}
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item text-primary" href="#" onclick="assignToAnother(${member.memberID})">
-              Assign to another
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#" onclick="editUser(${member.memberID})">
-              Edit user
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#" onclick="updateVisitationNote(${member.memberID})">
-              Update visitation note
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#" onclick="addVisitation(${member.memberID})">
-              Add visitation
-            </a>
-          </li>
-        </ul>
-      </div>
-    </td>
-            `;
-
-            tableBody.appendChild(row);
-
-            const listItem = document.createElement("div");
-        listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
-
-                listItem.innerHTML = `
-        <h5 class="mb-1 text-primary">
-            <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
-        </h5>
-        <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
-        <p class="mb-1"><strong>Age:</strong> ${member.age}</p>
-
-        ${member.mobile ? `
-        <p class="mb-1">
-            <strong>Mobile:</strong> ${member.mobile}
-            <a href="tel:${member.mobile}" class="ms-2">
-                <i class="fas fa-phone-alt"></i>
-            </a>
-        </p>` : ""}
-
-        <p class="mb-1"><strong>Attendance:</strong> ${member.attendance}</p>
-        <p class="mb-1"><strong>Last Present Date:</strong>
-            ${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : ""}
-        </p>
-        <p class="mb-1"><strong>Servant: </strong><span class="servant-name" data-member-id="${member.memberID}">${member.servant}</span>
-        </p>
-
-            <button class="btn ${member.showAssign ? "btn-success" : "btn-danger"} assign-btn"
-        data-member-id="${member.memberID}"
-        onclick="${member.showAssign ? `assignServant(${member.memberID})` : `unAssignServant(${member.memberID})`}">
-        ${member.showAssign ? "Assign" : "Unassign"}
-    </button>
-    `;
-        mobileList.appendChild(listItem);
-        });
-    }
-    function assignServant(memberID){
-        const classID = document.querySelector('input[name="classID"]').value;
-        const apiUrl = `${apiBaseUrl}/Meeting/AssignMemberServant?classID=${classID}&memberID=${memberID}`;
-        fetch(apiUrl, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({  classID: classID, memberID: memberID })
-        })
-        .then(response => response.text())
-        .then(data => {
-            $('[data-member-id="' + memberID + '"]').text(data);
-            const $btn = $(`.assign-btn[data-member-id="${memberID}"]`);
-            $btn.removeClass("btn-success btn-danger");
-            $btn.addClass("btn-danger");
-            $btn.text("Unassign");
-            $btn.attr("onclick", `unAssignServant(${memberID})`);
-            //fetchClassMembers();
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Failed to add member. Please try again.");
-        });
-    }
-    function unAssignServant(memberID){
-        const classID = document.querySelector('input[name="classID"]').value;
-        const apiUrl = `${apiBaseUrl}/Meeting/UnAssignMemberServant?classID=${classID}&memberID=${memberID}`;
-        fetch(apiUrl, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({  classID: classID, memberID: memberID })
-        })
-        .then(data => {
-            $('[data-member-id="' + memberID + '"]').text('');
-            const $btn = $(`.assign-btn[data-member-id="${memberID}"]`);
-            $btn.removeClass("btn-success btn-danger");
-            $btn.addClass("btn-success");
-            $btn.text("Assign");
-            $btn.attr("onclick", `assignServant(${memberID})`);
-            //fetchClassMembers();
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Failed to add member. Please try again.");
-        });
-    }
-</script>
+<partial name="_MemberDetailsModalPartial" />
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+    <script src="~/js/funds/common.js" asp-append-version="true"></script>
+    <script src="~/js/funds/listing.js" asp-append-version="true"></script>
+    <script src="~/js/aids/listing.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
+    <script src="~/js/members/details.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/class-members.js" asp-append-version="true"></script>
+}

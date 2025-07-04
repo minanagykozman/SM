@@ -1,0 +1,224 @@
+﻿<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-labelledby="memberDetailsModal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content d-flex flex-column">
+
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="memberDetailsModallLabel">
+                    Member Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body overflow-auto px-2 px-md-4">
+                <ul class="nav nav-tabs mb-3" id="memberTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="member-info-tab" data-bs-toggle="tab" data-bs-target="#member-info" type="button" role="tab" aria-controls="member-info" aria-selected="true">
+                            <i class="bi bi-person me-1"></i>Member Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
+                            <i class="bi bi-calendar-event me-1"></i>Events
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">
+                            <i class="bi bi-person-check me-1"></i>Attendance
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="aids-tab" data-bs-toggle="tab" data-bs-target="#aids" type="button" role="tab" aria-controls="aids" aria-selected="false">
+                            <i class="bi bi-hospital me-1"></i>Aids
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="funds-tab" data-bs-toggle="tab" data-bs-target="#funds" type="button" role="tab" aria-controls="funds" aria-selected="false">
+                            <i class="bi bi-cash-coin me-1"></i>Funds
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button" role="tab" aria-controls="family" aria-selected="false">
+                            <i class="bi bi-people me-1"></i>Family
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="memberTabsContent">
+                    <!-- Member Info Tab -->
+                    <div class="tab-pane fade show active" id="member-info" role="tabpanel" aria-labelledby="member-info-tab">
+                        <div class="card shadow-sm p-3 mb-3">
+                            <!-- Member Image -->
+                            <div id="memberImageContainer" class="text-center mb-3">
+                                <img id="memberImage" class="img-thumbnail shadow-sm d-none" alt="Member Photo" style="max-height: 200px;" />
+                                <i id="memberImagePlaceholder" class="fas fa-user-circle fa-5x text-secondary d-none"></i>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-floating me-3 flex-grow-1">
+                                    <input id="Code" class="form-control form-control-plaintext" readonly />
+                                    <label>Code</label>
+                                </div>
+                                <a href="#" id="btnEdit" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil-square me-1"></i>Edit
+                                </a>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="UNPersonalNumber" class="form-control" readonly />
+                                        <label>UN Personal Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="UNFileNumber" class="form-control" readonly />
+                                        <label>UN File Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="FullName" class="form-control" readonly />
+                                        <label>Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="Gender" class="form-control" readonly />
+                                        <label>Gender</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="date" id="Birthdate" class="form-control" readonly />
+                                        <label>Birthdate</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-floating flex-grow-1 me-2">
+                                            <input id="Mobile" class="form-control" readonly />
+                                            <label for="Mobile">Mobile</label>
+                                        </div>
+                                        <!-- Mobile dial icon, visible only on small screens -->
+                                        <button type="button"
+                                                class="btn btn-outline-success d-md-none"
+                                                onclick="dialMobile()"
+                                                aria-label="Call">
+                                            <i class="bi bi-telephone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="checkbox" id="Baptised" disabled />
+                                        <label class="form-check-label" for="Baptised">Baptized</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="BaptismName" class="form-control" readonly />
+                                        <label>Baptism Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="CardStatus" class="form-control" readonly />
+                                        <label>Card Status</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="ImageReference" class="form-control" readonly />
+                                        <label>Image Reference</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="Nickname" class="form-control" readonly />
+                                        <label>Nickname</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="School" class="form-control" readonly />
+                                        <label>School</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input id="Work" class="form-control" readonly />
+                                        <label>Work</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <textarea id="Notes" class="form-control" readonly style="height: 80px;"></textarea>
+                                        <label>Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Tab -->
+                    <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                        <div class="tab-spinner text-center py-5 d-none">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2 text-muted">Loading attendance...</p>
+                        </div>
+                        <div class="card shadow-sm p-3">
+                            <partial name="_LoadAttendanceHistoryPartial" />
+                        </div>
+                    </div>
+
+                    <!-- Events Tab -->
+                    <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+                        <div class="tab-spinner text-center py-5 d-none">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2 text-muted">Loading events...</p>
+                        </div>
+                        <div class="card shadow-sm p-3">
+                            <div id="eventRegistrationsList" class="list-group">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aids Tab -->
+                    <div class="tab-pane fade" id="aids" role="tabpanel" aria-labelledby="aids-tab">
+                        <div class="tab-spinner text-center py-5 d-none">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2 text-muted">Loading aids...</p>
+                        </div>
+                        <div class="card shadow-sm p-3">
+                            <partial name="_ListAidsPartial" />
+                        </div>
+                    </div>
+
+                    <!-- Funds Tab -->
+                    <div class="tab-pane fade" id="funds" role="tabpanel" aria-labelledby="funds-tab">
+                        <div class="tab-spinner text-center py-5 d-none">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2 text-muted">Loading funds...</p>
+                        </div>
+                        <div class="card shadow-sm p-3">
+                            <partial name="_LoadFundsPartial" />
+                        </div>
+                    </div>
+
+                    <!-- Family Tab -->
+                    <div class="tab-pane fade" id="family" role="tabpanel" aria-labelledby="family-tab">
+                        <div class="card shadow-sm p-3">
+                            <div id="membersFamilyList" class="list-group">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

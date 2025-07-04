@@ -85,6 +85,8 @@ namespace SM.DAL.DataModel
         }
         [NotMapped]
         public int FamilyCount { get; set; }
+        [NotMapped]
+        public List<Member> FamilyMembers { get; set; }
         public List<int> ClassesIDs
         {
             get

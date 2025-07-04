@@ -37,16 +37,15 @@ namespace SM.BAL
                 {
                     exMember.LastPresentDate = memberAttendance.Max(c => c.ClassOccurrence.ClassOccurrenceStartDate);
                     exMember.Attendance = string.Format("{0}/{1}", memberAttendance.Count.ToString("00"), meetingsCount);
+                    exMember.AttendanceCounter = memberAttendance.Count;
                 }
                 if (member.Servant != null)
                 {
                     exMember.Servant = member.Servant.ServantName;
-                    exMember.ShowAssign = member.Servant.ServantID == servant.ServantID ? false : true;
                 }
                 else
                 {
                     exMember.Servant = string.Empty;
-                    exMember.ShowAssign = true;
                 }
                 membersExtended.Add(exMember);
             }
