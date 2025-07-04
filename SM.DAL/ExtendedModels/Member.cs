@@ -40,6 +40,6 @@ namespace SM.DAL.DataModel
         public DateTime? LastPresentDate { get; set; } = null;
         public string Attendance { get; set; } = string.Empty;
         public string? Servant { get; set; } = string.Empty;
-        public bool ShowAssign { get; set; }
+        public int AttendanceCounter{ get; set; }
     }
 }

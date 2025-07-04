@@ -405,3 +405,11 @@ async function loadClasses(apiBaseUrl) {
     }
 
 }
+function dialMobile() {
+    const mobile = document.getElementById('Mobile').value;
+    if (mobile) {
+        window.location.href = 'tel:' + mobile;
+    } else {
+        alert('No mobile number available.');
+    }
+}

@@ -33,8 +33,9 @@ namespace SM.BAL
 
             if (includeFamilyCount.HasValue && includeFamilyCount.Value)
             {
-                int count = _dbcontext.Members.Count(m => m.UNFileNumber == member.UNFileNumber);
-                member.FamilyCount = count - 1;
+                var family = _dbcontext.Members.Where(m => m.UNFileNumber == member.UNFileNumber && m.MemberID != member.MemberID).OrderBy(m => m.Birthdate).ToList();
+                member.FamilyMembers = family;
+                member.FamilyCount = family.Count;
             }
 
             return member;
