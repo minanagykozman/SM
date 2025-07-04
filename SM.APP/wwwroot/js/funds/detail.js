@@ -70,32 +70,20 @@ class FundDetailManager {
 
     async loadMemberFundsHistory() {
         try {
-            const response = await fetch(`${apiBaseUrl}/Member/GetMemberFunds?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
-            if (response.ok) {
-                const funds = await response.json();
-                const filteredFunds = funds.filter(fund => parseInt(fund.fundID) !== parseInt(this.fundId));
-                this.populateFundsHistory(filteredFunds);
-            }
+            loadMemberFundsPartial(this.fund.member.memberID, this.fundId);
+
         } catch (error) { console.error('Error loading funds history:', error); }
     }
 
     async loadMemberAidsHistory() {
         try {
-            const response = await fetch(`${apiBaseUrl}/Member/GetMemberAids?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
-            if (response.ok) {
-                const aids = await response.json();
-                this.populateAidsHistory(aids);
-            }
+            loadMemberAidsPartial(this.fund.member.memberID);
         } catch (error) { console.error('Error loading aids history:', error); }
     }
 
     async loadMemberAttendanceHistory() {
         try {
-            const response = await fetch(`${apiBaseUrl}/Member/GetMemberClassOverviews?memberID=${this.fund.member.memberID}`, { credentials: 'include' });
-            if (response.ok) {
-                const memberClasses = await response.json();
-                this.populateAttendanceHistory(memberClasses);
-            }
+            loadMemberAttendancePartial(this.fund.member.memberID);
         } catch (error) { console.error('Error loading attendance history:', error); }
     }
 
@@ -115,7 +103,7 @@ class FundDetailManager {
         const statusBadge = document.getElementById('requestStatusBadge');
         if (statusBadge) {
             statusBadge.textContent = statusText;
-            statusBadge.className = `badge ${this.getFundStatusBadgeClass(this.fund.status)} fs-6 p-2 me-2`;
+            statusBadge.className = `badge ${getFundStatusBadgeClass(this.fund.status)} fs-6 p-2 me-2`;
         }
 
         // Fields population
@@ -124,7 +112,7 @@ class FundDetailManager {
         document.getElementById('memberMobile').value = this.fund.member?.mobile || '';
         document.getElementById('familyMembers').value = this.fund.member?.familyCount?.toString() || 'N/A';
         document.getElementById('requestType').value = this.fund.fundCategory || '';
-        document.getElementById('requestedAmount').value = this.formatCurrency(this.fund.requestedAmount);
+        document.getElementById('requestedAmount').value = formatCurrency(this.fund.requestedAmount);
         document.getElementById('requestDescription').value = this.fund.requestDescription || '';
         document.getElementById('createdBy').value = this.fund.servant?.servantName || 'Unknown';
         document.getElementById('assignedTo').value = this.fund.approver?.servantName || 'Unassigned';
@@ -175,85 +163,52 @@ class FundDetailManager {
         }
     }
 
-    parseNotes(notesString) { /* ... implementation ... */ return []; }
-
-    populateFundsHistory(funds) {
-        const fundsList = document.getElementById('fundsHistoryList');
-        if (!funds || funds.length === 0) {
-            fundsList.innerHTML = '<div class="list-group-item text-center text-muted">No funds history available</div>';
-            return;
+    parseNotes(notesString) {
+        // Return an empty array if the input is null, empty, or just whitespace.
+        if (!notesString || !notesString.trim()) {
+            return [];
         }
 
-        const self = this; // **FIX**: Preserve 'this' context
-        funds.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
-        fundsList.innerHTML = funds.map(function (fund) { // Use regular function with self
-            return `
-                        <div class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">${fund.fundCategory || 'N/A'}</h5>
-                                <span class="badge ${self.getFundStatusBadgeClass(fund.status)} fs-6">${self.getFundStatusText(fund.status)}</span>
-                            </div>
-                            <p class="mb-1">${fund.requestDescription || 'No description'}</p>
-                            <div class="d-flex w-100 justify-content-between align-items-center mt-2">
-                                <small class="text-muted"><i class="bi bi-calendar-event me-1"></i> ${formatDate(fund.requestDate)}</small>
-                                <small><b>Requested:</b> ${self.formatCurrency(fund.requestedAmount)} | <b>Approved:</b> ${self.formatCurrency(fund.approvedAmount)}</small>
-                            </div>
-                        </div>`;
-        }).join('');
-    }
+        const notes = [];
+        let currentNote = null;
+        const lines = notesString.split('\n');
+        const headerRegex = /^\[(.*?) - (.*?)\]:\s*(.*)$/;
 
-    populateAidsHistory(aids) {
-        const aidsList = document.getElementById('aidsHistoryList');
-        if (!aidsList) return;
+        for (const line of lines) {
+            const match = line.match(headerRegex);
 
-        if (aids && aids.length > 0) {
-            // **FIXED**: The logic was inadvertently removed in the previous update. This is the corrected version.
-            aidsList.innerHTML = aids.map(aid => `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <span>${aid.aid?.aidName || 'N/A'}</span>
-                <small class="text-muted fw-bold">${formatDate(aid.timeStamp)}</small>
-            </div>
-        `).join('');
-        } else {
-            aidsList.innerHTML = '<div class="list-group-item text-center text-muted"><i class="bi bi-bandaid fa-lg me-2"></i>No aids history available</div>';
-        }
-    }
-
-    populateAttendanceHistory(memberClasses) {
-        const attendanceList = document.getElementById('attendanceHistoryList');
-        if (!memberClasses || memberClasses.length === 0) {
-            attendanceList.innerHTML = '<div class="list-group-item text-center text-muted">No class attendance data available</div>';
-            return;
-        }
-
-        // No context issue here, but keeping the pattern for consistency
-        const self = this;
-        attendanceList.innerHTML = memberClasses.map(function (classData) {
-            let percentage = 0, badgeClass = 'bg-secondary', attendanceText = 'N/A';
-            if (classData.attendance && classData.attendance.includes('/')) {
-                const [attended, total] = classData.attendance.split('/').map(n => parseInt(n));
-                if (total > 0) {
-                    percentage = Math.round((attended / total) * 100);
-                    if (percentage >= 80) badgeClass = 'bg-success';
-                    else if (percentage >= 50) badgeClass = 'bg-warning text-dark';
-                    else badgeClass = 'bg-danger';
+            if (match) {
+                // This line is a new note header.
+                // First, if we were already building a note, save it to the array.
+                if (currentNote) {
+                    // Trim any trailing newlines from the previous note's content before saving.
+                    currentNote.content = currentNote.content.trim();
+                    notes.push(currentNote);
                 }
-                attendanceText = classData.attendance;
+
+                // Start a new note object from the captured regex groups.
+                currentNote = {
+                    timestamp: match[1].trim(), // e.g., "2024-07-03 10:30 AM"
+                    author: match[2].trim(),    // e.g., "John Doe"
+                    content: match[3].trim()     // The first line of the note's content
+                };
+            } else if (currentNote) {
+                // This line is a continuation of the current note's content.
+                // Append it to the existing content, preserving the multiline format.
+                currentNote.content += '\n' + line;
             }
-            const lastPresent = classData.lastPresentDate ? formatDate(classData.lastPresentDate) : 'Never';
-            return `
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between mb-1">
-                                <h6 class="mb-0">${classData.className || ''}</h6>
-                                <span class="badge bg-light text-dark align-self-center fs-6 fw-bold">${attendanceText}</span>
-                            </div>
-                            <div class="progress mb-1" style="height: 20px;">
-                                <div class="progress-bar ${badgeClass}" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">${percentage}%</div>
-                            </div>
-                            <small class="text-muted">Last Attended: ${lastPresent}</small>
-                        </div>`;
-        }).join('');
+        }
+
+        // After the loop, don't forget to push the very last note being built.
+        if (currentNote) {
+            currentNote.content = currentNote.content.trim();
+            notes.push(currentNote);
+        }
+
+        return notes;
     }
+
+
 
     showEditModal() {
         if (typeof showEditModal === 'function') showEditModal(this.fund);
@@ -271,25 +226,9 @@ class FundDetailManager {
         if (typeof showDeleteFundModal === 'function') showDeleteFundModal(this.fund);
     }
 
-    getFundStatusText(status) {
-        const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered' };
-        return statusMap[status] || status.toString();
-    }
+    
 
-    getFundStatusBadgeClass(status) {
-        switch (status) {
-            case 0: return 'bg-warning text-dark';
-            case 1: return 'bg-success';
-            case 2: return 'bg-danger';
-            case 3: return 'bg-info';
-            default: return 'bg-secondary';
-        }
-    }
-
-    formatCurrency(amount) {
-        if (amount === null || amount === undefined) return 'N/A';
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount);
-    }
+    
 
     showLoading(show) {
         document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';

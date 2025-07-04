@@ -106,8 +106,7 @@
                                 <i class="fas fa-calendar-check text-info me-2"></i>
                                 Attendance History
                             </h5>
-                            <div id="attendanceHistoryList" class="list-group">
-                            </div>
+                            <partial name="_LoadAttendanceHistoryPartial" />
                         </div>
                     </div>
                 </div>
@@ -164,16 +163,14 @@
                                 <i class="fas fa-history text-primary me-2"></i>
                                 Old Funds History
                             </h5>
-                            <div id="fundsHistoryList" class="list-group">
-                            </div>
+                            <partial name="_LoadFundsPartial" />
                         </div>
                         <div class="col-12">
                             <h5 class="mb-3">
                                 <i class="fas fa-history text-primary me-2"></i>
                                 General Aids History
                             </h5>
-                            <div id="aidsHistoryList" class="list-group">
-                            </div>
+                            <partial name="_ListAidsPartial" />
                         </div>
                     </div>
                 </div>
@@ -201,5 +198,9 @@
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
     </script>
+    <script src="~/js/funds/common.js" asp-append-version="true"></script>
+    <script src="~/js/funds/listing.js" asp-append-version="true"></script>
+    <script src="~/js/aids/listing.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
     <script src="~/js/funds/detail.js" asp-append-version="true"></script>
 } 
