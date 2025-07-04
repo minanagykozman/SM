@@ -175,7 +175,50 @@ class FundDetailManager {
         }
     }
 
-    parseNotes(notesString) { /* ... implementation ... */ return []; }
+    parseNotes(notesString) {
+        // Return an empty array if the input is null, empty, or just whitespace.
+        if (!notesString || !notesString.trim()) {
+            return [];
+        }
+
+        const notes = [];
+        let currentNote = null;
+        const lines = notesString.split('\n');
+        const headerRegex = /^\[(.*?) - (.*?)\]:\s*(.*)$/;
+
+        for (const line of lines) {
+            const match = line.match(headerRegex);
+
+            if (match) {
+                // This line is a new note header.
+                // First, if we were already building a note, save it to the array.
+                if (currentNote) {
+                    // Trim any trailing newlines from the previous note's content before saving.
+                    currentNote.content = currentNote.content.trim();
+                    notes.push(currentNote);
+                }
+
+                // Start a new note object from the captured regex groups.
+                currentNote = {
+                    timestamp: match[1].trim(), // e.g., "2024-07-03 10:30 AM"
+                    author: match[2].trim(),    // e.g., "John Doe"
+                    content: match[3].trim()     // The first line of the note's content
+                };
+            } else if (currentNote) {
+                // This line is a continuation of the current note's content.
+                // Append it to the existing content, preserving the multiline format.
+                currentNote.content += '\n' + line;
+            }
+        }
+
+        // After the loop, don't forget to push the very last note being built.
+        if (currentNote) {
+            currentNote.content = currentNote.content.trim();
+            notes.push(currentNote);
+        }
+
+        return notes;
+    }
 
     populateFundsHistory(funds) {
         const fundsList = document.getElementById('fundsHistoryList');
@@ -184,7 +227,7 @@ class FundDetailManager {
             return;
         }
 
-        const self = this; // **FIX**: Preserve 'this' context
+        const self = this;
         funds.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
         fundsList.innerHTML = funds.map(function (fund) { // Use regular function with self
             return `
