@@ -113,6 +113,7 @@ class FundDetailManager {
         document.getElementById('familyMembers').value = this.fund.member?.familyCount?.toString() || 'N/A';
         document.getElementById('requestType').value = this.fund.fundCategory || '';
         document.getElementById('requestedAmount').value = formatCurrency(this.fund.requestedAmount);
+        document.getElementById('approvedAmount').value = formatCurrency(this.fund.approvedAmount);
         document.getElementById('requestDescription').value = this.fund.requestDescription || '';
         document.getElementById('createdBy').value = this.fund.servant?.servantName || 'Unknown';
         document.getElementById('assignedTo').value = this.fund.approver?.servantName || 'Unassigned';
@@ -120,7 +121,27 @@ class FundDetailManager {
         document.getElementById('lastUpdateDate').value = formatDate(this.fund.requestDate);
         document.getElementById('memberNotes').value = this.fund.member?.notes || '';
         document.getElementById('memberCreationDate').value = this.fund.member?.createdAt ? formatDate(this.fund.member.createdAt) : 'Not Set';
-        this.populateFundNotes(this.fund.approverNotes);
+
+        // Fund Notes (ApproverNotes)
+        const notesContainer = document.getElementById('fundNotes');
+        if (notesContainer) {
+            if (this.fund.approverNotes && this.fund.approverNotes.trim()) {
+                // Parse notes (assuming they're in format: [timestamp - user]: note)
+                const notes = this.parseNotes(this.fund.approverNotes);
+                notesContainer.innerHTML = notes.map(note => `
+                    <div class="note-item border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>${note.author}</strong>
+                            <small class="text-muted">${note.timestamp}</small>
+                        </div>
+                        <p class="mb-0" style="white-space: pre-wrap;">${note.content.replace(/\n/g, '<br>')}</p>
+                    </div>
+                `).join('');
+            } else {
+                notesContainer.innerHTML = '<p class="text-muted mb-0">No notes available</p>';
+            }
+        }
+
 
         // Member Image
         const memberImage = document.getElementById('memberImage');
@@ -154,54 +175,41 @@ class FundDetailManager {
         }
     }
 
-    populateFundNotes(notesString) {
-        const notesContainer = document.getElementById('fundNotes');
-        if (notesString && notesString.trim()) {
-            notesContainer.innerHTML = this.parseNotes(notesString).map(note => `...`).join('');
-        } else {
-            notesContainer.innerHTML = '<p class="text-muted mb-0">No notes available</p>';
-        }
-    }
-
     parseNotes(notesString) {
-        // Return an empty array if the input is null, empty, or just whitespace.
-        if (!notesString || !notesString.trim()) {
-            return [];
-        }
-
+        const lines = notesString.split('\n');
         const notes = [];
         let currentNote = null;
-        const lines = notesString.split('\n');
-        const headerRegex = /^\[(.*?) - (.*?)\]:\s*(.*)$/;
 
         for (const line of lines) {
-            const match = line.match(headerRegex);
-
+            const match = line.match(/^\[(.*?) - (.*?)\]: (.*)$/);
             if (match) {
-                // This line is a new note header.
-                // First, if we were already building a note, save it to the array.
+                // Save previous note if exists
                 if (currentNote) {
-                    // Trim any trailing newlines from the previous note's content before saving.
-                    currentNote.content = currentNote.content.trim();
                     notes.push(currentNote);
                 }
-
-                // Start a new note object from the captured regex groups.
+                // Start new note
                 currentNote = {
-                    timestamp: match[1].trim(), // e.g., "2024-07-03 10:30 AM"
-                    author: match[2].trim(),    // e.g., "John Doe"
-                    content: match[3].trim()     // The first line of the note's content
+                    timestamp: match[1],
+                    author: match[2],
+                    content: match[3]
                 };
-            } else if (currentNote) {
-                // This line is a continuation of the current note's content.
-                // Append it to the existing content, preserving the multiline format.
-                currentNote.content += '\n' + line;
+            } else if (line.trim()) {
+                if (currentNote) {
+                    // Add line to current note content
+                    currentNote.content += '\n' + line.trim();
+                } else {
+                    // Fallback for notes without proper format
+                    currentNote = {
+                        timestamp: 'Unknown',
+                        author: 'System',
+                        content: line.trim()
+                    };
+                }
             }
         }
 
-        // After the loop, don't forget to push the very last note being built.
+        // Don't forget to add the last note
         if (currentNote) {
-            currentNote.content = currentNote.content.trim();
             notes.push(currentNote);
         }
 
