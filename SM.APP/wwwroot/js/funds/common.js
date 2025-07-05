@@ -11,3 +11,12 @@ function formatCurrency(amount) {
     if (amount === null || amount === undefined) return 'N/A';
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount);
 }
+// Format requested and approved amounts
+function formatAmount(amount) {
+    if (!amount || amount === 0) {
+        return 'EGP 0';
+    } else {
+        // Remove decimal .00
+        return `EGP ${Number(amount).toFixed(0)}`;
+    }
+}

@@ -113,6 +113,7 @@ class FundDetailManager {
         document.getElementById('familyMembers').value = this.fund.member?.familyCount?.toString() || 'N/A';
         document.getElementById('requestType').value = this.fund.fundCategory || '';
         document.getElementById('requestedAmount').value = formatCurrency(this.fund.requestedAmount);
+        document.getElementById('approvedAmount').value = formatCurrency(this.fund.approvedAmount);
         document.getElementById('requestDescription').value = this.fund.requestDescription || '';
         document.getElementById('createdBy').value = this.fund.servant?.servantName || 'Unknown';
         document.getElementById('assignedTo').value = this.fund.approver?.servantName || 'Unassigned';

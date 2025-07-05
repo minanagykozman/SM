@@ -4,10 +4,11 @@
         if (response.ok) {
             const funds = await response.json();
             if (fundID) {
-                const filteredFunds = funds.filter(fund => parseInt(fund.fundID) !== parseInt(this.fundId));
+                const filteredFunds = funds.filter(f => parseInt(f.fundID) !== parseInt(fundID));
                 populateFundsData(filteredFunds);
-            } else
+            } else {
                 populateFundsData(funds);
+            }
         }
     } catch (error) {
         console.error('Error loading funds history:', error);
@@ -25,16 +26,6 @@ function populateFundsData(funds) {
     funds.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
 
     fundsList.innerHTML = funds.map(function (fund) {
-
-        // Format requested and approved amounts
-        function formatAmount(amount) {
-            if (!amount || amount === 0) {
-                return 'EGP 0';
-            } else {
-                // Remove decimal .00
-                return `EGP ${Number(amount).toFixed(0)}`;
-            }
-        }
 
         return `
             <div class="list-group-item list-group-item-action flex-column align-items-start">

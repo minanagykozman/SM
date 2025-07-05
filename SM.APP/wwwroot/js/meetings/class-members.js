@@ -38,6 +38,7 @@ async function fetchClassMembers() {
 
         if (!Array.isArray(allMembers) || allMembers.length === 0) {
             showWarningMessage("No members found for this class.");
+            document.getElementById("counter").textContent = `(0)`;
         } else {
             applyFiltersAndSort();
         }
@@ -60,8 +61,7 @@ function applyFiltersAndSort() {
             member.fullName.toLowerCase().includes(searchTerm) ||
             member.age.toString().includes(searchTerm) ||
             (member.lastPresentDate && new Date(member.lastPresentDate).toLocaleDateString("en-GB").includes(searchTerm)) ||
-            (member.servant && member.servant.toLowerCase().includes(searchTerm)) ||
-            (member.cardStatus && member.cardStatus.toLowerCase().includes(searchTerm))
+            (member.servant && member.servant.toLowerCase().includes(searchTerm))
         );
     }
 
@@ -76,7 +76,7 @@ function applyFiltersAndSort() {
     const baptisedFilterValue = document.getElementById('baptised-filter').value;
     if (baptisedFilterValue !== 'all') {
         const mustBeBaptised = baptisedFilterValue === 'true';
-        filteredMembers = filteredMembers.filter(member => member.baptised === mustBeBaptised);
+        filteredMembers = filteredMembers.filter(member => member.isBaptised === mustBeBaptised);
     }
 
     // Sorting
@@ -104,7 +104,7 @@ function populateMembersGrid(members) {
     const membersGrid = document.getElementById("members-grid");
     membersGrid.innerHTML = "";
 
-    document.getElementById("counter").textContent = `Members: ${members.length}`;
+    document.getElementById("counter").textContent = `(${members.length} Members)`;
 
     if (members.length === 0) {
         membersGrid.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">No members match the current filters.</div></div>';
@@ -174,7 +174,7 @@ function handleAction(action, memberId) {
 function downloadClassData() {
     const classID = document.getElementById('classID').value;
     if (classID) {
-        const url = `${apiBaseUrl}/Meeting/DownloadClassMembers?classID=${classID}`;
+        const url = `/meetings/DowlnloadClassMembers?classID=${classID}`;
         window.location.href = url;
     } else {
         alert("Cannot download data: Class ID is not available.");

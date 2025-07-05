@@ -128,6 +128,11 @@
                                     <small class="text-muted d-block mb-1">${fund.member.fullName}</small>
                                     <p class="mb-1 text-muted">${fund.requestDescription}</p>
                                     <small class="text-muted"><i class="bi bi-calendar-event"></i> ${formatDate(fund.requestDate)}</small>
+                                    <small class="text-muted d-block">
+                                        <b>Requested:</b> ${formatAmount(fund.requestedAmount)} 
+                                        | 
+                                        <b>Approved:</b> ${formatAmount(fund.approvedAmount)}
+                                    </small>
                                 </div>
                                 <div class="d-flex align-items-center text-nowrap">
                                     <span class="badge bg-primary me-2">${fund.fundCategory}</span>
