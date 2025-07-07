@@ -21,6 +21,23 @@ namespace SM.API.Controllers
             _s3Client = s3Client;
         }
 
+        [HttpGet("List")]
+        public ActionResult<List<Member>> List()
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    List<Member> members = memberHandler.GetAllMembers();
+                    return Ok(members);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [HttpGet("GetFamily")]
         public ActionResult<List<Member>> GetFamily(string unFileNumber)
         {

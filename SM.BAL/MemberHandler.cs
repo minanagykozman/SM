@@ -674,6 +674,11 @@ namespace SM.BAL
             }
         }
 
+        public List<Member> GetAllMembers()
+        {
+            return _dbcontext.Members.Include(m => m.ClassMembers).Where(m => !m.IsDeleted).ToList();
+        }
+
         public class IamgeProperties
         {
             public string Filename { get; set; }
