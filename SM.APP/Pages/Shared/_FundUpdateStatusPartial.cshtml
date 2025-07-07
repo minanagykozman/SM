@@ -66,8 +66,9 @@
     const apiBaseUrlUpdate = '@Services.SMConfigurationManager.ApiBase';
     
     async function showUpdateStatusModal(fund) {
-        $('#newStatus').val(fund.status);
+        $('#newStatus').val(fund.statusName);
         $('#statusFundId').val(fund.fundID);
+        $('#newApprovedAmount').val(fund.approvedAmount);
         if ($('#newStatus').val() === 'Approved') {
             $('#approvedAmountGroup').slideDown();
         } else {
