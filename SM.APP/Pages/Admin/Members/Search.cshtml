@@ -503,10 +503,9 @@
                                     <p class="mb-1"><strong>UN File #:</strong> ${member.unFileNumber || 'N/A'}</p>
                                     <p class="mb-2"><strong>UN Personal #:</strong> ${member.unPersonalNumber || 'N/A'}</p>
 
-                                    <span class="badge ${member.gender === 'M' ? 'bg-primary' : 'bg-pink'} me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span>
-                                    <span class="badge bg-info me-2">Age: ${member.age}</span>
+                                    <span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span>
                                     <span class="badge ${member.baptised ? 'bg-success' : 'bg-secondary'} me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span>
-                                    <span class="badge bg-light text-dark">${member.cardStatus || 'N/A'}</span>
+                                    <span class="badge bg-info text-dark">${member.cardStatus || 'N/A'}</span>
 
                                     ${member.mobile ? `
                                     <div class="mt-3 d-grid">
