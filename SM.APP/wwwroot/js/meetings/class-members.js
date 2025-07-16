@@ -174,7 +174,7 @@ function handleAction(action, memberId) {
 function downloadClassData() {
     const classID = document.getElementById('classID').value;
     if (classID) {
-        const url = `/meetings/DowlnloadClassMembers?classID=${classID}`;
+        const url = `${apiBaseUrl}/Meeting/DownloadClassMembers?classID=${classID}`;
         window.location.href = url;
     } else {
         alert("Cannot download data: Class ID is not available.");

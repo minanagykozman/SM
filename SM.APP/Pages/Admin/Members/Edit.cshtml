@@ -133,7 +133,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="Index" onclick="back()" class="btn btn-outline-secondary">Back to List</a>
+                <a href="/Admin/Members/Search"  class="btn btn-outline-secondary">Back to List</a>
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
@@ -159,7 +159,7 @@
                     const url = `/Index?userCode=${encodeURIComponent(code)}`;
                     window.location.href = url;
                 } else {
-                    window.location.href = '/Index';
+                    window.location.href = '/Search';
                 }
             }
         }

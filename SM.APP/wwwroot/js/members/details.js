@@ -18,6 +18,7 @@
 async function loadMemberEvents(memberID) {
     if (memberID) {
         try {
+            showLoading();
             const response = await fetch(`${apiBaseUrl}/Member/GetMemberEventRegistrations?memberID=${memberID}`, {
                 method: "GET",
                 credentials: "include",
@@ -26,6 +27,7 @@ async function loadMemberEvents(memberID) {
             if (!response.ok) throw new Error("Failed to load event data");
             const eventRegistrations = await response.json();
             populateEventRegistrationsData(eventRegistrations);
+            hideLoading();
         } catch (err) {
             console.error("Error loading event:", err);
         }
@@ -62,9 +64,10 @@ function populateEventRegistrationsData(eventRegistrations) {
             </div>`;
     }).join('');
 }
-async function loadMemberData(memberID) {
+async function loadMemberDetails(memberID) {
     if (memberID) {
         try {
+
             const response = await fetch(`${apiBaseUrl}/Member/GetMember?memberID=${memberID}&&includeFamilyCount=true`, {
                 method: "GET",
                 credentials: "include",
@@ -126,7 +129,9 @@ async function loadMemberData(memberID) {
 }
 
 async function showMemberDetailsModal(memberID, returnURL) {
-    await loadMemberData(memberID);
+    const modal = new bootstrap.Modal(document.getElementById("memberDetailsModal"));
+    modal.show();
+    await loadMemberDetails(memberID);
 
     $('#btnEdit').on('click', function (e) {
         e.preventDefault();
@@ -139,7 +144,4 @@ async function showMemberDetailsModal(memberID, returnURL) {
             alert('Member ID is missing.');
         }
     });
-
-    const modal = new bootstrap.Modal(document.getElementById("memberDetailsModal"));
-    modal.show();
 }

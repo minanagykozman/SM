@@ -1,0 +1,156 @@
+﻿<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="myModalLabel">Edit Member</h5>
+                <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <input type="hidden" id="ID" value="" />
+                <partial name="_LoadingPartial" />
+                <form id="frmEdit" style="position:relative">
+                    <input type="hidden" id="S3KeyEdit" />
+                    <input type="hidden" id="MemberIDEdit" name="MemberIDEdit" />
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input id="CodeEdit" name="CodeEdit" class="form-control" required />
+                                <label>Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input class="form-control" id="UNPersonalNumberEdit" name="UNPersonalNumberEdit" placeholder="Enter Personal Number" required />
+                                <label>UN Personal Number</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="UNFileNumberEdit" name="UNFileNumberEdit" class="form-control" placeholder="Enter File Number" required />
+                                <label>UN File Number</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="UNFirstNameEdit" name="UNFirstNameEdit" class="form-control" placeholder="Enter First Name" required />
+                                <label>First Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="UNLastNameEdit" name="UNLastNameEdit" class="form-control" placeholder="Enter Last Name" required />
+                                <label>Last Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="GenderEdit" name="GenderEdit" class="form-select" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                                <label>Gender</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" id="BirthdateEdit" name="BirthdateEdit" class="form-control" placeholder="Enter Birthdate" required />
+                                <label>Birthdate</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" id="BaptisedEdit" name="BaptisedEdit" type="checkbox" />
+                                <label class="form-check-label">Baptised</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="BaptismNameEdit" name="BaptismNameEdit" class="form-control" placeholder="Enter Baptism Name" />
+                                <label>Baptism Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="MobileEdit" name="MobileEdit" class="form-control" placeholder="Enter Mobile" />
+                                <label>Mobile</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="NicknameEdit" name="NicknameEdit" class="form-control" placeholder="Enter Nickname" />
+                                <label>Nickname</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="SchoolEdit" name="SchoolEdit" class="form-control" placeholder="Enter School" />
+                                <label>School</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="WorkEdit" name="WorkEdit" class="form-control" placeholder="Enter Work" />
+                                <label>Work</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input id="ImageURLEdit" name="ImageURLEdit" class="form-control" disabled />
+                                <label>Image URL</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="CardStatusEdit">
+                                    <option value="MissingPhoto">Missing photo</option>
+                                    <option value="ReadyToPrint">Ready to print</option>
+                                    <option value="Printed">Printed</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="NotApplicable">Not applicable</option>
+                                </select>
+                                <label>Card Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating position-relative">
+                                <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
+                                <label for="ImageUpload">Upload Image</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label floating-label-custom">Classes</label>
+                            <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea id="NotesEdit" class="form-control" placeholder="Enter Notes" style="height: 100px;"></textarea>
+                                <label>Notes</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" id="btnCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+
+                <button type="submit" id="btnSaveChanges" class="btn btn-primary" form="frmEdit">
+                    <span class="btn-text">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Saving...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
