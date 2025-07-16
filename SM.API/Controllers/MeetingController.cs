@@ -295,7 +295,8 @@ namespace SM.API.Controllers
                 worksheet.Cell(1, 18).Value = "Notes";
                 worksheet.Cell(1, 19).Value = "Last Present Date";
                 worksheet.Cell(1, 20).Value = "Attendance";
-                worksheet.Cell(1, 21).Value = "Servant";
+                worksheet.Cell(1, 21).Value = "Attendance Count";
+                worksheet.Cell(1, 22).Value = "Assigned Servant";
 
                 int row = 2;
                 foreach (var member in members)
@@ -320,7 +321,9 @@ namespace SM.API.Controllers
                     worksheet.Cell(row, 18).Value = member.Notes ?? "";
                     worksheet.Cell(row, 19).Value = member.LastPresentDate?.ToShortDateString() ?? "";
                     worksheet.Cell(row, 20).Value = member.Attendance ?? "";
-                    worksheet.Cell(row, 21).Value = member.Servant ?? "";
+                    worksheet.Cell(row, 21).Value = member.AttendanceCounter;
+                    worksheet.Cell(row, 22).Value = member.Servant ?? "";
+                    
                     row++;
                 }
 

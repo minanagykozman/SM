@@ -64,7 +64,7 @@ function populateEventRegistrationsData(eventRegistrations) {
             </div>`;
     }).join('');
 }
-async function loadMemberData(memberID) {
+async function loadMemberDetails(memberID) {
     if (memberID) {
         try {
 
@@ -131,7 +131,7 @@ async function loadMemberData(memberID) {
 async function showMemberDetailsModal(memberID, returnURL) {
     const modal = new bootstrap.Modal(document.getElementById("memberDetailsModal"));
     modal.show();
-    await loadMemberData(memberID);
+    await loadMemberDetails(memberID);
 
     $('#btnEdit').on('click', function (e) {
         e.preventDefault();

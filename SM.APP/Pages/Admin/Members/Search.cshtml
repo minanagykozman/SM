@@ -125,7 +125,7 @@
     </div>
 </div>
 <partial name="_MemberDetailsModalPartial" />
-
+<partial name="_MemberEditModalPartial" />
 @section Scripts {
     @* Make sure bootstrap-select CSS/JS are included in your project's _Layout.cshtml or bundleconfig.json *@
     <script>
@@ -492,7 +492,7 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li><a class="dropdown-item" href="#" onclick="showMemberDetailsModal(${member.memberID}, null)">View</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="showMemberEditModal(${member.memberID}, null)">Edit</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="showEditMemberModal(${member.memberID})">Edit</a></li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item text-danger" href="#" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li>
                                         </ul>
@@ -502,7 +502,7 @@
                                     <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || 'N/A'}</small></p>
                                     <p class="mb-1"><strong>UN File #:</strong> ${member.unFileNumber || 'N/A'}</p>
                                     <p class="mb-2"><strong>UN Personal #:</strong> ${member.unPersonalNumber || 'N/A'}</p>
-
+                                    <p class="mb-2"><strong>Card Prints #:</strong> ${member.cardDeliveryCount || 'N/A'}</p>
                                     <span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span>
                                     <span class="badge ${member.baptised ? 'bg-success' : 'bg-secondary'} me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span>
                                     <span class="badge bg-info text-dark">${member.cardStatus || 'N/A'}</span>
@@ -523,7 +523,8 @@
         }
 
         function showErrorMessage(message) { alert(`ERROR: ${message}`); }
-        function showMemberEditModal(memberID, _) { alert(`Showing edit modal for member ID: ${memberID}`); }
+
+        function showEditMemberModalTemp(member) { alert(member.code); }
         function showMemberDeleteModal(memberID, _) { alert(`Showing delete confirmation for member ID: ${memberID}`); }
     </script>
 
@@ -532,5 +533,5 @@
     <script src="~/js/aids/listing.js" asp-append-version="true"></script>
     <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
     <script src="~/js/members/details.js" asp-append-version="true"></script>
-
+    <script src="~/js/members/edit.js" asp-append-version="true"></script>
 }
