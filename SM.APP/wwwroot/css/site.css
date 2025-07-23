@@ -20,3 +20,20 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Add this class to any element you want to show a loading indicator on top of */
+.loading-container {
+    position: relative;
+    min-height: 150px; /* Ensures the spinner is visible even if the container is empty */
+}
+
+/* This is the style for the loading overlay itself */
+.loading-overlay {
+    position: absolute;
+    inset: 0; /* Modern way to set top, right, bottom, left to 0 */
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
