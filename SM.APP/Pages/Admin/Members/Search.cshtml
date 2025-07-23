@@ -4,12 +4,12 @@
     ViewData["Title"] = "Member Search";
 }
 
-<div class="container mt-4" id="main-container" style="display: none;">
+<div class="container mt-4" id="main-container">
     <partial name="_LoadingPartial" />
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <h4 class="mb-0">Member Search <span id="counter" class="text-muted fw-normal"></span></h4>
         <div>
-            <a href="/Admin/Member/Create" class="btn btn-success">
+            <a href="/Admin/Members/Create" class="btn btn-success">
                 <i class="bi bi-plus-circle me-1"></i> Create Member
             </a>
             <button class="btn btn-outline-primary" id="refresh-btn">
@@ -174,7 +174,6 @@
 <partial name="_MemberEditModalPartial" />
 @section Scripts {
     <script>
-        // Configuration and State
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
     </script>
 

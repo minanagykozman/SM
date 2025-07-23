@@ -38,9 +38,9 @@ const elements = {
  * Initializes the page: fetches data, sets up event listeners.
  */
 document.addEventListener("DOMContentLoaded", async () => {
-    showLoading('#main-container');
     try {
         const codeSearchTabEl = document.getElementById('code-search-tab');
+        showLoading('#main-container');
         if (codeSearchTabEl) {
             elements.searchTabs = new bootstrap.Tab(codeSearchTabEl);
         }
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await Promise.all([fetchMembers(), fetchClasses()]);
         setupEventListeners();
         toggleFormInputs(document.getElementById('filter-search-pane'), false);
-        elements.mainContainer.style.display = 'block';
         elements.codeSearchInput.focus();
     } catch (error) {
         console.error("Initialization failed:", error);
@@ -270,6 +269,7 @@ function handleCodeSearch() {
         return;
     }
     const firstMatch = allMembers.find(m => (m.code && m.code.toLowerCase().includes(searchTerm)) || (m.unFileNumber && m.unFileNumber == searchTerm) || (m.unPersonalNumber && m.unPersonalNumber == searchTerm) || (m.imageReference && m.imageReference.toLowerCase().includes(searchTerm)));
+    console.log(firstMatch);
     if (firstMatch) {
         const familyFileNumber = firstMatch.unFileNumber;
         const familyMembers = allMembers.filter(m => m.unFileNumber === familyFileNumber).sort((a, b) => b.age - a.age);
