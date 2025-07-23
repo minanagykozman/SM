@@ -6,10 +6,12 @@
                 <h5 class="modal-title" id="myModalLabel">Edit Member</h5>
                 <button type="button" class="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            
             <!-- Modal Body -->
-            <div class="modal-body">
-                <input type="hidden" id="ID" value="" />
+            <div class="modal-body" id="edit-container">
                 <partial name="_LoadingPartial" />
+                <input type="hidden" id="ID" value="" />
+                
                 <form id="frmEdit" style="position:relative">
                     <input type="hidden" id="S3KeyEdit" />
                     <input type="hidden" id="MemberIDEdit" name="MemberIDEdit" />

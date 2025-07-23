@@ -4,12 +4,19 @@
     ViewData["Title"] = "Member Search";
 }
 
-<partial name="_LoadingPartial" />
-<div class="container mt-4" id="container" style="display: none;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-4" id="main-container" style="display: none;">
+    <partial name="_LoadingPartial" />
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <h4 class="mb-0">Member Search <span id="counter" class="text-muted fw-normal"></span></h4>
+        <div>
+            <a href="/Admin/Member/Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Create Member
+            </a>
+            <button class="btn btn-outline-primary" id="refresh-btn">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+            </button>
+        </div>
     </div>
-
     <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="code-search-tab" data-bs-toggle="tab" data-bs-target="#code-search-pane" type="button" role="tab" aria-controls="code-search-pane" aria-selected="true">
@@ -22,7 +29,6 @@
             </button>
         </li>
     </ul>
-
     <div class="tab-content" id="searchTabsContent">
         <div class="tab-pane fade show active p-3 border rounded bg-light" id="code-search-pane" role="tabpanel" aria-labelledby="code-search-tab">
             <div class="row align-items-end">
@@ -41,38 +47,57 @@
                 </div>
             </div>
         </div>
-
         <div class="tab-pane fade p-3 border rounded bg-light" id="filter-search-pane" role="tabpanel" aria-labelledby="filter-search-tab">
             <form id="advanced-filter-form">
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="first-name-filter" class="form-label small">First Name (Smart Search)</label>
-                        <input type="text" class="form-control" id="first-name-filter" placeholder="e.g., اوين">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="last-name-filter" class="form-label small">Last Name (Smart Search)</label>
-                        <input type="text" class="form-control" id="last-name-filter" placeholder="e.g., میخائیل">
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <label for="active-filter" class="form-label small">Active Status</label>
-                        <select id="active-filter" class="form-select">
-                            <option value="all" selected>Show All</option>
-                            <option value="true">Active Only</option>
-                            <option value="false">Inactive Only</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <label for="baptised-filter" class="form-label small">Baptism Status</label>
-                        <select id="baptised-filter" class="form-select">
-                            <option value="all" selected>Show All</option>
-                            <option value="true">Baptised Only</option>
-                            <option value="false">Not Baptised Only</option>
-                        </select>
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first-name-filter" class="form-label small">First Name</label>
+                                <input type="text" class="form-control" id="first-name-filter">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last-name-filter" class="form-label small">Last Name</label>
+                                <input type="text" class="form-control" id="last-name-filter">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-lg-6">
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="active-filter" class="form-label small">Active Status</label>
+                                <select id="active-filter" class="form-select">
+                                    <option value="all" selected>Show All</option>
+                                    <option value="true">Active Only</option>
+                                    <option value="false">Inactive Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="baptised-filter" class="form-label small">Baptism Status</label>
+                                <select id="baptised-filter" class="form-select">
+                                    <option value="all" selected>Show All</option>
+                                    <option value="true">Baptised Only</option>
+                                    <option value="false">Not Baptised Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="card-status-filter" class="form-label small">Card Status</label>
+                                <select id="card-status-filter" class="form-select">
+                                    <option value="all" selected>All Statuses</option>
+                                    <option value="MissingPhoto">Missing Photo</option>
+                                    <option value="ReadyToPrint">Ready to Print</option>
+                                    <option value="Printed">Printed</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="NotApplicable">Not Applicable</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
                         <label for="class-filter" class="form-label small">Class(es)</label>
-                        <select id="class-filter" class="selectpicker" multiple data-live-search="true" title="Any Class" data-width="100%"></select>
+                        <select id="class-filter" class="selectpicker" multiple data-live-search="true" title="Any Class" data-width="100%" data-actions-box="true" data-selected-text-format="count > 3"></select>
                         <div class="d-flex justify-content-between mt-2">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="class-filter-operator" checked>
@@ -86,22 +111,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label small">Birthdate Range</label>
-                        <div class="input-group">
-                            <input type="date" class="form-control" id="birthdate-start-filter">
-                            <span class="input-group-text">to</span>
-                            <input type="date" class="form-control" id="birthdate-end-filter">
+
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small">Birthdate Range</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control" id="birthdate-start-filter">
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" class="form-control" id="birthdate-end-filter">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small">Age Range</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="age-start-filter" placeholder="Min">
+                                    <span class="input-group-text">to</span>
+                                    <input type="number" class="form-control" id="age-end-filter" placeholder="Max">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label small">Age Range</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="age-start-filter" placeholder="Min">
-                            <span class="input-group-text">to</span>
-                            <input type="number" class="form-control" id="age-end-filter" placeholder="Max">
-                        </div>
-                    </div>
+
                     <div class="col-12 text-end">
                         <button type="button" class="btn btn-secondary" id="reset-filters-btn">Reset</button>
                         <button type="button" class="btn btn-primary" id="apply-filters-btn">
@@ -114,418 +145,37 @@
     </div>
 
     <hr class="my-4">
-    <div>
-        <div class="row g-4" id="members-grid">
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-search me-2"></i>Please use one of the search methods above to find members.
-                </div>
+
+    <div id="grid-controls" class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="select-all-checkbox">
+            <label class="form-check-label" for="select-all-checkbox">
+                Select All Visible
+            </label>
+        </div>
+        <div id="bulk-actions-dropdown" class="d-none">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="bulk-actions-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions (<span id="selected-count">0</span>)
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bulk-actions-btn">
+                    <li><a class="dropdown-item" href="#" data-action="print-card">Print Card</a></li>
+                    <li><a class="dropdown-item" href="#" data-action="update-baptism">Update Baptism Status</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" data-action="delete-members">Delete Members</a></li>
+                </ul>
             </div>
         </div>
+    </div>
+    <div class="row g-4" id="members-grid">
     </div>
 </div>
 <partial name="_MemberDetailsModalPartial" />
 <partial name="_MemberEditModalPartial" />
 @section Scripts {
-    @* Make sure bootstrap-select CSS/JS are included in your project's _Layout.cshtml or bundleconfig.json *@
     <script>
         // Configuration and State
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-        let allMembers = [];
-        let allClasses = [];
-
-        // DOM Elements
-        const elements = {
-            mainContainer: document.getElementById('container'),
-            codeSearchInput: document.getElementById('code-search-input'),
-            //scanQrBtn: document.getElementById('scan-qr-btn'),
-
-            // Advanced filter elements
-            advancedFilterForm: document.getElementById('advanced-filter-form'),
-            firstNameFilter: document.getElementById('first-name-filter'),
-            lastNameFilter: document.getElementById('last-name-filter'),
-            activeFilter: document.getElementById('active-filter'),
-            baptisedFilter: document.getElementById('baptised-filter'),
-            classFilter: document.getElementById('class-filter'),
-            birthdateStartFilter: document.getElementById('birthdate-start-filter'),
-            birthdateEndFilter: document.getElementById('birthdate-end-filter'),
-            ageStartFilter: document.getElementById('age-start-filter'),
-            ageEndFilter: document.getElementById('age-end-filter'),
-            resetFiltersBtn: document.getElementById('reset-filters-btn'),
-            applyFiltersBtn: document.getElementById('apply-filters-btn'),
-            notInClassFilter: document.getElementById('not-in-class-filter'),
-            classFilterOperator: document.getElementById('class-filter-operator'),
-
-            membersGrid: document.getElementById('members-grid'),
-            counter: document.getElementById('counter'),
-            searchTabs: new bootstrap.Tab(document.getElementById('code-search-tab')),
-        };
-
-        /**
-         * Initializes the page: fetches data, sets up event listeners.
-         */
-        document.addEventListener("DOMContentLoaded", async () => {
-            showLoading();
-            try {
-                initializeScanning();
-                await Promise.all([fetchMembers(), fetchClasses()]);
-                setupEventListeners();
-                // Disable advanced filter inputs initially
-                toggleFormInputs(document.getElementById('filter-search-pane'), false);
-                elements.mainContainer.style.display = 'block';
-                elements.codeSearchInput.focus();
-
-                elements.classFilterOperator.addEventListener('change', () => {
-                    const label = document.getElementById('class-filter-operator-label');
-                    label.textContent = elements.classFilterOperator.checked ? 'Match ANY (OR)' : 'Match ALL (AND)';
-                });
-            } catch (error) {
-                console.error("Initialization failed:", error);
-                showErrorMessage("Failed to load initial data. Please refresh the page.");
-            } finally {
-                hideLoading();
-            }
-        });
-
-        /**
-         * Fetches the full list of members from the API.
-         */
-        async function fetchMembers() {
-            const response = await fetch(`${apiBaseUrl}/Member/List`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-            if (!response.ok) throw new Error(`Failed to fetch members: ${response.statusText}`);
-            allMembers = await response.json();
-        }
-
-        /**
-         * Fetches the list of classes and initializes the selectpicker.
-         */
-        async function fetchClasses() {
-            const response = await fetch(`${apiBaseUrl}/Meeting/GetServantClasses`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-            if (!response.ok) throw new Error(`Failed to fetch classes: ${response.statusText}`);
-            allClasses = await response.json();
-
-            allClasses.forEach(cls => {
-                const option = new Option(cls.className, cls.classID);
-                elements.classFilter.add(option);
-            });
-
-            // Initialize the bootstrap-select plugin
-            $('#class-filter').selectpicker();
-        }
-
-        /**
-         * Sets up all event listeners for the page.
-         */
-        function setupEventListeners() {
-            // Toggle search modes
-            const tabs = document.querySelectorAll('#searchTabs button');
-            tabs.forEach(tab => tab.addEventListener('shown.bs.tab', handleTabChange));
-
-            // Search by Code (triggers on input)
-            elements.codeSearchInput.addEventListener('input', handleCodeSearch);
-            // elements.scanQrBtn.addEventListener('click', () => {
-            //     alert('QR code scanner implementation is pending.');
-            // });
-
-            // Advanced Filters (triggers on button click)
-            elements.applyFiltersBtn.addEventListener('click', applyAdvancedFilters);
-            elements.resetFiltersBtn.addEventListener('click', resetAdvancedFilters);
-
-            // Update the AND/OR switch label on change
-            elements.classFilterOperator.addEventListener('change', () => {
-                const label = document.getElementById('class-filter-operator-label');
-                label.textContent = elements.classFilterOperator.checked ? 'Match ANY (OR)' : 'Match ALL (AND)';
-            });
-
-            // ✅ START: New Mutually Exclusive Logic
-            // When "Not Assigned" is checked, disable the class dropdown.
-            elements.notInClassFilter.addEventListener('change', () => {
-                const isChecked = elements.notInClassFilter.checked;
-                if (isChecked) {
-                    $('#class-filter').selectpicker('val', ''); // Clear selection
-                    $('#class-filter').prop('disabled', true).selectpicker('refresh');
-                    elements.classFilterOperator.disabled = true;
-                } else {
-                    $('#class-filter').prop('disabled', false).selectpicker('refresh');
-                    elements.classFilterOperator.disabled = false;
-                }
-            });
-
-            // When a class is selected, uncheck the "Not Assigned" box.
-            $('#class-filter').on('change.bs.select', function() {
-                const selectedClasses = $(this).val();
-                if (selectedClasses && selectedClasses.length > 0) {
-                    elements.notInClassFilter.checked = false;
-                    // Fire the change event manually to trigger the listener above
-                    elements.notInClassFilter.dispatchEvent(new Event('change'));
-                }
-            });
-            // ✅ END: New Mutually Exclusive Logic
-        }
-
-        /**
-         * Manages UI state when switching between search tabs.
-         */
-        function handleTabChange(event) {
-            const isCodeSearch = event.target.id === 'code-search-tab';
-            toggleFormInputs(document.getElementById('code-search-pane'), isCodeSearch);
-            toggleFormInputs(document.getElementById('filter-search-pane'), !isCodeSearch);
-
-            // Clear results and inputs when switching
-            populateMembersGrid([], true);
-            elements.codeSearchInput.value = '';
-            resetAdvancedFilters(false); // Reset form without triggering a new search
-
-            // Set focus to the code input when its tab is activated
-            if (isCodeSearch) {
-                setTimeout(() => elements.codeSearchInput.focus(), 150);
-            }
-        }
-
-        /**
-         * Enables or disables all form inputs within a given container.
-         */
-        function toggleFormInputs(container, enable) {
-            const inputs = container.querySelectorAll('input, select, button');
-            inputs.forEach(input => {
-                // For bootstrap-select, we also need to toggle its button
-                if (input.id === 'class-filter') {
-                    $(input).prop('disabled', !enable);
-                    // Delay refresh slightly to ensure proper re-rendering after tab switch
-                    setTimeout(() => $(input).selectpicker('refresh'), 50);
-                } else {
-                     input.disabled = !enable;
-                }
-            });
-        }
-
-        /**
-         * Handles the logic for the "Search by Code" feature.
-         */
-        function handleCodeSearch() {
-            const searchTerm = elements.codeSearchInput.value.trim().toLowerCase();
-
-            if (!searchTerm) {
-                populateMembersGrid([], true); // Clear grid and show initial message
-                return;
-            }
-
-            const firstMatch = allMembers.find(m =>
-                (m.code && m.code.toLowerCase().includes(searchTerm)) ||
-                (m.unFileNumber && m.unFileNumber == searchTerm) ||
-                (m.unPersonalNumber && m.unPersonalNumber == searchTerm) ||
-                (m.imageReference && m.imageReference.toLowerCase().includes(searchTerm))
-            );
-
-            if (firstMatch) {
-                const familyFileNumber = firstMatch.unFileNumber;
-                const familyMembers = allMembers
-                    .filter(m => m.unFileNumber === familyFileNumber)
-                    .sort((a, b) => b.age - a.age); // Sort descending by age
-                populateMembersGrid(familyMembers);
-            } else {
-                populateMembersGrid([]); // Show "no members found"
-            }
-        }
-
-        /**
-         * Normalizes Arabic text by removing diacritics for smart search.
-         */
-        function normalizeArabic(text) {
-            if (!text) return "";
-            return text.normalize("NFD").replace(/[\u064B-\u0652]/g, "");
-        }
-        //Intialize scanning component
-        function initializeScanning(){
-             //Scanning code
-            const scanButton = document.getElementById("scanMemberCodeBtnSearch");
-            const qrScannerContainer = document.getElementById("qrScannerContainerSearch");
-            const stopScanButton = document.getElementById("btnStopScanSearch");
-            const codeBtn = document.getElementById("code-search-input");
-            if (scanButton) {
-                let html5QrCode;
-                scanButton.addEventListener("click", function () {
-                    qrScannerContainer.classList.remove("d-none");
-
-                    html5QrCode = new Html5Qrcode("reader");
-                    html5QrCode.start(
-                        { facingMode: "environment" }, // Use back camera
-                        {
-                            fps: 10,
-                            qrbox: { width: 250, height: 250 }
-                        },
-                        (decodedText) => {
-                            codeBtn.value=decodedText;
-                            
-                            html5QrCode.stop();
-                            qrScannerContainer.classList.add("d-none");
-                            handleCodeSearch();
-                        },
-                        (errorMessage) => {
-                            console.warn("QR Code scan error: ", errorMessage);
-                        }
-                    ).catch((err) => {
-                        console.error("QR Code scanning failed: ", err);
-                    });
-                });
-                // Stop scanning
-                stopScanButton.addEventListener("click", function () {
-                    if (html5QrCode) {
-                        html5QrCode.stop();
-                    }
-                    qrScannerContainer.classList.add("d-none");
-                });
-            }
-        }
-
-        /**
-         * Applies all advanced filters together with AND logic.
-         */
-        function applyAdvancedFilters() {
-            const filters = {
-                firstName: normalizeArabic(elements.firstNameFilter.value.trim().toLowerCase()),
-                lastName: normalizeArabic(elements.lastNameFilter.value.trim().toLowerCase()),
-                isActive: elements.activeFilter.value,
-                isBaptised: elements.baptisedFilter.value,
-                classIDs: $('#class-filter').val() || [],
-                birthStart: elements.birthdateStartFilter.value,
-                birthEnd: elements.birthdateEndFilter.value,
-                ageStart: parseInt(elements.ageStartFilter.value, 10) || null,
-                ageEnd: parseInt(elements.ageEndFilter.value, 10) || null,
-                // New filter states
-                isNotInAnyClass: elements.notInClassFilter.checked,
-                classOperatorIsOr: elements.classFilterOperator.checked
-            };
-
-            const filteredMembers = allMembers.filter(member => {
-                // Standard filters
-                if (filters.firstName && (!member.unFirstName || !normalizeArabic(member.unFirstName.toLowerCase()).includes(filters.firstName))) return false;
-                if (filters.lastName && (!member.unLastName || !normalizeArabic(member.unLastName.toLowerCase()).includes(filters.lastName))) return false;
-                if (filters.isActive !== 'all' && member.isActive !== (filters.isActive === 'true')) return false;
-                if (filters.isBaptised !== 'all' && member.baptised !== (filters.isBaptised === 'true')) return false;
-
-                // --- New Class Filtering Logic ---
-                if (filters.isNotInAnyClass) {
-                    // If checked, we only want members with no classes.
-                    if (member.classesIDs && member.classesIDs.length > 0) return false;
-                } else if (filters.classIDs.length > 0) {
-                    // If classes are selected, apply AND/OR logic.
-                    const memberClasses = member.classesIDs || [];
-                    if (filters.classOperatorIsOr) { // Match ANY (OR)
-                        if (!filters.classIDs.some(id => memberClasses.includes(parseInt(id, 10)))) return false;
-                    } else { // Match ALL (AND)
-                        if (!filters.classIDs.every(id => memberClasses.includes(parseInt(id, 10)))) return false;
-                    }
-                }
-
-                // Date and Age filters
-                const birthDate = new Date(member.birthdate);
-                if (filters.birthStart && birthDate < new Date(filters.birthStart)) return false;
-                if (filters.birthEnd && birthDate > new Date(filters.birthEnd)) return false;
-                if (filters.ageStart && member.age < filters.ageStart) return false;
-                if (filters.ageEnd && member.age > filters.ageEnd) return false;
-
-                return true; // Keep member if all checks pass
-            });
-
-            populateMembersGrid(filteredMembers);
-        }
-
-        /**
-         * Resets all advanced filters to their default state.
-         */
-        function resetAdvancedFilters(triggerSearch = true) {
-            elements.advancedFilterForm.reset();
-
-            // Specifically reset and refresh the bootstrap-select dropdown
-            $('#class-filter').selectpicker('val', '');
-
-            // ✅ Return the class controls to their default enabled state
-            elements.notInClassFilter.disabled = false;
-            $('#class-filter').prop('disabled', false).selectpicker('refresh');
-            elements.classFilterOperator.disabled = false;
-            document.getElementById('class-filter-operator-label').textContent = 'Match ANY (OR)';
-
-
-            if (triggerSearch) {
-                populateMembersGrid([], true);
-            }
-        }
-
-
-        /**
-         * Renders the member cards in the grid.
-         */
-        function populateMembersGrid(members, showInitialMessage = false) {
-            elements.membersGrid.innerHTML = "";
-            elements.counter.textContent = `(${members.length} Members)`;
-
-            if (showInitialMessage) {
-                 elements.membersGrid.innerHTML = `<div class="col-12"><div class="alert alert-info text-center"><i class="bi bi-search me-2"></i>Please use a search method to find members.</div></div>`;
-                 elements.counter.textContent = '';
-                 return;
-            }
-
-            if (members.length === 0) {
-                elements.membersGrid.innerHTML = '<div class="col-12"><div class="alert alert-warning text-center">No members found matching your search criteria.</div></div>';
-                return;
-            }
-
-            members.forEach(member => {
-                const memberCard = `
-                    <div class="col-xl-4 col-lg-6 col-12">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="card-title mb-1">${member.fullName || 'N/A'}</h5>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item" href="#" onclick="showMemberDetailsModal(${member.memberID}, null)">View</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="showEditMemberModal(${member.memberID})">Edit</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item text-danger" href="#" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-text">
-                                    <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || 'N/A'}</small></p>
-                                    <p class="mb-1"><strong>UN File #:</strong> ${member.unFileNumber || 'N/A'}</p>
-                                    <p class="mb-2"><strong>UN Personal #:</strong> ${member.unPersonalNumber || 'N/A'}</p>
-                                    <p class="mb-2"><strong>Card Prints #:</strong> ${member.cardDeliveryCount || 'N/A'}</p>
-                                    <span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span>
-                                    <span class="badge ${member.baptised ? 'bg-success' : 'bg-secondary'} me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span>
-                                    <span class="badge bg-info text-dark">${member.cardStatus || 'N/A'}</span>
-
-                                    ${member.mobile ? `
-                                    <div class="mt-3 d-grid">
-                                        <a href="tel:${member.mobile}" class="btn btn-outline-success btn-sm">
-                                            <i class="bi bi-telephone-fill me-2"></i> ${member.mobile}
-                                        </a>
-                                    </div>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                elements.membersGrid.insertAdjacentHTML('beforeend', memberCard);
-            });
-        }
-
-        function showErrorMessage(message) { alert(`ERROR: ${message}`); }
-
-        function showEditMemberModalTemp(member) { alert(member.code); }
-        function showMemberDeleteModal(memberID, _) { alert(`Showing delete confirmation for member ID: ${memberID}`); }
     </script>
 
     <script src="~/js/funds/common.js" asp-append-version="true"></script>
@@ -534,4 +184,5 @@
     <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
     <script src="~/js/members/details.js" asp-append-version="true"></script>
     <script src="~/js/members/edit.js" asp-append-version="true"></script>
+    <script src="~/js/members/search.js" asp-append-version="true"></script>
 }

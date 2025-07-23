@@ -2,15 +2,15 @@
 async function showEditMemberModal(memberID) {
     $('#ID').val(memberID);
     modal.show();
-    showLoading();
-    initailizeForm(memberID);
+    showLoading('#edit-container');
+    await initailizeForm(memberID);
     await initializePage(memberID);
     $('#drpClasses').on('change', function () {
         $(this).valid();
     });
-    hideLoading();
+    hideLoading('#edit-container');
 }
-function initailizeForm(memberID) {
+async function initailizeForm(memberID) {
     $("#frmEdit").validate({
         ignore: [],
         errorClass: "text-danger",
@@ -36,7 +36,7 @@ function initailizeForm(memberID) {
             BirthdateEdit: "required"
         },
         messages: {
-            UNPersonalNumberEdit: { required: "UN Personal Number is required.", remote: "This UN number already exists." }
+            UNPersonalNumberEdit: { required: "UN Personal Number is required.", remote: "This UN number is used by another member." }
         },
         highlight: function (element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },
         unhighlight: function (element) { $(element).removeClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid'); } },
@@ -51,9 +51,9 @@ function initailizeForm(memberID) {
         },
         submitHandler: async function (form, event) {
             event.preventDefault();
-            showLoading();
+            showLoading('#edit-container');
             await updateMember();
-            hideLoading();
+            hideLoading('#edit-container');
             modal.hide();
         }
     });
@@ -157,16 +157,12 @@ async function updateMember() {
     }
 }
 async function initializePage(memberID) {
-    showLoading();
-    if (typeof loadClasses === "function") { await loadClasses(apiBaseUrl); }
-    if (typeof loadMemberData === "function") { await loadMemberData(memberID); } // This will populate the form
-
+    await loadClasses(apiBaseUrl); 
+    await loadMemberData(memberID);
     // Set up other page logic after data is loaded
     const baptisedCheckbox = document.getElementById("BaptisedEdit");
     const baptismNameInput = document.getElementById("BaptismNameEdit");
     function toggleBaptismName() { baptismNameInput.disabled = !baptisedCheckbox.checked; }
     toggleBaptismName();
     baptisedCheckbox.addEventListener("change", toggleBaptismName);
-
-    hideLoading();
 }

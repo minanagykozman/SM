@@ -15,10 +15,11 @@
         </div>`;
     }).join('');
 }
+
 async function loadMemberEvents(memberID) {
     if (memberID) {
         try {
-            showLoading();
+            showLoading('#view-details-container');
             const response = await fetch(`${apiBaseUrl}/Member/GetMemberEventRegistrations?memberID=${memberID}`, {
                 method: "GET",
                 credentials: "include",
@@ -27,7 +28,7 @@ async function loadMemberEvents(memberID) {
             if (!response.ok) throw new Error("Failed to load event data");
             const eventRegistrations = await response.json();
             populateEventRegistrationsData(eventRegistrations);
-            hideLoading();
+            hideLoading('#view-details-container');
         } catch (err) {
             console.error("Error loading event:", err);
         }
