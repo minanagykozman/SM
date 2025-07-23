@@ -269,7 +269,6 @@ function handleCodeSearch() {
         return;
     }
     const firstMatch = allMembers.find(m => (m.code && m.code.toLowerCase().includes(searchTerm)) || (m.unFileNumber && m.unFileNumber == searchTerm) || (m.unPersonalNumber && m.unPersonalNumber == searchTerm) || (m.imageReference && m.imageReference.toLowerCase().includes(searchTerm)));
-    console.log(firstMatch);
     if (firstMatch) {
         const familyFileNumber = firstMatch.unFileNumber;
         const familyMembers = allMembers.filter(m => m.unFileNumber === familyFileNumber).sort((a, b) => b.age - a.age);

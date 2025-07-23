@@ -1,4 +1,53 @@
-﻿function populateFamilyMembers(members) {
+﻿const memberDetailsModalEl = document.getElementById('memberDetailsModal');
+const memberDetailsModal = new bootstrap.Modal(memberDetailsModalEl);
+
+/**
+ * Clears all dynamic data from the member details modal.
+ */
+function clearMemberDetailsModal() {
+    // Clear simple input fields
+    const fieldsToClear = ['Code', 'UNPersonalNumber', 'UNFileNumber', 'FullName', 'Gender', 'Birthdate', 'Mobile', 'Nickname', 'BaptismName', 'CardStatus', 'ImageReference', 'School', 'Work', 'Notes'];
+    fieldsToClear.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    // Uncheck checkboxes
+    const baptisedCheckbox = document.getElementById('Baptised');
+    if (baptisedCheckbox) baptisedCheckbox.checked = false;
+
+    // Reset member image
+    const memberImage = document.getElementById('memberImage');
+    if (memberImage) {
+        memberImage.src = '';
+        memberImage.classList.add('d-none');
+    }
+    const placeholder = document.getElementById('memberImagePlaceholder');
+    if (placeholder) {
+        placeholder.classList.add('d-none');
+    }
+
+    // Clear the content of list containers in each tab
+    const listsToClear = ['eventRegistrationsList', 'membersFamilyList', 'attendanceHistory', 'aidsList', 'fundsList'];
+    listsToClear.forEach(id => {
+        const listEl = document.getElementById(id);
+        if (listEl) listEl.innerHTML = '';
+    });
+
+    // Reset to the first tab being active
+    const firstTab = document.querySelector('#memberTabs button:first-child');
+    if (firstTab) {
+        new bootstrap.Tab(firstTab).show();
+    }
+}
+
+// This runs the clear function every time the modal is closed.
+memberDetailsModalEl.addEventListener('hidden.bs.modal', () => {
+    clearMemberDetailsModal();
+});
+
+
+function populateFamilyMembers(members) {
     const membersList = document.getElementById('membersFamilyList');
     if (!members || members.length === 0) {
         membersList.innerHTML = '<div class="list-group-item text-center text-muted">No members available</div>';
@@ -130,19 +179,28 @@ async function loadMemberDetails(memberID) {
 }
 
 async function showMemberDetailsModal(memberID, returnURL) {
-    const modal = new bootstrap.Modal(document.getElementById("memberDetailsModal"));
-    modal.show();
-    await loadMemberDetails(memberID);
+    // Store the ID on the modal element so other functions can access it
+    memberDetailsModalEl.dataset.memberId = memberID;
+    memberDetailsModalEl.dataset.returnUrl = returnURL || '';
 
-    $('#btnEdit').on('click', function (e) {
-        e.preventDefault();
-        if (memberID) {
-            if (returnURL)
-                window.location.href = `/Admin/Members/Edit?id=${memberID}&returnURL='${returnURL}'`;
-            else
-                window.location.href = `/Admin/Members/Edit?id=${memberID}`;
-        } else {
-            alert('Member ID is missing.');
-        }
-    });
+    showLoading('#view-details-container');
+    memberDetailsModal.show();
+    await loadMemberDetails(memberID);
+    hideLoading('#view-details-container');
 }
+
+document.getElementById('btnEdit').addEventListener('click', function (e) {
+    e.preventDefault();
+    const memberID = memberDetailsModalEl.dataset.memberId;
+    const returnURL = memberDetailsModalEl.dataset.returnUrl;
+
+    if (memberID) {
+        let url = `/Admin/Members/Edit?id=${memberID}`;
+        if (returnURL) {
+            url += `&returnURL=${encodeURIComponent(returnURL)}`;
+        }
+        window.location.href = url;
+    } else {
+        alert('Member ID is missing.');
+    }
+});
