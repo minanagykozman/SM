@@ -6,7 +6,7 @@ let formValidator; // We will store the validator instance here
 // --- 2. Setup All Modal Logic (runs once after the page is ready) ---
 $(async function () {
     // A) Initialize Form Validation (ONCE)
-    await loadClasses(apiBaseUrl);
+    await loadEditClasses(apiBaseUrl);
     formValidator = $("#frmEdit").validate({
         ignore: [],
         errorClass: "text-danger",
@@ -82,11 +82,6 @@ $(async function () {
 });
 
 
-// --- 3. Define the Functions that will be called by the events ---
-
-/**
- * Public function to be called from other pages to show the modal.
- */
 function showEditMemberModal(memberID) {
     editMemberModalEl.dataset.memberid = memberID;
     editMemberModal.show();
@@ -206,5 +201,38 @@ async function updateMember() {
     } catch (err) {
         console.error("Failed to submit member data:", err);
         //showFailedToast("Failed to save member data!");
+    }
+}
+async function loadEditClasses(apiBaseUrl) {
+    try {
+        const classesDropdown = document.getElementById("drpClasses");
+        const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+        const classResponse = await fetch(request, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+        const classList = await classResponse.json();
+
+        // Populate the dropdown
+        classesDropdown.innerHTML = "";
+        classList.forEach(cls => {
+            const option = document.createElement("option");
+            option.value = cls.classID;
+            option.textContent = cls.className;
+            classesDropdown.appendChild(option);
+        });
+
+        $('#drpClasses').select2({
+            placeholder: "Select classes",
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#editMemberModal .modal-content')
+        });
+
+    } catch (err) {
+        console.error("Error loading classes:", err);
     }
 }

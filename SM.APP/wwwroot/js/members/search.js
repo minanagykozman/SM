@@ -443,9 +443,58 @@ function clearSelection() {
 }
 
 // --- Bulk Action Functions (Placeholders) ---
-function bulkPrintCards(memberIds) {
-    console.log("Printing cards for member IDs:", memberIds);
-    alert(`Printing cards for ${memberIds.length} members.`);
+async function bulkPrintCards(memberIds) {
+    if (!memberIds || memberIds.length === 0) {
+        alert("No members selected to print.");
+        return;
+    }
+
+    console.log("Requesting cards for member IDs:", memberIds);
+    showLoading(); // Show the full-page loading indicator
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/MemberImages/generate-cards`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(memberIds) // Send the array as a JSON string
+        });
+
+        if (!response.ok) {
+            // Try to get a meaningful error message from the server
+            const errorText = await response.text();
+            throw new Error(`Failed to generate cards. Server responded with: ${errorText || response.statusText}`);
+        }
+
+        // The response is the zip file itself (a blob)
+        const blob = await response.blob();
+
+        // Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a temporary link element to trigger the download
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        // Set the default filename for the download
+        a.download = 'MemberCards.zip';
+
+        // Add the link to the page, click it, and then remove it
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up by revoking the temporary URL
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+    } catch (error) {
+        console.error("Error printing member cards:", error);
+        alert(`An error occurred: ${error.message}`); // Show a more user-friendly error
+    } finally {
+        hideLoading(); // Always hide the loading indicator
+    }
 }
 
 function bulkUpdateBaptism(memberIds) {
