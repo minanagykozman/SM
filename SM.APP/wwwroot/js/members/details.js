@@ -68,7 +68,7 @@ function populateFamilyMembers(members) {
 async function loadMemberEvents(memberID) {
     if (memberID) {
         try {
-            showLoading('#view-details-container');
+            showLoading();
             const response = await fetch(`${apiBaseUrl}/Member/GetMemberEventRegistrations?memberID=${memberID}`, {
                 method: "GET",
                 credentials: "include",
@@ -77,7 +77,7 @@ async function loadMemberEvents(memberID) {
             if (!response.ok) throw new Error("Failed to load event data");
             const eventRegistrations = await response.json();
             populateEventRegistrationsData(eventRegistrations);
-            hideLoading('#view-details-container');
+            hideLoading();
         } catch (err) {
             console.error("Error loading event:", err);
         }
@@ -183,10 +183,10 @@ async function showMemberDetailsModal(memberID, returnURL) {
     memberDetailsModalEl.dataset.memberId = memberID;
     memberDetailsModalEl.dataset.returnUrl = returnURL || '';
 
-    showLoading('#view-details-container');
+    showLoading();
     memberDetailsModal.show();
     await loadMemberDetails(memberID);
-    hideLoading('#view-details-container');
+    hideLoading();
 }
 
 document.getElementById('btnEdit').addEventListener('click', function (e) {

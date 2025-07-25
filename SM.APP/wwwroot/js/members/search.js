@@ -40,7 +40,7 @@ const elements = {
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const codeSearchTabEl = document.getElementById('code-search-tab');
-        showLoading('#main-container');
+        showLoading();
         if (codeSearchTabEl) {
             elements.searchTabs = new bootstrap.Tab(codeSearchTabEl);
         }
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Initialization failed:", error);
         showErrorMessage("Failed to load initial data. Please refresh the page.");
     } finally {
-        hideLoading('#main-container');
+        hideLoading();
     }
 });
 
@@ -241,7 +241,7 @@ function toggleFormInputs(container, enable) {
  * Re-fetches members and applies the current filter.
  */
 async function refreshData() {
-    showLoading('#main-container');
+    showLoading();
     try {
         await fetchMembers();
         const activeTab = document.querySelector('#searchTabs .nav-link.active');
@@ -254,7 +254,7 @@ async function refreshData() {
         console.error("Failed to refresh data:", error);
         showErrorMessage("Could not refresh data from the server.");
     } finally {
-        hideLoading('#main-container');
+        hideLoading();
     }
 }
 

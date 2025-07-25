@@ -27,13 +27,13 @@ body {
     min-height: 150px; /* Ensures the spinner is visible even if the container is empty */
 }
 
-/* This is the style for the loading overlay itself */
-.loading-overlay {
-    position: absolute;
-    inset: 0; /* Modern way to set top, right, bottom, left to 0 */
-    background-color: rgba(255, 255, 255, 0.7);
+
+#full-page-loader {
+    position: fixed;
+    inset: 0; /* This sets top, bottom, left, and right to 0 */
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9999; /* A high z-index to ensure it's on top of everything */
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
 }

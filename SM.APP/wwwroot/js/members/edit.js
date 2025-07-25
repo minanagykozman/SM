@@ -1,17 +1,13 @@
-﻿const modal = new bootstrap.Modal(document.getElementById("editMemberModal"));
-async function showEditMemberModal(memberID) {
-    $('#ID').val(memberID);
-    modal.show();
-    showLoading('#edit-container');
-    await initailizeForm(memberID);
-    await initializePage(memberID);
-    $('#drpClasses').on('change', function () {
-        $(this).valid();
-    });
-    hideLoading('#edit-container');
-}
-async function initailizeForm(memberID) {
-    $("#frmEdit").validate({
+﻿// --- 1. Define Modal Elements and Validator Instance (do this once) ---
+const editMemberModalEl = document.getElementById('editMemberModal');
+const editMemberModal = new bootstrap.Modal(editMemberModalEl);
+let formValidator; // We will store the validator instance here
+
+// --- 2. Setup All Modal Logic (runs once after the page is ready) ---
+$(async function () {
+    // A) Initialize Form Validation (ONCE)
+    await loadClasses(apiBaseUrl);
+    formValidator = $("#frmEdit").validate({
         ignore: [],
         errorClass: "text-danger",
         errorElement: "div",
@@ -22,8 +18,8 @@ async function initailizeForm(memberID) {
                     url: `${apiBaseUrl}/Member/ValidateUNNumber`,
                     type: "get",
                     data: {
-                        unFileNumber: function () { return $("#UNPersonalNumberEdit").val(); },
-                        memberID: function () { return memberID; }
+                        unFileNumber: () => $("#UNPersonalNumberEdit").val(),
+                        memberID: () => $("#MemberIDEdit").val()
                     },
                     xhrFields: { withCredentials: true }
                 }
@@ -38,26 +34,80 @@ async function initailizeForm(memberID) {
         messages: {
             UNPersonalNumberEdit: { required: "UN Personal Number is required.", remote: "This UN number is used by another member." }
         },
-        highlight: function (element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },
-        unhighlight: function (element) { $(element).removeClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid'); } },
+        highlight: function (element) { $(element).addClass('is-invalid'); },
+        unhighlight: function (element) { $(element).removeClass('is-invalid'); },
         errorPlacement: function (error, element) {
-            if (element.next('.select2-container').length) {
-                error.insertAfter(element.next('.select2-container'));
-            } else if (element.parent().hasClass('form-floating')) {
+            if ($(element).parent().hasClass('form-floating')) {
                 error.insertAfter(element.parent());
-            } else {
+            } else if (element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
+            }
+            else {
                 error.insertAfter(element);
             }
         },
         submitHandler: async function (form, event) {
             event.preventDefault();
-            showLoading('#edit-container');
+            showLoading();
             await updateMember();
-            hideLoading('#edit-container');
-            modal.hide();
+            hideLoading();
+            editMemberModal.hide();
         }
     });
+
+    editMemberModalEl.addEventListener('show.bs.modal', async (event) => {
+        const memberID = event.currentTarget.dataset.memberid;
+        if (memberID) {
+            showLoading();
+            // Load all necessary data when the modal opens
+            await loadMemberData(memberID);
+            hideLoading();
+        }
+    });
+
+    // C) Attach Event Listener for when the modal CLOSES (ONCE)
+    editMemberModalEl.addEventListener('hidden.bs.modal', () => {
+        clearEditModal();
+    });
+
+    // D) Attach other static event listeners (ONCE)
+    $('#drpClasses').on('change', function () {
+        $(this).valid(); // Trigger validation for the classes dropdown
+    });
+
+    const baptisedCheckbox = document.getElementById("BaptisedEdit");
+    baptisedCheckbox.addEventListener("change", function () {
+        document.getElementById("BaptismNameEdit").disabled = !this.checked;
+    });
+});
+
+
+// --- 3. Define the Functions that will be called by the events ---
+
+/**
+ * Public function to be called from other pages to show the modal.
+ */
+function showEditMemberModal(memberID) {
+    editMemberModalEl.dataset.memberid = memberID;
+    editMemberModal.show();
 }
+
+/**
+ * Clears all dynamic data and validation from the edit modal.
+ */
+function clearEditModal() {
+    const form = document.getElementById('frmEdit');
+    form.reset();
+    $('#drpClasses').val(null).trigger('change');
+    if (formValidator) {
+        formValidator.resetForm();
+    }
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+/**
+ * Fetches and populates the form with a specific member's data.
+ */
 async function loadMemberData(memberID) {
     try {
         const response = await fetch(`${apiBaseUrl}/Member/GetMember?memberID=${memberID}`, {
@@ -65,41 +115,43 @@ async function loadMemberData(memberID) {
             credentials: "include",
             headers: { "Content-Type": "application/json" }
         });
-        if (!response.ok) throw new Error("Failed to load event data");
+        if (!response.ok) throw new Error("Failed to load member data");
         const memberData = await response.json();
-        console.info(memberData);
+
         const birthdate = new Date(memberData.birthdate);
         const formattedBirthdate = birthdate.toISOString().split('T')[0];
-        document.getElementById("CodeEdit").value = memberData.code;
-        document.getElementById("MemberIDEdit").value = memberData.memberID;
-        document.getElementById("UNPersonalNumberEdit").value = memberData.unPersonalNumber;
-        document.getElementById("UNFileNumberEdit").value = memberData.unFileNumber;
-        document.getElementById("UNFirstNameEdit").value = memberData.unFirstName;
-        document.getElementById("UNLastNameEdit").value = memberData.unLastName;
-        document.getElementById("GenderEdit").value = memberData.gender;
+        document.getElementById("CodeEdit").value = memberData.code || '';
+        document.getElementById("MemberIDEdit").value = memberData.memberID || '';
+        document.getElementById("UNPersonalNumberEdit").value = memberData.unPersonalNumber || '';
+        document.getElementById("UNFileNumberEdit").value = memberData.unFileNumber || '';
+        document.getElementById("UNFirstNameEdit").value = memberData.unFirstName || '';
+        document.getElementById("UNLastNameEdit").value = memberData.unLastName || '';
+        document.getElementById("GenderEdit").value = memberData.gender || '';
         document.getElementById("BirthdateEdit").value = formattedBirthdate;
         document.getElementById("BaptisedEdit").checked = memberData.baptised;
-        document.getElementById("MobileEdit").value = memberData.mobile;
-        document.getElementById("NicknameEdit").value = memberData.nickname;
-        document.getElementById("BaptismNameEdit").value = memberData.baptismName;
-        document.getElementById("SchoolEdit").value = memberData.school;
-        document.getElementById("WorkEdit").value = memberData.work;
-        document.getElementById("NotesEdit").value = memberData.notes;
-        document.getElementById("ImageURLEdit").value = memberData.imageURL;
-        document.getElementById("S3KeyEdit").value = memberData.s3ImageKey;
-        document.getElementById("CardStatusEdit").value = memberData.cardStatus;
+        document.getElementById("MobileEdit").value = memberData.mobile || '';
+        document.getElementById("NicknameEdit").value = memberData.nickname || '';
+        document.getElementById("BaptismNameEdit").value = memberData.baptismName || '';
+        document.getElementById("SchoolEdit").value = memberData.school || '';
+        document.getElementById("WorkEdit").value = memberData.work || '';
+        document.getElementById("NotesEdit").value = memberData.notes || '';
+        document.getElementById("ImageURLEdit").value = memberData.imageURL || '';
+        document.getElementById("S3KeyEdit").value = memberData.s3ImageKey || '';
+        document.getElementById("CardStatusEdit").value = memberData.cardStatus || '';
 
+        document.getElementById("BaptismNameEdit").disabled = !memberData.baptised;
 
-        
-        // Set selected classes
-        const classIDs = memberData.classesIDs;
-
-        $('#drpClasses').val(classIDs).trigger('change');
-
+        if (memberData.classesIDs) {
+            $('#drpClasses').val(memberData.classesIDs).trigger('change');
+        }
     } catch (err) {
         console.error("Error loading member details:", err);
     }
 }
+
+/**
+ * Gathers form data and sends it to the server to update the member.
+ */
 async function updateMember() {
     const id = document.getElementById("MemberIDEdit").value;
     const formData = new FormData();
@@ -155,14 +207,4 @@ async function updateMember() {
         console.error("Failed to submit member data:", err);
         //showFailedToast("Failed to save member data!");
     }
-}
-async function initializePage(memberID) {
-    await loadClasses(apiBaseUrl); 
-    await loadMemberData(memberID);
-    // Set up other page logic after data is loaded
-    const baptisedCheckbox = document.getElementById("BaptisedEdit");
-    const baptismNameInput = document.getElementById("BaptismNameEdit");
-    function toggleBaptismName() { baptismNameInput.disabled = !baptisedCheckbox.checked; }
-    toggleBaptismName();
-    baptisedCheckbox.addEventListener("change", toggleBaptismName);
 }

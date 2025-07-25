@@ -347,38 +347,19 @@ function showWarningMessage(message) {
                 </div>`;
     mobileList.appendChild(listItem);
 }
-function showLoading(targetSelector) {
-    const container = document.querySelector(targetSelector);
-    if (!container) {
-        console.error("showLoading: Target container not found", targetSelector);
-        return;
-    }
-
-    // Add the class to make position: relative work
-    container.classList.add("loading-container");
-
-    // Find the loader *inside* the target container
-    const loadingIndicator = container.querySelector(".loading-overlay");
-    if (loadingIndicator) {
-        loadingIndicator.classList.remove("d-none");
+// In site.js
+function showLoading() {
+    const loader = document.getElementById("full-page-loader");
+    if (loader) {
+        loader.classList.remove("d-none");
     }
 }
 
-function hideLoading(targetSelector) {
-    const container = document.querySelector(targetSelector);
-    if (!container) {
-        console.error("hideLoading: Target container not found", targetSelector);
-        return;
+function hideLoading() {
+    const loader = document.getElementById("full-page-loader");
+    if (loader) {
+        loader.classList.add("d-none");
     }
-
-    // Find the loader *inside* the target container
-    const loadingIndicator = container.querySelector(".loading-overlay");
-    if (loadingIndicator) {
-        loadingIndicator.classList.add("d-none");
-    }
-
-    // Optional: remove the relative positioning if it's no longer needed
-    // container.classList.remove("loading-container");
 }
 function showSuccessToast(message) {
     const toastElement = document.getElementById('successToast');
