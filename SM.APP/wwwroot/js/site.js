@@ -365,14 +365,14 @@ function showSuccessToast(message) {
     const toastElement = document.getElementById('successToast');
     const lblSuccessMessage = document.getElementById('lblSuccessMessage');
     lblSuccessMessage.textContent = message;
-    const toast = new bootstrap.Toast(toastElement, { delay: 6000 }); // 3 seconds
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 }); // 3 seconds
     toast.show();
 }
 function showFailedToast(message) {
     const toastElement = document.getElementById('failedToast');
     const lblFailedMessage = document.getElementById('lblFailedMessage');
     lblFailedMessage.textContent = message;
-    const toast = new bootstrap.Toast(toastElement, { delay: 6000 }); // 3 seconds
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 }); // 3 seconds
     toast.show();
 }
 

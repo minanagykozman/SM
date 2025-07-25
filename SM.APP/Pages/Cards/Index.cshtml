@@ -8,11 +8,11 @@
 <partial name="_LoadingPartial" />
 <div class="container mt-4" id="container">
     <div class="container">
+        <partial name="_SuccessToastPartial" />
         <div class="row align-items-center mb-2">
             <!-- Title and Counter in the same line -->
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Members' Cards</h4>
-                <span id="counter" class="badge bg-success px-3 py-2 fs-6">Members: 0</span>
             </div>
         </div>
         <div class="row g-3">
@@ -31,45 +31,6 @@
             </div>
             <partial name="_SearchPartial" />
         </div>
-        <div class="row g-3">
-            <div class="d-none d-md-block">
-                <div class="table-responsive">
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-hover align-middle" id="dataTable">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>
-                                        Code
-                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
-                                    </th>
-                                    <th>
-                                        Name
-                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
-                                    </th>
-                                    <th>
-                                        UN File Number
-                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
-                                    </th>
-                                    <th>
-                                        UN Personal Number
-                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN Number">
-                                    </th>
-                                    <th>
-                                        Card Status
-                                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search UN No">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile View -->
-            <partial name="_MobileViewPartial" />
-        </div>
     </div>
 
     <partial name="_ModalPartial" />
@@ -83,88 +44,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         fetchCardStatusMembers('');
     });
-    document.getElementById("dpCardStatus").addEventListener("change", function() {
-        fetchCardStatusMembers(this.value);
-    });
-    async function fetchCardStatusMembers(cardStatus) {
-        if(cardStatus==='')
-        {
-            showErrorMessage("Please select card status!");
-            document.getElementById("counter").textContent = `Members: 0`;
-            return;
-        }
-        const url = `${apiBaseUrl}/Member/GetMembersByCardStatus`;
-
-        try {
-            showLoading();
-            const response = await fetch(`${url}?cardStatus=${cardStatus}`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (!response.ok) {
-                handleHTTPError(response);
-                return;
-            }
-
-            const members = await response.json();
-
-            if (!Array.isArray(members) || members.length === 0) {
-                showWarningMessage("No members found for this status.");
-                return;
-            }
-
-            document.getElementById("counter").textContent = `Members: ${members.length}`;
-            populateTable(members);
-        } catch (error) {
-            console.error("Network error:", error);
-            showErrorMessage("Failed to fetch data. Please try again later.");
-        }
-        finally {
-            hideLoading();
-        }
-    }
-
-
-    function populateTable(members) {
-        const tableBody = document.querySelector("#dataTable tbody");
-        tableBody.innerHTML = ""; // Clear existing rows
-
-        const mobileList = document.getElementById("mobileList");
-        mobileList.innerHTML = ""; // Clear existing list items
-
-        members.forEach(member => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td><a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a></td>
-                <td>${member.fullName}</td>
-                <td>${member.unFileNumber}</td>
-                <td>${member.unPersonalNumber}</td>
-                <td>${member.cardStatus}</td>
-            `;
-
-            tableBody.appendChild(row);
-
-            const listItem = document.createElement("div");
-        listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start");
-
-        listItem.innerHTML = `
-            <h5 class="mb-1 text-primary">
-                <a href="/Admin/Members/Edit?id=${member.memberID}" target="_blank" rel="noopener noreferrer">${member.code}</a>
-            </h5>
-            <p class="mb-1"><strong>Name:</strong> ${member.fullName}</p>
-            <p class="mb-1"><strong>UN File Number:</strong> ${member.unFileNumber}</p>
-            <p class="mb-1"><strong>UN Number:</strong> ${member.unPersonalNumber}</p>
-            <p class="mb-1"><strong>Card Status:</strong> ${member.cardStatus}</p>
-        `;
-
-        mobileList.appendChild(listItem);
-        });
-    }
+   
+    
     document.getElementById("btnCheck").addEventListener("click", function () {
         const searchValue = document.getElementById("SearchString").value.trim();
         const cardStatus = document.getElementById("dpCardStatus").value.trim();
@@ -256,16 +137,16 @@
             body: JSON.stringify({  memberCode: memberCode, cardStatus: cardStatus})
         })
         .then(data => {
-            fetchCardStatusMembers(cardStatus);
             closeModal(); // Close the modal after successful API call
             var searchInput = document.getElementById("SearchString");
             searchInput.value = "";
             searchInput.focus();
+            showSuccessToast("Card status updated successfully");
         })
         .catch(error => {
             console.error("Error:", error);
             closeModal();
-            alert("Failed to add member. Please try again.");
+            showFailedToast("Failed to add member. Please try again.");
         });
     });
 </script>
