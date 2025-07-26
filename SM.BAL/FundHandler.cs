@@ -18,13 +18,7 @@ namespace SM.BAL
                 .Include(f => f.Approver)
                 .AsQueryable();
 
-            // Role-based filtering
-            if (!IsAdmin(username))
-            {
-                // Servants can only see funds assigned to them
-                query = query.Where(f => f.ServantID == servant.ServantID);
-            }
-            else if (assigneeId.HasValue)
+            if (assigneeId.HasValue)
             {
                 // Admin can filter by assignee
                 query = query.Where(f => f.ServantID == assigneeId.Value);
@@ -99,7 +93,7 @@ namespace SM.BAL
             }
 
             var fund = query.FirstOrDefault();
-            
+
             if (fund?.Member != null)
             {
                 int familyCount = _dbcontext.Members.Count(m => m.UNFileNumber == fund.Member.UNFileNumber);
@@ -256,7 +250,7 @@ namespace SM.BAL
                 }
                 fund.ApproverID = request.ServantID.Value;
             }
-            
+
             if (request.RequestedAmount.HasValue)
             {
                 fund.RequestedAmount = request.RequestedAmount.Value;
