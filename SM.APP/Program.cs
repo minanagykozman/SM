@@ -92,13 +92,29 @@ internal class Program
             )
             .CreateLogger();
         builder.Host.UseSerilog();
+
+        // Configure HttpClient to talk to the API
+        builder.Services.AddHttpClient("API", client =>
+        {
+            var baseUrl = builder.Configuration.GetSection("AppSettings")["API"];
+            client.BaseAddress = new Uri(baseUrl);
+        });
+
+        //Configure Session
+        builder.Services.AddDistributedMemoryCache(); // Required for session state
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
         var app = builder.Build();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            dbContext.Database.Migrate();
-        }
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        //    dbContext.Database.Migrate();
+        //}
 
         //app.Use(async (context, next) =>
         //{

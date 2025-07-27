@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NuGet.Common;
+using SM.APP.Models;
+using System.Text.Json;
 
 namespace SM.APP.Services
 {
@@ -9,14 +12,25 @@ namespace SM.APP.Services
     {
         internal readonly UserManager<IdentityUser> _userManager;
         internal readonly ILogger<PageModelBase> _logger;
+        public UserPermissionsDto UserPermissions { get; set; } = new UserPermissionsDto();
 
-        public PageModelBase(UserManager<IdentityUser> userManager, ILogger<PageModelBase> logger)
+        public PageModelBase( UserManager<IdentityUser> userManager, ILogger<PageModelBase> logger)
         {
             _userManager = userManager;
             _logger = logger;
-            
         }
-        
+
+        public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+        {
+            base.OnPageHandlerExecuting(context);
+
+            var permissionsJson = context.HttpContext.Session.GetString("UserPermissions");
+            if (!string.IsNullOrEmpty(permissionsJson))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                UserPermissions = JsonSerializer.Deserialize<UserPermissionsDto>(permissionsJson, options) ?? new UserPermissionsDto();
+            }
+        }
         public async Task<string> GetAPIToken()
         {
             string jwtToken = Request.Cookies["AuthToken"];
@@ -53,6 +67,7 @@ namespace SM.APP.Services
             }
             return jwtToken;
         }
+
 
         public IActionResult HandleException(Exception ex)
         {

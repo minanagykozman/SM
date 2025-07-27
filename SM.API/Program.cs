@@ -13,6 +13,8 @@ using System.Text;
 using Amazon;
 using Amazon.S3;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Authorization;
+using SM.API.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 // Pass IConfiguration to the helper class
@@ -93,6 +95,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, DatabaseAuthorizationPolicyProvider>();
 
 builder.Services.AddCors(options =>
 {

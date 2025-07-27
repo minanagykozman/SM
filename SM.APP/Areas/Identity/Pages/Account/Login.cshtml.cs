@@ -1,17 +1,12 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Tokens;
 using SM.APP.Services;
 using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using Azure.Core;
 
 namespace SM.APP.Areas.Identity.Pages.Account
 {
@@ -20,12 +15,35 @@ namespace SM.APP.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<LoginModel> logger)
+
+        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<LoginModel> logger, IHttpClientFactory httpClientFactory)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
+        }
+
+        private async Task LoadAndStorePermissionsAsync(string accessToken)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("API");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await client.GetAsync("permissions/me");
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    // Store the raw JSON string in the session.
+                    HttpContext.Session.SetString("UserPermissions", jsonString);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         /// <summary>
@@ -126,7 +144,10 @@ namespace SM.APP.Areas.Identity.Pages.Account
                     var expirationTime = DateTime.UtcNow.AddMinutes(SMConfigurationManager.TokenExpiry);
                     var roles = await _userManager.GetRolesAsync(user);
                     var token = AuthenticatorService.GenerateToken(user, roles, expirationTime);
-
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        await LoadAndStorePermissionsAsync(token);
+                    }
                     var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
                     await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, claimsPrincipal.Claims);
                     if (SMConfigurationManager.IsDevelopment)
