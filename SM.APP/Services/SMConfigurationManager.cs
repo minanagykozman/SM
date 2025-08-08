@@ -54,6 +54,26 @@ namespace SM.APP.Services
                     return Environment.GetEnvironmentVariable("JWTIssuer") ?? string.Empty;
             }
         }
+        public static string DBConnection
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["ConnectionStrings:DBConnectionString"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("DBConnectionString") ?? string.Empty;
+            }
+        }
+        public static string LogDBConnection
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["ConnectionStrings:LoggerDB"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("LoggerDB") ?? string.Empty;
+            }
+        }
         public static bool IsDevelopment
         {
             get

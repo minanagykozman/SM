@@ -24,6 +24,36 @@ namespace SM.API.Services
                     return Environment.GetEnvironmentVariable("ApiBase") ?? string.Empty;
             }
         }
+        public static string DBConnection
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["ConnectionStrings:DBConnectionString"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("DBConnectionString") ?? string.Empty;
+            }
+        }
+        public static string LogDBConnection
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["ConnectionStrings:LoggerDB"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("LoggerDB") ?? string.Empty;
+            }
+        }
+        public static string HangfireDBConnection
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["ConnectionStrings:HangFireDB"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("HangFireDB") ?? string.Empty;
+            }
+        }
         public static string JWTSecret
         {
             get

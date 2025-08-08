@@ -17,34 +17,18 @@ internal class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
 
-        string connectionString = string.Empty;
-        string loggerConnectionString = string.Empty;
-        string secretKey = string.Empty;
-        string issuer = string.Empty;
-        string audience = string.Empty;
+  
         if (!builder.Environment.IsDevelopment())
         {
-            connectionString = Environment.GetEnvironmentVariable("DBConnectionString")!;
-            loggerConnectionString = Environment.GetEnvironmentVariable("LoggerDB")!;
-            secretKey = Environment.GetEnvironmentVariable("JWTSecretKey")!;
-            issuer = Environment.GetEnvironmentVariable("JWTIssuer")!;
-            audience = Environment.GetEnvironmentVariable("JWTAudience")!;
             builder.WebHost.UseKestrel(options =>
             {
                 options.ListenAnyIP(5000); 
             });
         }
-        else
-        {
-            connectionString = builder.Configuration.GetConnectionString("DBConnectionString")!;
-            loggerConnectionString = builder.Configuration.GetConnectionString("LoggerDB")!;
-            secretKey = builder.Configuration["JwtSettings:SecretKey"]!;
-            issuer = builder.Configuration["JwtSettings:Issuer"]!;
-            audience = builder.Configuration["JwtSettings:Audience"]!;
-        }
+        
         // Register ApplicationDbContext with the MySQL connection string
         builder.Services.AddDbContext<AppDbContext>(options =>
-            AppDbContext.ConfigureDbContextOptions(options, connectionString));
+            AppDbContext.ConfigureDbContextOptions(options, SMConfigurationManager.DBConnection));
 
 
         // Add Identity with Role Support
@@ -69,7 +53,7 @@ internal class Program
             options.AddPolicy("AllowAppAndApi",
                 policy =>
                 {
-                    policy.WithOrigins(issuer)
+                    policy.WithOrigins(SMConfigurationManager.JWTIssuer)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -77,17 +61,13 @@ internal class Program
         });
         builder.Services.AddSession(); // Add session service
         builder.Services.AddDistributedMemoryCache(); // Required for session storage
-        //Serilog.Debugging.SelfLog.Enable(msg =>
-        //{
-        //    System.IO.File.AppendAllText("C:\\Users\\Administrator\\Documents\\Mina\\Evangalism\\Apps\\AWS\\ssudan.stpaul\\serilog-errors.txt", msg + Environment.NewLine);
-        //});
 
         // Configure Serilog
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Error()
             .WriteTo.Console()
             .WriteTo.MySQL(
-                connectionString: loggerConnectionString,
+                connectionString: SMConfigurationManager.LogDBConnection,
                 tableName: "Logs"
             )
             .CreateLogger();
