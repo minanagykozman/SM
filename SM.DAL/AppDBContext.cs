@@ -34,7 +34,8 @@
         public DbSet<Visitation> Visitations { get; set; }
         public DbSet<MemberFund> MemberFunds { get; set; }
         public DbSet<AuditTrail> AuditTrail { get; set; }
-
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -83,6 +84,25 @@
             .HasIndex(m => m.UNPersonalNumber).IsUnique();
             modelBuilder.Entity<Member>()
             .HasIndex(m => m.Sequence).IsUnique();
+
+            modelBuilder.Entity<RolePermission>()
+           .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Role)
+                .WithMany() // Assuming a Role can have many RolePermissions
+                .HasForeignKey(rp => rp.RoleId);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId);
+
+            // Add a unique constraint to the Permission Name
+            modelBuilder.Entity<Permission>()
+                .HasIndex(p => p.Name)
+                .IsUnique();
+
 
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });

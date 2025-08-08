@@ -6,7 +6,7 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Funds
 {
-    [Authorize]
+    [Authorize(Policy = "Funds.View")]
     public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
     {
         public async Task<IActionResult> OnGet(string unFileNumber, bool? showMessage, string code)

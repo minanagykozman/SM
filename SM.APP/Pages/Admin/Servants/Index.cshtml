@@ -3,156 +3,111 @@
 @{
     ViewData["Title"] = "Servants";
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Events</h4>
-    <a asp-page="Create" class="btn btn-success">Create</a>
-</div>
-<partial name="_DeleteModalPartial" />
-<partial name="_LoadingPartial" />
-<div class="d-none d-md-block" id="container">
-    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-hover table-striped align-middle" id="dataTable">
-            <thead class="table-primary">
-                <tr>
-                    <th onclick="sortTable(0,this)">
-                        Event Name
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Name">
-                    </th>
-                    <th onclick="sortByDate(1,this)">
-                        Start Date
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Start">
-                    </th>
-                    <th onclick="sortByDate(2,this)">
-                        End Date
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search End">
-                    </th>
-                    <th onclick="sortTable(3,this)">
-                        Active
-                        <i class="fa-solid fa-sort"></i>
-                        <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Yes/No">
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Events will be inserted here -->
-            </tbody>
-        </table>
-    </div>
-</div>
-<partial name="_MobileViewPartial" />
 
-<!-- Action Menu Template (hidden) -->
-<div id="actionMenuTemplate" class="d-none">
-    <div class="dropdown">
-        <button class="btn btn-link text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-ellipsis-v"></i>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item edit-btn" href="#">Edit</a></li>
-            <li><a class="dropdown-item delete-btn" href="#">Delete</a></li>
-        </ul>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">
+            Servants <span id="servant-counter" class="text-muted fs-6 fw-normal"></span>
+        </h4>
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>Create New Servant
+        </a>
+    </div>
+
+    <div id="servant-grid" class="row g-4">
     </div>
 </div>
 
-<script>
-    const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-    async function loadEvents() {
-        showLoading();
-        const request = apiBaseUrl+'/Events/GetEvents';
-        const response = await fetch(request, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-        });
-        const events = await response.json();
-
-        const tbody = document.querySelector('#dataTable tbody');
-        tbody.innerHTML = '';
-        const mobileList = document.getElementById("mobileList");
-        mobileList.innerHTML = ""; // Clear existing list items
-        events.forEach(event => {
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
-                <td>${event.eventName}</td>
-                <td>${formatDate(event.eventStartDate)}</td>
-                <td>${formatDate(event.eventEndDate)}</td>
-                <td>${event.isActive ? 'Yes' : 'No'}</td>
-                <td class="text-end"></td>
-            `;
-
-            const actionCell = row.querySelector('td:last-child');
-            const menu = document.querySelector('#actionMenuTemplate').cloneNode(true);
-            menu.classList.remove('d-none');
-            menu.id = '';
-            actionCell.appendChild(menu);
-
-            const editBtn = menu.querySelector('.edit-btn');
-            const deleteBtn = menu.querySelector('.delete-btn');
-
-            editBtn.href = `/Admin/Events/Edit?eventID=${event.eventID}`;
-            deleteBtn.addEventListener('click', () => deleteEvent(event));
-            tbody.appendChild(row);
-
-            const eventJson = JSON.stringify(event).replace(/"/g, '&quot;');
-            const listItem = document.createElement("div");
-            listItem.classList.add("list-group-item", "list-group-item-action", "flex-column", "align-items-start", "position-relative");
-            listItem.innerHTML = `
-            <div class="dropdown position-absolute top-0 end-0 m-2">
-            <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-               <i class="fas fa-ellipsis-v"></i>
-            </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/Admin/Events/Edit?eventID=${event.eventID}">Edit</a></li>
-                <li><a class="dropdown-item text-danger" href="#" onclick="deleteEvent(${eventJson})">Delete</a></li>
-              </ul>
-            </div>
-            <h5 class="mb-1 text-primary">
-                <a href="/Admin/Events/Edit?eventID=${event.eventID}" >${event.eventName}</a>
-            </h5>
-            <p class="mb-1"><strong>Start Date:</strong> ${formatDate(event.eventEndDate)}</p>
-            <p class="mb-1"><strong>End Date:</strong> ${formatDate(event.eventEndDate)}</p>
-            <p class="mb-1"><strong>Active:</strong> ${event.isActive ? 'Yes' : 'No'}</p>
-        `;
-
-        mobileList.appendChild(listItem);
-        });
-        hideLoading();
-    }
-
-    async function deleteEvent(event) {
-        let message='Are you sure you want to delete event '+event.eventName+'?';
-
-        showDeleteModal('Delete Event',message,event.eventID);
-    }
-    async function btnDelete_click(){
+@section Scripts {
+    <script>
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-        let eventID=document.getElementById("ID").value;
 
-        try {
-                const request = `${apiBaseUrl}/Events/DeleteEvent`;
+        // Placeholder function for deleting a servant
+        function deleteServant(servantId, servantName) {
+            console.log(`Delete action for ID: ${servantId}, Name: ${servantName}`);
+            alert(`Delete functionality for ${servantName} (ID: ${servantId}) is not yet implemented.`);
+        }
+
+        // Function to fetch and populate the servant grid
+        async function loadServants() {
+            const servantGrid = document.getElementById("servant-grid");
+            const counterElement = document.getElementById("servant-counter");
+
+            // Show a loading spinner
+            servantGrid.innerHTML = `<div class="d-flex justify-content-center p-5 w-100"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
+
+            try {
+                const request = `${apiBaseUrl}/Servants/GetServants`;
                 const response = await fetch(request, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(eventID)
+                    method: "GET",
+                    credentials: "include"
                 });
-                if (!response.ok) throw new Error("Event deletion failed");
-                closeDeleteModal();
-                showSuccessToast("Event deleted successfully");
-                await loadEvents();
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch servants.");
                 }
-                catch (err) {
-                console.error("Error creating event:", err);
+
+                const servants = await response.json();
+                servantGrid.innerHTML = ''; // Clear the loading spinner
+
+                // Update the counter
+                counterElement.textContent = `(${servants.length} Servants)`;
+
+                // Handle the case where no servants are found
+                if (servants.length === 0) {
+                    servantGrid.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">No servants have been created yet.</div></div>';
+                    return;
+                }
+
+                // Populate the grid with servant cards
+                servants.forEach(servant => {
+                    const servantCardCol = document.createElement("div");
+                    servantCardCol.className = "col-xl-4 col-lg-6 col-md-6 col-sm-12";
+
+                    const statusBadge = servant.isActive
+                        ? `<span class="badge bg-success">Active</span>`
+                        : `<span class="badge bg-danger">Inactive</span>`;
+
+                    servantCardCol.innerHTML = `
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h5 class="card-title mb-2">${servant.servantName}</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="/Admin/Servants/Edit/${servant.servantID}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="deleteServant(${servant.servantID}, '${servant.name}')"><i class="bi bi-trash-fill me-2"></i>Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mb-3">${statusBadge}</div>
+
+                                <p class="card-text mb-2">
+                                    <i class="bi bi-envelope-fill me-2 text-muted"></i>
+                                    <span>${servant.email}</span>
+                                </p>
+                                <p class="card-text mb-0">
+                                    <i class="bi bi-telephone-fill me-2 text-muted"></i>
+                                    <a href="tel:${servant.mobile1}" class="text-decoration-none text-dark">${servant.mobile1}</a>
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    servantGrid.appendChild(servantCardCol);
+                });
+
+            } catch (err) {
+                console.error("Error loading servants:", err);
+                servantGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Error: Could not load servant data.</div></div>`;
             }
+        }
 
-    }
-
-    document.addEventListener('DOMContentLoaded', loadEvents);
-</script>
+        // Load the servants when the page is ready
+        $(function () {
+            loadServants();
+        });
+    </script>
+}

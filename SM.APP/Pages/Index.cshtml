@@ -3,16 +3,8 @@
 @{
     ViewData["Title"] = "Home page";
 }
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-@{
-    var user = await UserManager.GetUserAsync(User);
-    var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
-    var isServant = user != null && await UserManager.IsInRoleAsync(user, "Servant");
-}
 
-@if (isAdmin || isServant)
+@if (User.Identity.IsAuthenticated)
 {
     <div class="container mt-5">
         <h2 class="text-center mb-4">System Modules</h2>
@@ -66,7 +58,7 @@
             </div>
 
             <!-- Funds -->
-            <div class="col-6 col-md-4 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-3" auth-policy="Funds.View">
                 <a href="/Funds" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
                         <i class="bi bi-cash-coin fs-1"></i>
@@ -74,22 +66,19 @@
                     </div>
                 </a>
             </div>
-            @if (isAdmin)
-            {
-                <!-- Administration -->
-                <div class="col-6 col-md-4 col-lg-3">
-                    <a href="/Admin" class="text-decoration-none">
-                        <div class="card text-center p-4 shadow-sm">
-                            <i class="bi bi-gear fs-1"></i>
-                            <h5 class="mt-2">Administration</h5>
-                        </div>
-                    </a>
-                </div>
-            }
+            <!-- Administration -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="/Admin" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-gear fs-1"></i>
+                        <h5 class="mt-2">Administration</h5>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 }
-else if (!SignInManager.IsSignedIn(User))
+else
 {
     <!-- Show message for non-logged-in users -->
     <div class="container text-center mt-5">
@@ -99,12 +88,4 @@ else if (!SignInManager.IsSignedIn(User))
         </div>
     </div>
 }
-else
-{
-    <!-- Show message for logged-in users without access -->
-    <div class="container text-center mt-5">
-        <div class="alert alert-danger p-4">
-            <h4>You don't have access to any module!</h4>
-        </div>
-    </div>
-}
+

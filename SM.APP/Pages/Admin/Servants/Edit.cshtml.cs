@@ -7,10 +7,6 @@ namespace SM.APP.Pages.Admin.Servants
 {
     public class EditModel(UserManager<IdentityUser> userManager, ILogger<EditModel> logger) : PageModelBase(userManager, logger)
     {
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+
     }
 }

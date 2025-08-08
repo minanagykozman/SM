@@ -5,6 +5,9 @@ using SM.APP.Services;
 using SM.DAL;
 using Serilog;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Authorization;
+using SM.BAL.Services.Authorization;
+using SM.BAL;
 internal class Program
 {
     private static void Main(string[] args)
@@ -42,6 +45,28 @@ internal class Program
             options.LoginPath = "/Identity/Account/Login";
             options.AccessDeniedPath = "/Identity/Account/AccessDenied";
         });
+        builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        builder.Services.AddAuthorization(options =>
+        {
+            // This is a common pattern to resolve services during startup
+            // to fetch data from the database.
+            using var scope = builder.Services.BuildServiceProvider().CreateScope();
+            using (PermissionHandler permissionService = new PermissionHandler())
+            {
+
+                // Get all distinct permission names from the database
+                var allPermissions = permissionService.GetAllPermissionNamesAsync().GetAwaiter().GetResult();
+
+                foreach (var permissionName in allPermissions)
+                {
+                    // For each permission, create a new policy
+                    options.AddPolicy(permissionName, policy =>
+                        policy.AddRequirements(new PermissionRequirement(permissionName)));
+                }
+            }
+        });
+
+
         builder.Services.Configure<FormOptions>(options =>
         {
             options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB

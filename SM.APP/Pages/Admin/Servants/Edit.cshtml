@@ -1,163 +1,192 @@
-﻿@page
+﻿@page "{id:int}"
 @model SM.APP.Pages.Admin.Servants.EditModel
 @{
-    ViewData["Title"] = "Edit Event";
+    ViewData["Title"] = "Edit Servant";
 }
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0" id="lblTitle">Edit Event</h4>
-</div>
-<partial name="_SuccessToastPartial" />
-<form id="eventForm" style="position:relative">
-    <div class="card shadow-lg p-4">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="row g-3 mt-2">
-            <div class="col-md-12">
-                <div class="form-floating">
-                    <input class="form-control" id="EventName" placeholder="Enter Event Name" required />
-                    <label>Event Name</label>
-                </div>
-                <div class="invalid-feedback">This field is required.</div>
-            </div>
-        </div>
-
-        <div class="row g-3 mt-2">
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="EventStartDate" placeholder="Select Start Date" required />
-                    <label>Start Date</label>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="EventEndDate" placeholder="Select End Date" required />
-                    <label>End Date</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-3 mt-2">
-            <div class="col-md-12">
-                <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
-                <select class="form-select" id="EventClasses" multiple required></select>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-between mt-4">
-            <a href="Index" class="btn btn-outline-secondary">Back to List</a>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Update</button>
-            </div>
-        </div>
+<div class="container mt-4" id="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0" id="lblTitle">Edit Servant</h4>
     </div>
-</form>
+    <partial name="_SuccessToastPartial" />
+    <form id="frmEdit" class="needs-validation" style="position:relative">
+        <div class="card shadow-lg p-4">
+            <input type="hidden" id="ServantID" name="ServantID" />
 
-<script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        const classesDropdown = document.getElementById("EventClasses");
-        const eventID = new URLSearchParams(window.location.search).get("eventID");
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="ServantName" name="ServantName" placeholder="Enter Servant Name">
+                        <label>Servant Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="Email" name="Email" placeholder="Enter E-mail Address" disabled>
+                        <label>E-mail</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="Mobile" name="Mobile" placeholder="Enter Mobile">
+                        <label>Mobile</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="Mobile2" name="Mobile2" placeholder="Enter Mobile">
+                        <label>Mobile 2</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label floating-label-custom">Classes</label>
+                    <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label floating-label-custom">Roles</label>
+                    <select class="form-select" id="drpRoles" name="drpRoles" multiple required></select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script>
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
 
-        let allClasses = [];
-
-        try {
-            // Load all available classes
-            const classResponse = await fetch(`${apiBaseUrl}/Meeting/GetServantClasses`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" }
-            });
-
-            if (!classResponse.ok) throw new Error("Failed to fetch classes.");
-            allClasses = await classResponse.json();
-
-            // Populate the dropdown
-            classesDropdown.innerHTML = "";
-            allClasses.forEach(cls => {
-                const option = document.createElement("option");
-                option.value = cls.classID;
-                option.textContent = cls.className;
-                classesDropdown.appendChild(option);
-            });
-
-            $('#EventClasses').select2({
-                placeholder: "Select classes",
-                allowClear: true,
-                width: '100%'
-            });
-
-        } catch (err) {
-            console.error("Error loading class list:", err);
-        }
-
-        // Load existing event data
-        if (eventID) {
+        async function loadRoles() {
             try {
-                const response = await fetch(`${apiBaseUrl}/Events/GetEvent?eventID=${eventID}`, {
+                const rolesDropdown = document.getElementById("drpRoles");
+                const request = `${apiBaseUrl}/Servants/GetSystemRoles`;
+                const rolesResponse = await fetch(request, {
                     method: "GET",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" }
                 });
 
-                if (!response.ok) throw new Error("Failed to load event data");
-                const eventData = await response.json();
+                if (!rolesResponse.ok) throw new Error("Failed to fetch roles.");
+                const rolesList = await rolesResponse.json();
 
-                // Fill form with data
-                document.getElementById("EventName").value = eventData.eventName;
-                document.getElementById("EventStartDate").value = eventData.eventStartDate.slice(0, 16);
-                document.getElementById("EventEndDate").value = eventData.eventEndDate.slice(0, 16);
-                document.getElementById("lblTitle").textContent ='Edit Event: ' + eventData.eventName;
+                rolesDropdown.innerHTML = "";
+                rolesList.forEach(role => {
+                    const option = document.createElement("option");
+                    option.value = role.id;
+                    option.textContent = role.name;
+                    rolesDropdown.appendChild(option);
+                });
 
-                // Set selected classes
-                const classIDs = eventData.classesIDs;
-                
-                $('#EventClasses').val(classIDs).trigger('change');
+                $('#drpRoles').select2({
+                    placeholder: "Select roles",
+                    allowClear: true,
+                    width: '100%'
+                });
 
             } catch (err) {
-                console.error("Error loading event:", err);
+                console.error("Error loading roles:", err);
             }
         }
 
-        // Submit update
-        const form = document.getElementById("eventForm");
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
+        async function loadServantData(servantId) {
+            try {
+                const request = `${apiBaseUrl}/Servants/GetServant?servantID=${servantId}`;
+                const response = await fetch(request, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
 
-            const eventName = document.getElementById("EventName").value;
-            const startDate = document.getElementById("EventStartDate").value;
-            const endDate = document.getElementById("EventEndDate").value;
-            const selectedClasses = Array.from(classesDropdown.selectedOptions).map(opt => parseInt(opt.value));
+                if (!response.ok) {
+                    throw new Error("Failed to fetch servant data.");
+                }
 
-            const eventPayload = {
-                event: {
-                    eventID: parseInt(eventID),
-                    eventName: eventName,
-                    eventStartDate: startDate,
-                    eventEndDate: endDate,
-                    isActive: true
-                },
+                const servant = await response.json();
+
+                $("#ServantID").val(servant.servantID);
+                $("#ServantName").val(servant.servantName);
+                $("#Email").val(servant.email);
+                $("#Mobile").val(servant.mobile1);
+                $("#Mobile2").val(servant.mobile2);
+
+                if (servant.servantClassesIDs) {
+                    $('#drpClasses').val(servant.servantClassesIDs).trigger('change');
+                }
+                if (servant.servantRoles) {
+                    $('#drpRoles').val(servant.servantRoles).trigger('change');
+                }
+
+            } catch (err) {
+                console.error("Error loading servant data:", err);
+                showFailedToast("Could not load servant data. " + err.message);
+                $('#frmEdit :input').prop('disabled', true);
+            }
+        }
+
+        async function updateServant() {
+            const selectedClasses = Array.from(document.getElementById("drpClasses").selectedOptions).map(opt => parseInt(opt.value));
+            const selectedRoles = Array.from(document.getElementById("drpRoles").selectedOptions).map(opt => opt.value);
+
+            const payload = {
+                servantID: parseInt($("#ServantID").val()),
+                roles: selectedRoles,
+                name: $("#ServantName").val(),
+                mobile: $("#Mobile").val(),
+                mobile2: $("#Mobile2").val(),
                 classes: selectedClasses
             };
 
             try {
-                const updateRequest = `${apiBaseUrl}/Events/UpdateEvent`;
-                const updateResponse = await fetch(updateRequest, {
+                const request = `${apiBaseUrl}/Servants/Update`;
+                const response = await fetch(request, {
                     method: "POST",
                     credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(eventPayload)
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
                 });
 
-                if (!updateResponse.ok) throw new Error("Update failed");
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.message || "Servant update failed";
+                    throw new Error(errorMessage);
+                }
 
-                showSuccessToast("Event updated successfully");
+                showSuccessToast("Servant updated successfully");
 
             } catch (err) {
-                console.error("Error updating event:", err);
+                console.error("Error updating servant:", err);
+                showFailedToast(err.message);
             }
+        }
+
+        $(async function () {
+            showLoading();
+
+            const pathParts = window.location.pathname.split('/');
+            const servantId = pathParts[pathParts.length - 1];
+
+            await loadClasses(apiBaseUrl);
+            await loadRoles();
+            await loadServantData(servantId);
+
+            hideLoading();
+
+            // --- Form Submit Handler ---
+            $("#frmEdit").on("submit", async function(event) {
+                event.preventDefault();
+
+                // Check if the form is valid using the generic validator
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                showLoading();
+                await updateServant();
+                hideLoading();
+            });
         });
-    });
-</script>
+    </script>
+}

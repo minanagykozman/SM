@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SM.DAL.DataModel
 {
@@ -15,6 +16,28 @@ namespace SM.DAL.DataModel
         public string? Mobile2 { get; set; }
         public bool IsActive { get; set; }
         public string UserID { get; set; }
+
+        public List<int> ServantClassesIDs
+        {
+            get
+            {
+                if (ServantClasses == null)
+                    return new List<int>();
+                else
+                    return ServantClasses.Select(s => s.ClassID).ToList();
+            }
+        }
+        [NotMapped]
+        public List<string> ServantRoles
+        {
+            get; set;
+        }
+        [NotMapped]
+        public string Email
+        {
+            get; set;
+        }
+
         [JsonIgnore]
         public ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
         [JsonIgnore]

@@ -117,7 +117,6 @@
                 deleteButtonHtml = `<li><hr class="dropdown-divider"></li><li><button class="dropdown-item text-danger delete-btn" type="button"><i class="bi bi-trash me-2"></i>Delete</button></li>`;
             }
 
-            // *** THE FIX: Call the helper function to get the correct badge class ***
             const statusBadgeClass = getStatusBadgeClass(fund.statusName);
 
             const fundItemHtml = `

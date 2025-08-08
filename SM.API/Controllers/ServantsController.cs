@@ -70,6 +70,22 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpGet("GetServant")]
+        public ActionResult<Servant> GetServant(int servantID)
+        {
+            try
+            {
+                using (ServantHandler handler = new ServantHandler())
+                {
+                    var servant = handler.GetServant(servantID);
+                    return Ok(servant);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] ServantRegisterModel model)
@@ -93,6 +109,22 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [HttpPost("Update")]
+        public async Task<IActionResult> Update([FromBody] ServantEditModel model)
+        {
+            try
+            {
+                using (ServantHandler handler = new ServantHandler())
+                {
+                    var servant = handler.UpdateServant(model.ServantID, model.Name, model.Mobile, model.Mobile2, model.Classes,model.Roles);
+                    return Ok(servant);
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         public class ServantRegisterModel
         {
             [Required]
@@ -102,6 +134,18 @@ namespace SM.API.Controllers
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
+            [Required]
+            public List<string> Roles { get; set; }
+            public string Name { get; set; }
+            public string Mobile { get; set; }
+            public string Mobile2 { get; set; }
+            public List<int> Classes { get; set; }
+        }
+
+        public class ServantEditModel
+        {
+            [Required]
+            public int ServantID { get; set; }
             [Required]
             public List<string> Roles { get; set; }
             public string Name { get; set; }
