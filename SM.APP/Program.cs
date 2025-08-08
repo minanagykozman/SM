@@ -95,7 +95,9 @@ internal class Program
         app.UseSession();
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
+        app.UseMiddleware<TokenRefreshMiddleware>();
 
         app.MapRazorPages();
 

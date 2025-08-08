@@ -12,7 +12,15 @@ namespace SM.APP.Services
         }
         public static int TokenExpiry
         {
-            get { return 120; }
+            get
+            {
+                int tokenExpiry = 0;
+                if (IsDevelopment)
+                    int.TryParse(_configuration["JwtSettings:TokenExpiry"], out tokenExpiry);
+                else
+                    int.TryParse(Environment.GetEnvironmentVariable("TokenExpiry"), out tokenExpiry);
+                return tokenExpiry;
+            }
         }
         public static string ApiBase
         {
@@ -22,6 +30,16 @@ namespace SM.APP.Services
                     return _configuration["AppSettings:API"] ?? string.Empty;
                 else
                     return Environment.GetEnvironmentVariable("ApiBase") ?? string.Empty;
+            }
+        }
+        public static string Domian
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["AppSettings:Domian"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("Domian") ?? string.Empty;
             }
         }
         public static string JWTSecret

@@ -3,6 +3,9 @@
 
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", function () {
+    refreshToken();
+
+
     let myModal = document.getElementById("myModal");
     if (myModal) {
         document.getElementById("myModal").addEventListener("keypress", function (event) {
@@ -416,4 +419,24 @@ function dialMobile() {
     } else {
         alert('No mobile number available.');
     }
+}
+function refreshToken() {
+    const keepAliveInterval = 10 * 60 * 1000;
+
+    const keepSessionAlive = () => {
+        fetch('/RefreshToken', { // The path to your new Razor Page
+            method: 'GET',
+            // This is crucial! It ensures cookies are sent with the request.
+            credentials: 'include'
+        }).then(response => {
+            if (response.ok) {
+                console.log('Session keep-alive signal sent successfully.');
+            }
+        }).catch(error => {
+            console.error('Error sending session keep-alive signal:', error);
+        });
+    };
+
+    // Start the timer
+    setInterval(keepSessionAlive, keepAliveInterval);
 }

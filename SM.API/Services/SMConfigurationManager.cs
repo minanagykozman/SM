@@ -10,10 +10,6 @@ namespace SM.API.Services
         {
             _configuration = configuration;
         }
-        public static int TokenExpiry
-        {
-            get { return 120; }
-        }
         public static string ApiBase
         {
             get
