@@ -44,14 +44,14 @@ namespace SM.BAL
                 .AsQueryable();
 
             // Role-based filtering
-            if (!IsAdmin(username))
-            {
-                query = query.Where(f => f.ServantID == servant.ServantID);
-            }
-            else if (assigneeId.HasValue)
-            {
-                query = query.Where(f => f.ServantID == assigneeId.Value);
-            }
+            //if (!IsAdmin(username))
+            //{
+            //    query = query.Where(f => f.ServantID == servant.ServantID);
+            //}
+            //else if (assigneeId.HasValue)
+            //{
+            //    query = query.Where(f => f.ServantID == assigneeId.Value);
+            //}
 
             // Status filtering
             if (!string.IsNullOrEmpty(status) && Enum.TryParse<FundStatus>(status, out var statusEnum))
@@ -86,11 +86,11 @@ namespace SM.BAL
                 .Include(f => f.Approver)
                 .Where(f => f.FundID == fundId);
 
-            // Role-based access
-            if (!IsAdmin(username))
-            {
-                query = query.Where(f => f.ServantID == servant.ServantID);
-            }
+            //// Role-based access
+            //if (!IsAdmin(username))
+            //{
+            //    query = query.Where(f => f.ServantID == servant.ServantID);
+            //}
 
             var fund = query.FirstOrDefault();
 
@@ -231,7 +231,7 @@ namespace SM.BAL
             }
 
             // Only allow updates if fund is still Open or if user is admin
-            if (fund.Status != FundStatus.Open && !IsAdmin(username))
+            if (fund.Status != FundStatus.Open)
             {
                 throw new InvalidOperationException("Cannot update fund that is not in Open status");
             }
@@ -283,10 +283,7 @@ namespace SM.BAL
         // Delete a fund (Admin only, and only if Open)
         public void DeleteFund(int fundId, string username)
         {
-            if (!IsAdmin(username))
-            {
-                throw new UnauthorizedAccessException("Only administrators can delete funds");
-            }
+            
 
             var fund = _dbcontext.MemberFunds.FirstOrDefault(f => f.FundID == fundId);
             if (fund == null)

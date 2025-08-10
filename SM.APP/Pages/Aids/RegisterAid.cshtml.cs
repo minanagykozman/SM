@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5,12 +6,9 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Aids
 {
-    public class RegisterAidModel(UserManager<IdentityUser> userManager, ILogger<RegisterAidModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Aids.Register")]
+    public class RegisterAidModel(ILogger<RegisterAidModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+       
     }
 }

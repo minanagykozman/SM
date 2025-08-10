@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SM.APP.Pages.Admin.Members
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class DetailsModel(UserManager<IdentityUser> userManager, ILogger<DetailsModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Members.View")]
+    public class DetailsModel(ILogger<DetailsModel> logger) : PageModelBase(logger)
     {
         public Member? Member { get; set; }
 

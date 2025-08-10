@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,7 +9,8 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Aids
 {
-    public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Aids.View")]
+    public class IndexModel(ILogger<IndexModel> logger) : PageModelBase(logger)
     {
         [BindProperty(SupportsGet = true)]
         public List<Aid> Aids{ get; set; }

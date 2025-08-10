@@ -12,6 +12,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class FundController(ILogger<FundController> logger) : SMControllerBase(logger)
     {
+        [Authorize(Policy = "Funds.View")]
         [HttpGet("GetAllFunds")]
         public ActionResult<List<MemberFund>> GetAllFunds(int? assigneeId = null, string? status = null)
         {
@@ -28,6 +29,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Funds.View")]
         [HttpGet("GetFundCategories")]
         public ActionResult<List<string>> GetFundCategories()
         {
@@ -50,7 +52,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.View")]
         // GET: api/Fund/status
         [HttpGet("status")]
         public IActionResult GetFundsByStatus([FromQuery] int? assigneeId, [FromQuery] string? status, [FromQuery] string? searchTerm)
@@ -66,7 +68,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.View")]
         // GET: api/Fund/{id}
         [HttpGet("{id}")]
         public IActionResult GetFund(int id)
@@ -86,7 +88,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // POST: api/Fund
         [HttpPost("CreateFund")]
         public IActionResult CreateFund([FromBody] CreateFundRequest request)
@@ -104,7 +106,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // PUT: api/Fund/{id}/status
         [HttpPut("{id}/status")]
         public IActionResult UpdateFundStatus(int id, [FromBody] UpdateFundStatusRequest request)
@@ -121,7 +123,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // POST: api/Fund/{id}/notes
         [HttpPost("{id}/notes")]
         public IActionResult AppendNotes(int id, [FromBody] AppendNotesRequest request)
@@ -129,16 +131,18 @@ namespace SM.API.Controllers
             try
             {
                 request.FundID = id; // Ensure the ID matches the route
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                fundHandler.AppendNotes(request, User.Identity.Name);
-                return Ok(new { Message = "Notes appended successfully" });
+                using (FundHandler fundHandler = new SM.BAL.FundHandler())
+                {
+                    fundHandler.AppendNotes(request, User.Identity.Name);
+                    return Ok(new { Message = "Notes appended successfully" });
+                }
             }
             catch (Exception ex)
             {
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // PUT: api/Fund/{id}
         [HttpPut("{id}")]
         public IActionResult UpdateFund(int id, [FromBody] UpdateFundRequest request)
@@ -155,7 +159,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // DELETE: api/Fund/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteFund(int id)
@@ -171,7 +175,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.Manage")]
         // GET: api/Fund/assignable-servants
         [HttpGet("assignable-servants")]
         public IActionResult GetAssignableServants()

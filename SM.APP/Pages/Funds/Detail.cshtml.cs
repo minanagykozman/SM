@@ -6,12 +6,9 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Funds
 {
-    [Authorize]
-    public class DetailModel : PageModelBase
+    [Authorize(Policy = "Funds.View")]
+    public class DetailModel(ILogger<DetailModel> logger) : PageModelBase(logger)
     {
-        public DetailModel(UserManager<IdentityUser> userManager, ILogger<DetailModel> logger) : base(userManager, logger)
-        {
-        }
 
         [BindProperty(SupportsGet = true)]
         public int? Id { get; set; }
@@ -22,7 +19,6 @@ namespace SM.APP.Pages.Funds
             {
                 return RedirectToPage("/Funds/Index");
             }
-            await GetAPIToken();
             return Page();
         }
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,10 +9,9 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Classess
 {
-    public class ClassMembersModel(UserManager<IdentityUser> userManager, ILogger<ClassMembersModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Class.View")]
+    public class ClassMembersModel(ILogger<ClassMembersModel> logger) : PageModelBase(logger)
     {
-        public void OnGet()
-        {
-        }
+
     }
 }

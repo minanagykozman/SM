@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,7 +9,8 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Classess
 {
-    public class ClassOccurancesModel(UserManager<IdentityUser> userManager, ILogger<ClassOccurancesModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Class.Attendance")]
+    public class ClassOccurancesModel(ILogger<ClassOccurancesModel> logger) : PageModelBase(logger)
     {
         #region Properties
         [BindProperty(SupportsGet = true)]

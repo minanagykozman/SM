@@ -19,13 +19,9 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Members
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class EditModel(UserManager<IdentityUser> userManager, ILogger<EditModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Members.Manage")]
+    public class EditModel(ILogger<EditModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+       
     }
 }

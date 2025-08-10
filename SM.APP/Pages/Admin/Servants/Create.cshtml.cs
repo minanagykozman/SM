@@ -7,7 +7,8 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Servants
 {
-    public class CreateModel(UserManager<IdentityUser> userManager, ILogger<CreateModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy ="Servants.Manage")]
+    public class CreateModel(ILogger<CreateModel> logger) : PageModelBase( logger)
     {
 
 

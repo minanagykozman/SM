@@ -11,8 +11,8 @@ using Newtonsoft.Json.Linq;
 
 namespace SM.APP.Pages.Events
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class ListEventMembersModel(UserManager<IdentityUser> userManager, ILogger<ListEventMembersModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Events.View")]
+    public class ListEventMembersModel(ILogger<ListEventMembersModel> logger) : PageModelBase(logger)
     {
         public int RegisteredCount { get; set; } = 0;
 

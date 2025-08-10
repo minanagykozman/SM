@@ -38,7 +38,7 @@ namespace SM.DAL.Migrations
                     { 14, "Funds.View" },
                     { 15, "Funds.Review" },
                     { 16, "Servants.Manage" },
-                    { 17, "Members.Create" },
+                    { 17, "Members.Manage" },
                     { 18, "Members.Delete" },
                     { 19, "Members.View" },
                     { 20, "Members.ManageCards" }

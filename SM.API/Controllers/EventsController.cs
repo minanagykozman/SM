@@ -12,6 +12,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class EventsController(ILogger<EventsController> logger) : SMControllerBase(logger)
     {
+        [Authorize(Policy = "Events.View")]
 
         [HttpGet("GetEvents")]
         public ActionResult<List<Event>> GetEvents()
@@ -30,6 +31,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.View")]
 
         [HttpGet("GetEvent")]
         public ActionResult<Event> GetEvent(int eventID)
@@ -48,6 +50,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Rgister")]
         [HttpGet("CheckRegistrationStatus")]
         public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus(string memberCode, int eventID)
         {
@@ -73,6 +76,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Attendance")]
         [HttpGet("CheckAttendanceStatus")]
         public ActionResult<EventAttendanceStatusResponse> CheckAttendanceStatus(string memberCode, int eventID)
         {
@@ -92,7 +96,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Events.View")]
         [HttpGet("GetEventRegisteredMembers")]
         public ActionResult<List<Member>> GetEventRegisteredMembers(int eventID)
         {
@@ -110,6 +114,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.View")]
         [HttpGet("GetEventAttendedMembers")]
         public ActionResult<List<Member>> GetEventAttendedMembers(int eventID)
         {
@@ -127,7 +132,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Events.View")]
         [HttpGet("GetEventMembers")]
         public ActionResult<List<MemberEventView>> GetEventMembers(int eventID, bool? registered, bool? attended)
         {
@@ -145,7 +150,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Events.Register")]
         [HttpPost("Register")]
         public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, bool isException, string? notes)
         {
@@ -164,6 +169,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Manage")]
         [HttpPost("CreateEvent")]
         public ActionResult<int> CreateEvent([FromBody] EventParams eventParams)
         {
@@ -181,6 +187,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Manage")]
         [HttpPost("DeleteEvent")]
         public ActionResult<int> DeleteEvent([FromBody] int eventID)
         {
@@ -198,6 +205,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Manage")]
         [HttpPost("UpdateEvent")]
         public ActionResult<int> UpdateEvent([FromBody] EventParams eventParams)
         {
@@ -215,6 +223,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Attendance")]
         [HttpPost("TakeAttendance")]
         public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID)
         {
@@ -233,6 +242,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.Register")]
         [HttpPost("DistributeMembers")]
         public ActionResult<string> DistributeMembers([FromBody] DistributionParams param)
         {

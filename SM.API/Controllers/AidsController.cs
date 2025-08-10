@@ -13,7 +13,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class AidsController(ILogger<EventsController> logger) : SMControllerBase(logger)
     {
-
+        [Authorize(Policy = "Aids.View")]
         [HttpGet("GetAids")]
         public ActionResult<List<Aid>> GetAids()
         {
@@ -31,6 +31,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.View")]
         [HttpGet("GetAid")]
         public ActionResult<Aid> GetAid(int aidID)
         {
@@ -48,6 +49,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.Manage")]
         [HttpPost("DeleteAid")]
         public ActionResult<int> DeleteAid([FromBody] int aidID)
         {
@@ -65,6 +67,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.Manage")]
         [HttpPost("UpdateAid")]
         public ActionResult<int> UpdateAid([FromBody] AidParams aidParams)
         {
@@ -82,6 +85,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.Register")]
         [HttpGet("CheckMemberStatus")]
         public ActionResult<AidStatusResponse> CheckMemberStatus(string memberCode, int aidID)
         {
@@ -101,6 +105,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.View")]
         [HttpGet("GetAidMembers")]
         public ActionResult<List<MemberAid>> GetAidMembers(int aidID)
         {
@@ -118,6 +123,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.Register")]
         [HttpPost("Register")]
         public ActionResult<AidStatus> Register(string memberCode, int aidID, string? notes)
         {
@@ -136,6 +142,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Aids.Manage")]
         [HttpPost("Create")]
         public ActionResult<int> Create([FromBody] AidParams aidParams)
         {
@@ -146,7 +153,6 @@ namespace SM.API.Controllers
                     int aidID = aidHandler.CreateAid(aidParams.Aid, aidParams.Classes);
                     return Ok(aidID);
                 }
-
             }
             catch (Exception ex)
             {

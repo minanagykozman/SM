@@ -21,7 +21,7 @@ namespace SM.APP.Pages.Admin.Class
 
         public IActionResult OnGet()
         {
-        ViewData["MeetingID"] = new SelectList(_context.Meetings, "MeetingID", "MeetingName");
+            ViewData["MeetingID"] = new SelectList(_context.Meetings, "MeetingID", "MeetingName");
             return Page();
         }
 

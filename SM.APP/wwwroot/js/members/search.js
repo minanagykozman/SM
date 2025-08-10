@@ -407,7 +407,46 @@ function populateMembersGrid(members, showInitialMessage = false) {
     elements.gridControls.classList.remove('d-none');
     members.forEach(member => {
         const isSelected = selectedMemberIDs.has(member.memberID);
-        const memberCard = `<div class="col-xl-4 col-lg-6 col-12"><div class="card h-100 shadow-sm position-relative"><div class="position-absolute top-0 start-0 p-2" style="z-index: 10;"><input class="form-check-input member-select-checkbox" type="checkbox" value="${member.memberID}" ${isSelected ? 'checked' : ''}></div><div class="card-body"><div class="d-flex justify-content-between align-items-start"><h5 class="card-title mb-1 ms-4">${member.fullName || 'N/A'}</h5><div class="dropdown"><button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a href="#" class="dropdown-item" onclick="showMemberDetailsModal(${member.memberID}, null)">View</a></li><li><a href="#" class="dropdown-item" onclick="showEditMemberModal(${member.memberID})">Edit</a></li><li><hr class="dropdown-divider"></li><li><a href="#" class="dropdown-item text-danger" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li></ul></div></div><div class="card-text"><p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || 'N/A'}</small></p><p class="mb-1"><strong>UN File #:</strong> ${member.unFileNumber || 'N/A'}</p><p class="mb-2"><strong>UN Personal #:</strong> ${member.unPersonalNumber || 'N/A'}</p><p class="mb-2"><strong>Card Prints #:</strong> ${member.cardDeliveryCount || 'N/A'}</p><span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span><span class="badge ${member.baptised ? 'bg-success' : 'bg-secondary'} me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span><span class="badge bg-info text-dark">${member.cardStatus || 'N/A'}</span>${member.mobile ? `<div class="mt-3 d-grid"><a href="tel:${member.mobile}" class="btn btn-outline-success btn-sm"><i class="bi bi-telephone-fill me-2"></i> ${member.mobile}</a></div>` : ''}</div></div></div></div>`;
+        let editButtonHtml = '';
+        let deleteButtonHtml = '';
+        if (member.permissions["canEdit"]) {
+            editButtonHtml = `<li><a href="#" class="dropdown-item" onclick="showEditMemberModal(${member.memberID})">Edit</a></li>`;
+        }
+        if (member.permissions["canDelete"]) {
+            deleteButtonHtml = `<li>
+                     <hr class="dropdown-divider">
+                  </li>
+                  <li><a href="#" class="dropdown-item text-danger" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li>`;
+        }
+        const memberCard = `<div class="col-xl-4 col-lg-6 col-12">
+   <div class="card h-100 shadow-sm position-relative">
+      <div class="position-absolute top-0 start-0 p-2" style="z-index: 10;">
+         <input class="form-check-input member-select-checkbox" type="checkbox" value="${member.memberID}" ${isSelected ? 'checked' : ''}>
+      </div>
+      <div class="card-body">
+         <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title mb-1 ms-4">${member.fullName || 'N/A'}</h5>
+            <div class="dropdown">
+               <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></button>
+               <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a href="#" class="dropdown-item" onclick="showMemberDetailsModal(${member.memberID}, null)">View</a></li>
+                  ${editButtonHtml}
+                  ${deleteButtonHtml}
+               </ul>
+            </div>
+         </div>
+         <div class="card-text">
+            <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || 'N/A'}</small></p>
+            <p class="mb-1"><strong>UN File #:</strong> ${member.unFileNumber || 'N/A'}</p>
+            <p class="mb-2"><strong>UN Personal #:</strong> ${member.unPersonalNumber || 'N/A'}</p>
+            <p class="mb-2"><strong>Card Prints #:</strong> ${member.cardDeliveryCount || 'N/A'}</p>
+            <span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span><span class="badge ${member.baptised ? 'bg-success' : 'bg-secondary'} me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span><span class="badge bg-info text-dark">${member.cardStatus || 'N/A'}</span>${member.mobile ? `
+            <div class="mt-3 d-grid"><a href="tel:${member.mobile}" class="btn btn-outline-success btn-sm"><i class="bi bi-telephone-fill me-2"></i> ${member.mobile}</a></div>
+            ` : ''}
+         </div>
+      </div>
+   </div>
+</div>`;
         elements.membersGrid.insertAdjacentHTML('beforeend', memberCard);
     });
     updateBulkActionsUI();

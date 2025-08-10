@@ -9,16 +9,9 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Members
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class CreateModel(UserManager<IdentityUser> userManager, ILogger<CreateModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Members.View")]
+    public class CreateModel(ILogger<CreateModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGet(string unFileNumber, bool? showMessage, string code)
-        {
-            await GetAPIToken();
-            return Page();
-        }
-
-        [BindProperty]
-        public Member Member { get; set; } = default!;
+        
     }
 }

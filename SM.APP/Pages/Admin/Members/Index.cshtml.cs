@@ -17,7 +17,7 @@ using SM.DAL.DataModel;
 namespace SM.APP.Pages.Admin.Members
 {
     [Authorize(Roles = "Admin,Servant")]
-    public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
+    public class IndexModel(ILogger<IndexModel> logger) : PageModelBase(logger)
     {
         [BindProperty(SupportsGet = true)]
         public string UserCode { get; set; } = string.Empty;

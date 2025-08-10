@@ -7,13 +7,9 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Aids
 {
-    [Authorize(Roles = "Admin")]
-    public class CreateModel(UserManager<IdentityUser> userManager, ILogger<CreateModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Aids.Manage")]
+    public class CreateModel(ILogger<CreateModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+        
     }
 }

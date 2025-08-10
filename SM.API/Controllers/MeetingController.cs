@@ -15,6 +15,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class MeetingController(ILogger<MeetingController> logger) : SMControllerBase(logger)
     {
+        [Authorize(Policy = "Class.View")]
 
         [HttpGet("GetServantClasses")]
         public ActionResult<List<Class>> GetServantClasses()
@@ -34,6 +35,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.View")]
         [HttpGet("GetClassOccurences")]
         public ActionResult<List<ClassOccurrence>> GetClassOccurences(int classID)
         {
@@ -55,6 +57,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.View")]
         [HttpGet("GetClassMembers")]
         public ActionResult<List<ClassMemberExtended>> GetClassMembers(int classID)
         {
@@ -73,6 +76,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.View")]
         [HttpGet("GetAttendedMembers")]
         public ActionResult<List<Member>> GetAttendedMembers(int occurenceID)
         {
@@ -94,6 +98,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Attendance")]
         [HttpGet("CheckAttendance")]
         public ActionResult<MemberAttendanceResult> CheckAttendance(int classOccurenceID, string memberCode)
         {
@@ -114,6 +119,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Manage")]
         [HttpPost("CreateClass")]
         public ActionResult<Class> CreateClass(string className, int meetingID)
         {
@@ -131,6 +137,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Manage")]
         [HttpPost("AutoAssignClassMembers")]
         public ActionResult<string> AutoAssignClassMembers(int classID)
         {
@@ -148,6 +155,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Manage")]
         [HttpPost("CreateClassOccurences")]
         public ActionResult<string> CreateClassOccurences(int classID)
         {
@@ -165,6 +173,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Manage")]
         [HttpPost("CreateClassOccurencesTimed")]
         public ActionResult<List<ClassOccurrence>> CreateClassOccurencesTimed(int classID, DateTime startDate, DateTime endDate)
         {
@@ -182,6 +191,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Attendance")]
         [HttpPost("TakeAttendance")]
         public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode, bool forceRegister)
         {
@@ -200,6 +210,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Attendance")]
         [HttpPost("TakeAttendanceBulk")]
         public ActionResult<string> TakeAttendanceBulk(int classOccurenceID, List<int> memberIDs, int servantID)
         {
@@ -218,6 +229,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.ManageVisitation")]
         [HttpPost("AssignMemberServant")]
         public ActionResult<string> AssignMemberServant(int classID, int memberID)
         {
@@ -236,6 +248,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.ManageVisitation")]
         [HttpPost("UnAssignMemberServant")]
         public ActionResult<string> UnAssignMemberServant(int classID, int memberID)
         {
@@ -254,7 +267,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Class.View")]
         [HttpGet("DownloadClassMembers")]
         public IActionResult DownloadClassMembers(int classID)
         {

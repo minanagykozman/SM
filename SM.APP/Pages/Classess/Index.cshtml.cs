@@ -9,14 +9,11 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Classess
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class IndexModel : PageModelBase
+    [Authorize(Policy = "Class.View")]
+    public class IndexModel(ILogger<IndexModel> logger) : PageModelBase(logger)
     {
 
-        public IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : base(userManager, logger)
-        {
-
-        }
+       
         [BindProperty(SupportsGet = true)]
         public List<Class> Classes { get; set; }
         public async Task<IActionResult> OnGetAsync()

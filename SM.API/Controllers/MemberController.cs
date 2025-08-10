@@ -15,20 +15,31 @@ namespace SM.API.Controllers
     public class MemberController : SMControllerBase
     {
         private readonly IAmazonS3 _s3Client;
-        public MemberController(ILogger<SMControllerBase> logger, IAmazonS3 s3Client)
+        private readonly IAuthorizationService _authorizationService;
+        public MemberController(ILogger<SMControllerBase> logger, IAmazonS3 s3Client, IAuthorizationService authorizationService)
        : base(logger)
         {
             _s3Client = s3Client;
+            _authorizationService = authorizationService;
         }
-
+        [Authorize(Policy = "Members.View")]
         [HttpGet("List")]
-        public ActionResult<List<Member>> List()
+        public async Task<ActionResult> List()
         {
             try
             {
+                var canEdit = (await _authorizationService.AuthorizeAsync(User, "Members.Manage")).Succeeded;
+                var canDelete = (await _authorizationService.AuthorizeAsync(User, "Members.Delete")).Succeeded;
+
                 using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
                     List<Member> members = memberHandler.GetAllMembers();
+                    members.ForEach(member =>
+                    {
+                        member.Permissions = new Dictionary<string, bool>();
+                        member.Permissions.Add("canEdit", canEdit);
+                        member.Permissions.Add("canDelete", canDelete);
+                    });
                     return Ok(members);
                 }
 
@@ -38,6 +49,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.View")]
         [HttpGet("GetFamily")]
         public ActionResult<List<Member>> GetFamily(string unFileNumber)
         {
@@ -72,6 +84,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.Manage")]
         [HttpGet("ValidateUNNumber")]
         public ActionResult<bool> ValidateUNNumber(string unFileNumber, int? memberID)
         {
@@ -90,6 +103,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.View")]
         [HttpGet("SearchMembers")]
         public ActionResult<List<Member>> SearchMembers(string? memberCode, string? firstName, string? lastName)
         {
@@ -107,6 +121,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.View")]
         [HttpGet("GetMembersByCardStatus")]
         public ActionResult<List<Member>> GetMembersByCardStatus(CardStatus cardStatus)
         {
@@ -124,8 +139,9 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.View")]
         [HttpGet("GetMember")]
-        public ActionResult<Member> GetMember(int memberID,bool? includeFamilyCount)
+        public ActionResult<Member> GetMember(int memberID, bool? includeFamilyCount)
         {
             try
             {
@@ -141,6 +157,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.View")]
         [HttpGet("GetMemberByCode")]
         public ActionResult<Member> GetMemberByCode(string memberCode)
         {
@@ -158,6 +175,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.Manage")]
         [HttpPost("UpdateMember")]
         public ActionResult<string> UpdateMember([FromBody] Member member)
         {
@@ -176,6 +194,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Funds.Manage")]
         [HttpPut("UpdateMemberMobile")]
         public ActionResult<string> UpdateMemberMobile([FromBody] UpdateMemberMobileParams member)
         {
@@ -194,6 +213,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.Manage")]
         [HttpPost("UpdateMemberWImage")]
         public async Task<IActionResult> UpdateMemberWImage([FromForm] MemberParam param)
         {
@@ -232,25 +252,8 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        [HttpPost("CreateMember")]
-        public ActionResult<string> CreateMember([FromBody] Member member)
-        {
-            try
-            {
-                using (SM.BAL.MemberHandler eventHandler = new SM.BAL.MemberHandler())
-                {
-                    ValidateServant();
-                    Member newMember = eventHandler.CreateMember(member, User.Identity.Name);
-
-                    return Ok(newMember.Code);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex);
-            }
-        }
+        
+        [Authorize(Policy = "Members.Manage")]
         [HttpPost("CreateMemberWImage")]
         public async Task<IActionResult> CreateMemberWImage([FromForm] MemberParam param)
         {
@@ -274,6 +277,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.ManageCards")]
         [HttpPost("UpdateMemberCard")]
         public ActionResult<string> UpdateMemberCard([FromBody] UpdateCardModel model)
         {
@@ -293,7 +297,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Events.View")]
         // Get member event registrations
         [HttpGet("GetMemberEventRegistrations")]
         public ActionResult<IEnumerable<EventRegistration>> GetMemberEventRegistrations(int memberID)
@@ -311,7 +315,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Class.View")]
         // Get member class attendance overviews
         [HttpGet("GetMemberClassOverviews")]
         public ActionResult<IEnumerable<MemberClassOverview>> GetMemberClassOverviews(int memberID)
@@ -329,7 +333,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Class.View")]
         // Get member attendance history
         [HttpGet("GetAttendanceHistory")]
         public ActionResult<IEnumerable<ClassAttendance>> GetAttendanceHistory(int memberID)
@@ -347,7 +351,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Aids.View")]
         // Get member aid participations
         [HttpGet("GetMemberAids")]
         public ActionResult<IEnumerable<MemberAid>> GetMemberAids(int memberID)
@@ -365,7 +369,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Funds.View")]
         // Get member fund transactions
         [HttpGet("GetMemberFunds")]
         public ActionResult<IEnumerable<MemberFund>> GetMemberFunds(int memberID)

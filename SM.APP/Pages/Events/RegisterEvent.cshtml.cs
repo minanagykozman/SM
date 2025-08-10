@@ -11,8 +11,8 @@ using Newtonsoft.Json.Linq;
 
 namespace SM.APP.Pages.Events
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class RegisterEventModel(UserManager<IdentityUser> userManager, ILogger<RegisterEventModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Events.Register")]
+    public class RegisterEventModel(ILogger<RegisterEventModel> logger) : PageModelBase(logger)
     {
         public async Task<IActionResult> OnGetAsync()
         {

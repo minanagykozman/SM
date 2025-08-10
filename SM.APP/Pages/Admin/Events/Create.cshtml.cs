@@ -7,15 +7,9 @@ using SM.DAL.DataModel;
 
 namespace SM.APP.Pages.Admin.Events
 {
-    [Authorize(Roles = "Admin")]
-    public class CreateModel(UserManager<IdentityUser> userManager, ILogger<CreateModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Events.Manage")]
+    public class CreateModel(ILogger<CreateModel> logger) : PageModelBase(logger)
     {
-        [BindProperty]
-        public Event Event { get; set; } = default!;
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+       
     }
 }

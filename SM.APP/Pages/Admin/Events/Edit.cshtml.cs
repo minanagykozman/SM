@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5,12 +6,9 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Admin.Events
 {
-    public class EditModel(UserManager<IdentityUser> userManager, ILogger<EditModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Events.Manage")]
+    public class EditModel(ILogger<EditModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+       
     }
 }

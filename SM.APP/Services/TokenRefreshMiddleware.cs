@@ -18,11 +18,8 @@ namespace SM.APP.Services
 
         public async Task InvokeAsync(HttpContext context, UserManager<IdentityUser> userManager)
         {
-            // First, let the rest of the pipeline run to establish the user's identity
-            await _next(context);
-
             // Only proceed if the request is authenticated and the response hasn't started
-            if (context.User.Identity?.IsAuthenticated == true && !context.Response.HasStarted)
+            if (context.User.Identity?.IsAuthenticated == true )
             {
                 var tokenCookie = context.Request.Cookies["AuthToken"];
 
@@ -54,6 +51,7 @@ namespace SM.APP.Services
                     }
                 }
             }
+            await _next(context);
         }
 
         private bool ShouldRefreshToken(string? token)

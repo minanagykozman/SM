@@ -11,8 +11,8 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Events
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class IndexModel(UserManager<IdentityUser> userManager, ILogger<IndexModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy ="Events.View")]
+    public class IndexModel(ILogger<IndexModel> logger) : PageModelBase(logger)
     {
         
         [BindProperty(SupportsGet = true)]

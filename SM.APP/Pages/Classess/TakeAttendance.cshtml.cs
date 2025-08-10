@@ -9,8 +9,8 @@ using System.Text.Json;
 
 namespace SM.APP.Pages.Classess
 {
-    [Authorize(Roles = "Admin,Servant")]
-    public class TakeAttendanceModel(UserManager<IdentityUser> userManager, ILogger<TakeAttendanceModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy = "Class.Attendance")]
+    public class TakeAttendanceModel(ILogger<TakeAttendanceModel> logger) : PageModelBase(logger)
     {
         public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
         public async Task<IActionResult> OnGetAsync()

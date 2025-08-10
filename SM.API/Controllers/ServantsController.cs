@@ -14,7 +14,6 @@ namespace SM.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
     public class ServantsController : SMControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -25,6 +24,7 @@ namespace SM.API.Controllers
             _roleManager = roleManager;
             _userManager = userManager;
         }
+        [Authorize(Policy = "Servants.Manage")]
         [HttpGet("GetSystemRoles")]
         public ActionResult<List<IdentityRole>> GetSystemRoles()
         {
@@ -38,6 +38,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Servants.Manage")]
         [HttpGet("CheckEmail")]
         public ActionResult<bool> CheckEmail(string email)
         {
@@ -70,6 +71,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Servants.Manage")]
         [HttpGet("GetServant")]
         public ActionResult<Servant> GetServant(int servantID)
         {
@@ -86,7 +88,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Servants.Manage")]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] ServantRegisterModel model)
         {
@@ -109,6 +111,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Servants.Manage")]
         [HttpPost("Update")]
         public async Task<IActionResult> Update([FromBody] ServantEditModel model)
         {

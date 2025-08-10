@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5,13 +6,9 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Admin.Members
 {
-    public class SearchModel(UserManager<IdentityUser> userManager, ILogger<SearchModel> logger) : PageModelBase(userManager, logger)
+    [Authorize(Policy ="Members.View")]
+    public class SearchModel(ILogger<SearchModel> logger) : PageModelBase(logger)
     {
-        public async Task<IActionResult> OnGet(string unFileNumber, bool? showMessage, string code)
-        {
-            await GetAPIToken();
-            return Page();
-        }
-
+        
     }
 }

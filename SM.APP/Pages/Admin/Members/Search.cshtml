@@ -8,7 +8,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <h4 class="mb-0">Member Search <span id="counter" class="text-muted fw-normal"></span></h4>
         <div>
-            <a href="/Admin/Members/Create" class="btn btn-success">
+            <a href="/Admin/Members/Create" class="btn btn-success" auth-policy="Members.Manage">
                 <i class="bi bi-plus-circle me-1"></i> Create Member
             </a>
             <button class="btn btn-outline-primary" id="refresh-btn">
@@ -158,10 +158,10 @@
                     Actions (<span id="selected-count">0</span>)
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bulk-actions-btn">
-                    <li><a class="dropdown-item" href="#" data-action="print-card">Download Card(s)</a></li>
+                    <li auth-policy="Members.ManageCards"><a class="dropdown-item" href="#" data-action="print-card">Download Card(s)</a></li>
                     <li><a class="dropdown-item" href="#" data-action="update-baptism">Update Baptism Status</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#" data-action="delete-members">Delete Members</a></li>
+                    <li auth-policy="Members.Delete"><hr class="dropdown-divider"></li>
+                    <li auth-policy="Members.Delete"><a class="dropdown-item text-danger" href="#" data-action="delete-members">Delete Members</a></li>
                 </ul>
             </div>
         </div>
