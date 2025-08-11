@@ -3,7 +3,7 @@ class FundDetailManager {
         this.fundId = this.getFundIdFromUrl();
         this.fund = null;
         this.assignableServants = [];
-        //this.STATUS = { OPEN: 0, APPROVED: 1, REJECTED: 2, DELIVERED: 3, ONHOLD: 4 };
+        this.STATUS = { OPEN: 0, APPROVED: 1, REJECTED: 2, DELIVERED: 3, ONHOLD: 4 };
         this.init();
     }
 
@@ -170,8 +170,8 @@ class FundDetailManager {
         const deleteFundLi = document.getElementById('deleteFundLi');
         const deleteFundSeparator = document.getElementById('deleteFundSeparator');
         if (deleteFundLi) {
-            deleteFundLi.style.display = (this.fund.status === this.STATUS.OPEN) ? 'block' : 'none';
-            deleteFundSeparator.style.display = (this.fund.status === this.STATUS.OPEN) ? 'block' : 'none';
+            deleteFundLi.style.display = (this.fund.status === this.STATUS.OPEN || this.fund.status === this.STATUS.ONHOLD) ? 'block' : 'none';
+            deleteFundSeparator.style.display = (this.fund.status === this.STATUS.OPEN || this.fund.status === this.STATUS.ONHOLD) ? 'block' : 'none';
         }
     }
 
