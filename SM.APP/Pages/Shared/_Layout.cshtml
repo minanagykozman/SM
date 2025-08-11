@@ -36,32 +36,35 @@
                     </button>
 
                     <div class="collapse navbar-collapse" id="mainNav">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Members
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="membersDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Admin/Members/Search">Search Members</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Cards/Index">Cards</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Classess/Index">Classes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Aids/Index">Aids</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Events/Index">Events</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Funds/Index">Funds</a>
-                            </li>
-                        </ul>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Members
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="membersDropdown">
+                                        <li><a class="dropdown-item" asp-page="/Admin/Members/Search">Search Members</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Cards/Index">Cards</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-page="/Classess/Index">Classes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-page="/Aids/Index">Aids</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-page="/Events/Index">Events</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-page="/Funds/Index">Funds</a>
+                                </li>
+                            </ul>
+                        }
                         <div class="d-flex">
                             <partial name="_LoginPartial" />
                         </div>
