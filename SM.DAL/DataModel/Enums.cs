@@ -12,7 +12,9 @@ namespace SM.DAL.DataModel
         Open,
         Approved,
         Rejected,
-        Delivered
+        Delivered,
+        [Display(Name = "On Hold")]
+        OnHold
     }
     public enum RegistrationStatus
     {

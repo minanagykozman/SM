@@ -50,7 +50,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        [Authorize(Policy = "Events.Rgister")]
+        [Authorize(Policy = "Events.Register")]
         [HttpGet("CheckRegistrationStatus")]
         public ActionResult<RegistrationStatusResponse> CheckRegistrationStatus(string memberCode, int eventID)
         {

@@ -42,26 +42,29 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
                                 </li>
-                                <li class="nav-item dropdown">
+                                <li class="nav-item dropdown" auth-policy="Members.View">
                                     <a class="nav-link dropdown-toggle" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Members
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="membersDropdown">
-                                        <li><a class="dropdown-item" asp-page="/Admin/Members/Search">Search Members</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Cards/Index">Cards</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Members/Search" auth-policy="Members.View">Search Members</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Cards/Index" auth-policy="Members.ManageCards">Cards</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-page="/Classess/Index">Classes</a>
+                                    <a class="nav-link" asp-area="" auth-policy="Class.View" asp-page="/Classess/Index">Classes</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-page="/Aids/Index">Aids</a>
+                                    <a class="nav-link" asp-area="" auth-policy="Aids.View" asp-page="/Aids/Index">Aids</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-page="/Events/Index">Events</a>
+                                    <a class="nav-link" asp-area="" auth-policy="Events.View" asp-page="/Events/Index">Events</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-page="/Funds/Index">Funds</a>
+                                    <a class="nav-link" asp-area="" auth-policy="Funds.View" asp-page="/Funds/Index">Funds</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area=""  asp-page="/Admin/Index">Administration</a>
                                 </li>
                             </ul>
                         }

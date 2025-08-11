@@ -3,7 +3,7 @@ class FundDetailManager {
         this.fundId = this.getFundIdFromUrl();
         this.fund = null;
         this.assignableServants = [];
-        this.STATUS = { OPEN: 0, APPROVED: 1, REJECTED: 2, DELIVERED: 3 };
+        //this.STATUS = { OPEN: 0, APPROVED: 1, REJECTED: 2, DELIVERED: 3, ONHOLD: 4 };
         this.init();
     }
 
@@ -97,12 +97,12 @@ class FundDetailManager {
     populateFundDetails() {
         if (!this.fund) return;
 
-        const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered' };
-        let statusText = typeof this.fund.status === 'number' ? statusMap[this.fund.status] : this.fund.status;
+        //const statusMap = { 0: 'Open', 1: 'Approved', 2: 'Rejected', 3: 'Delivered',4: 'On Hold' };
+        //let statusText =  this.fund.statusName;
 
         const statusBadge = document.getElementById('requestStatusBadge');
         if (statusBadge) {
-            statusBadge.textContent = statusText;
+            statusBadge.textContent = this.fund.statusName;
             statusBadge.className = `badge ${getFundStatusBadgeClass(this.fund.status)} fs-6 p-2 me-2`;
         }
 

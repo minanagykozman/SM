@@ -40,22 +40,6 @@
         showDeleteFundModal(fund);
     }
 
-    // *** NEW HELPER FUNCTION FOR STATUS BADGES ***
-    function getStatusBadgeClass(statusName) {
-        switch (statusName) {
-            case 'Open':
-                return 'bg-warning text-dark';
-            case 'Approved':
-                return 'bg-success';
-            case 'Rejected':
-                return 'bg-danger';
-            case 'Delivered':
-                return 'bg-info';
-            default:
-                return 'bg-secondary';
-        }
-    }
-
     async function loadServants() {
         try {
             const dropdown = $("#filterAssignedTo");
@@ -113,12 +97,14 @@
         }
         funds.forEach(fund => {
             let deleteButtonHtml = '';
-            if (fund.statusName === 'Open') {
+            let editButtonHtml = '';
+            if (fund.statusName === 'Open' || fund.statusName ==='OnHold') {
                 deleteButtonHtml = `<li><hr class="dropdown-divider"></li><li><button class="dropdown-item text-danger delete-btn" type="button"><i class="bi bi-trash me-2"></i>Delete</button></li>`;
+                editButtonHtml = '<li><button class="dropdown-item edit-btn" type="button"><i class="bi bi-pencil me-2"></i>Edit</button></li>';
             }
 
-            const statusBadgeClass = getStatusBadgeClass(fund.statusName);
-
+            const statusBadgeClass = getFundStatusBadgeClass(fund.status);
+            
             const fundItemHtml = `
                         <div class="list-group-item" data-fund-id="${fund.fundID}">
                             <div class="d-flex w-100 justify-content-between align-items-start">
@@ -140,7 +126,7 @@
                                         <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li><a class="dropdown-item" href="/Funds/Detail/${fund.fundID}"><i class="bi bi-eye me-2"></i>View</a></li>
-                                            <li><button class="dropdown-item edit-btn" type="button"><i class="bi bi-pencil me-2"></i>Edit</button></li>
+                                            ${editButtonHtml}
                                             <li><button class="dropdown-item update-status-btn" type="button"><i class="bi bi-check2-square me-2"></i>Update Status</button></li>
                                             ${deleteButtonHtml}
                                         </ul>

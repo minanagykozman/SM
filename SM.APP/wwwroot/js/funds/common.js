@@ -4,6 +4,7 @@
         case 1: return 'bg-success';
         case 2: return 'bg-danger';
         case 3: return 'bg-info';
+        case 4: return 'bg-secondary text-light';
         default: return 'bg-secondary';
     }
 }

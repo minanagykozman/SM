@@ -21,6 +21,7 @@
                         <select class="form-select" id="newStatus" required>
                             <option value="" selected>Select Status</option>
                             <option value="Open">Open</option>
+                            <option value="OnHold">On Hold</option>
                             <option value="Approved">Approved</option>
                             <option value="Rejected">Rejected</option>
                             <option value="Delivered">Delivered</option>
@@ -123,7 +124,13 @@
             saveBtn.disabled = false;
         }
     }
-    
+    $('#updateStatusModal').on('hidden.bs.modal', function () {
+        // Use the native DOM reset() method on the form to clear all fields
+        $('#updateStatusForm')[0].reset();
+
+        // Also explicitly hide the conditional 'Approved Amount' field
+        $('#approvedAmountGroup').hide();
+    });
     (async function() {
         $('#newStatus').on('change', function() {
         if ($(this).val() === 'Approved') {

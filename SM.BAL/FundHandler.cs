@@ -231,7 +231,7 @@ namespace SM.BAL
             }
 
             // Only allow updates if fund is still Open or if user is admin
-            if (fund.Status != FundStatus.Open)
+            if (fund.Status == FundStatus.Approved || fund.Status == FundStatus.Rejected)
             {
                 throw new InvalidOperationException("Cannot update fund that is not in Open status");
             }

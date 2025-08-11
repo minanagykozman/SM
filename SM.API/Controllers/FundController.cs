@@ -43,6 +43,7 @@ namespace SM.API.Controllers
                     "Furinture",
                     "Medical",
                     "Education",
+                    "Work Request",
                     "Others"
                 };
                 return Ok(categories);
@@ -75,13 +76,15 @@ namespace SM.API.Controllers
         {
             try
             {
-                FundHandler fundHandler = new SM.BAL.FundHandler();
-                var fund = fundHandler.GetFund(id, User.Identity.Name);
-                if (fund == null)
+                using (FundHandler fundHandler = new SM.BAL.FundHandler())
                 {
-                    return NotFound("Fund not found or access denied");
+                    var fund = fundHandler.GetFund(id, User.Identity.Name);
+                    if (fund == null)
+                    {
+                        return NotFound("Fund not found or access denied");
+                    }
+                    return Ok(fund);
                 }
-                return Ok(fund);
             }
             catch (Exception ex)
             {
