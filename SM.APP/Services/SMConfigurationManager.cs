@@ -32,14 +32,14 @@ namespace SM.APP.Services
                     return Environment.GetEnvironmentVariable("ApiBase") ?? string.Empty;
             }
         }
-        public static string Domian
+        public static string Domain
         {
             get
             {
                 if (IsDevelopment)
-                    return _configuration["AppSettings:Domian"] ?? string.Empty;
+                    return _configuration["AppSettings:Domain"] ?? string.Empty;
                 else
-                    return Environment.GetEnvironmentVariable("Domian") ?? string.Empty;
+                    return Environment.GetEnvironmentVariable("Domain") ?? string.Empty;
             }
         }
         public static string JWTSecret

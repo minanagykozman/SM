@@ -139,7 +139,7 @@ namespace SM.APP.Areas.Identity.Pages.Account
                     };
                     if (!SMConfigurationManager.IsDevelopment)
                     {
-                        options.Domain = SMConfigurationManager.Domian;
+                        options.Domain = SMConfigurationManager.Domain;
                     }
                     Response.Cookies.Append("AuthToken", token, options);
                     

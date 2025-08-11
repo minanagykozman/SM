@@ -90,7 +90,7 @@ namespace SM.APP.Services
 
             if (!SMConfigurationManager.IsDevelopment)
             {
-                options.Domain = SMConfigurationManager.Domian;
+                options.Domain = SMConfigurationManager.Domain;
             }
 
             return options;
