@@ -16,7 +16,7 @@ namespace SM.DAL.DataModel
         public string? Mobile2 { get; set; }
         public bool IsActive { get; set; }
         public string UserID { get; set; }
-
+        public int ChurchID { get; set; }
         public List<int> ServantClassesIDs
         {
             get
@@ -27,6 +27,16 @@ namespace SM.DAL.DataModel
                     return ServantClasses.Select(s => s.ClassID).ToList();
             }
         }
+       public Church ServantChurch { get; set; }
+
+        [JsonIgnore]
+        public ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
+        [JsonIgnore]
+        public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
+        [JsonIgnore]
+        public ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
+        [JsonIgnore]
+        public ICollection<MemberFund> Funds { get; set; } = new List<MemberFund>();
         [NotMapped]
         public List<string> ServantRoles
         {
@@ -37,15 +47,6 @@ namespace SM.DAL.DataModel
         {
             get; set;
         }
-
-        [JsonIgnore]
-        public ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
-        [JsonIgnore]
-        public ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
-        [JsonIgnore]
-        public ICollection<MemberAid> MemberAids { get; set; } = new List<MemberAid>();
-        [JsonIgnore]
-        public ICollection<MemberFund> Funds { get; set; } = new List<MemberFund>();
     }
 
 }

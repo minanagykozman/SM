@@ -21,6 +21,9 @@ namespace SM.DAL.DataModel
         public string? ApproverNotes { get; set; }
         public FundStatus Status { get; set; }
         public DateTime RequestDate { get; set; }
+        public DateTime? ClosureDate { get; set; }
+        public int ChurchID { get; set; }
+        public virtual Church Church { get; set; }
         public virtual Member Member { get; set; }
         public virtual Servant Servant { get; set; }
         public virtual Servant? Approver { get; set; }

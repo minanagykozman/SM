@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815172132_AddChurchesModule")]
+    partial class AddChurchesModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -927,7 +930,7 @@ namespace SM.DAL.Migrations
                     b.Property<string>("ApproverNotes")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ChurchID")
+                    b.Property<int?>("ChurchID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ClosureDate")
@@ -1012,7 +1015,7 @@ namespace SM.DAL.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ServantID"));
 
-                    b.Property<int>("ChurchID")
+                    b.Property<int?>("ChurchID")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
@@ -1043,7 +1046,6 @@ namespace SM.DAL.Migrations
                         new
                         {
                             ServantID = -1,
-                            ChurchID = 0,
                             IsActive = true,
                             Mobile1 = "",
                             ServantName = "admin",
@@ -1306,9 +1308,7 @@ namespace SM.DAL.Migrations
 
                     b.HasOne("SM.DAL.DataModel.Church", "Church")
                         .WithMany()
-                        .HasForeignKey("ChurchID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChurchID");
 
                     b.HasOne("SM.DAL.DataModel.Member", "Member")
                         .WithMany("Funds")
@@ -1354,9 +1354,7 @@ namespace SM.DAL.Migrations
                 {
                     b.HasOne("SM.DAL.DataModel.Church", "ServantChurch")
                         .WithMany("ChurchServants")
-                        .HasForeignKey("ChurchID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChurchID");
 
                     b.Navigation("ServantChurch");
                 });

@@ -36,6 +36,8 @@
         public DbSet<AuditTrail> AuditTrail { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<Church> Churches{ get; set; }
+        public DbSet<ChurchMember> ChurchMembers { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -90,7 +92,7 @@
 
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
-                .WithMany() // Assuming a Role can have many RolePermissions
+                .WithMany() 
                 .HasForeignKey(rp => rp.RoleId);
 
             modelBuilder.Entity<RolePermission>()
@@ -103,6 +105,10 @@
                 .HasIndex(p => p.Name)
                 .IsUnique();
 
+            modelBuilder.Entity<ChurchMember>()
+               .HasKey(cm => new { cm.ChurchID, cm.MemberID });
+
+           
 
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });

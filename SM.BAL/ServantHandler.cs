@@ -36,7 +36,7 @@ namespace SM.BAL
                 return true;
             return false;
         }
-        public Servant CreateServant(string name, string mobile1, string mobile2, string id, List<int> classes)
+        public Servant CreateServant(string name, string mobile1, string mobile2, string id, int churchID, List<int> classes)
         {
             Servant servant = new Servant()
             {
@@ -44,7 +44,8 @@ namespace SM.BAL
                 Mobile1 = mobile1,
                 Mobile2 = mobile2,
                 UserID = id,
-                IsActive = true
+                IsActive = true,
+                ChurchID = churchID
             };
             _dbcontext.Servants.Add(servant);
             _dbcontext.SaveChanges();

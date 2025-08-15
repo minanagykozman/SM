@@ -134,7 +134,8 @@ namespace SM.BAL
                     Status = FundStatus.Open,
                     RequestDate = CurrentTime,
                     ApproverNotes = request.ApproverNotes ?? string.Empty,
-                    ApprovedAmount = 0
+                    ApprovedAmount = 0,
+                    ChurchID = servant.ChurchID
                 };
 
                 _dbcontext.MemberFunds.Add(fund);
@@ -283,7 +284,7 @@ namespace SM.BAL
         // Delete a fund (Admin only, and only if Open)
         public void DeleteFund(int fundId, string username)
         {
-            
+
 
             var fund = _dbcontext.MemberFunds.FirstOrDefault(f => f.FundID == fundId);
             if (fund == null)

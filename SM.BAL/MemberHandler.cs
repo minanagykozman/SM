@@ -437,6 +437,7 @@ namespace SM.BAL
             _dbcontext.Members.Add(newMember);
             _dbcontext.SaveChanges();
 
+            _dbcontext.ChurchMembers.Add(new ChurchMember() { MemberID = newMember.MemberID, ChurchID = servant.ChurchID });
             if (classes != null)
             {
                 foreach (var cl in classes)

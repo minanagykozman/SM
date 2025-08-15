@@ -102,7 +102,15 @@ namespace SM.API.Controllers
                 }
                 using (ServantHandler handler = new ServantHandler())
                 {
-                    var servant = handler.CreateServant(model.Name, model.Mobile, model.Mobile2, user.Id, model.Classes);
+                    int churchID = 0;
+                    if (model.ChurchID.HasValue)
+                        churchID = model.ChurchID.Value;
+                    else
+                    {
+                        var creatingServant = handler.GetServantByUsername(User.Identity.Name);
+                        churchID = creatingServant.ChurchID;
+                    }
+                    var servant = handler.CreateServant(model.Name, model.Mobile, model.Mobile2, user.Id, churchID, model.Classes);
                     return Ok(servant);
                 }
             }
@@ -119,7 +127,7 @@ namespace SM.API.Controllers
             {
                 using (ServantHandler handler = new ServantHandler())
                 {
-                    var servant = handler.UpdateServant(model.ServantID, model.Name, model.Mobile, model.Mobile2, model.Classes,model.Roles);
+                    var servant = handler.UpdateServant(model.ServantID, model.Name, model.Mobile, model.Mobile2, model.Classes, model.Roles);
                     return Ok(servant);
                 }
             }
@@ -142,6 +150,7 @@ namespace SM.API.Controllers
             public string Name { get; set; }
             public string Mobile { get; set; }
             public string Mobile2 { get; set; }
+            public int? ChurchID { get; set; }
             public List<int> Classes { get; set; }
         }
 
