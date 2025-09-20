@@ -11,9 +11,6 @@
             <a href="/Admin/Members/Create" class="btn btn-success" auth-policy="Members.Manage">
                 <i class="bi bi-plus-circle me-1"></i> Create Member
             </a>
-            <button class="btn btn-outline-primary" id="refresh-btn">
-                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-            </button>
         </div>
     </div>
     <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
@@ -35,6 +32,9 @@
                     <label for="code-search-input" class="form-label">Search by Code, File Number, or Personal Number</label>
                     <div class="input-group">
                         <input type="text" class="form-control" id="code-search-input" placeholder="Enter search term...">
+                        <button class="btn btn-primary" type="button" id="code-search-btn">
+                            <i class="bi bi-search"></i>
+                        </button>
                         <button class="btn btn-outline-secondary" type="button" id="scanMemberCodeBtnSearch" title="Scan QR Code">
                             <i class="bi bi-qr-code-scan"></i>
                         </button>

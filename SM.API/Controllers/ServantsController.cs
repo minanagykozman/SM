@@ -18,19 +18,28 @@ namespace SM.API.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
-        public ServantsController(ILogger<SMControllerBase> logger, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        private readonly IAuthorizationService _authorizationService;
+        public ServantsController(ILogger<SMControllerBase> logger, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuthorizationService authorizationService)
        : base(logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
         [Authorize(Policy = "Servants.Manage")]
         [HttpGet("GetSystemRoles")]
-        public ActionResult<List<IdentityRole>> GetSystemRoles()
+        public async Task<ActionResult> GetSystemRoles()
         {
             try
             {
-                var roles = _roleManager.Roles.ToList();
+                bool admin = (await _authorizationService.AuthorizeAsync(User, "Church.ManageAll")).Succeeded;
+                var roles = _roleManager.Roles.OrderBy(r => r.Name).ToList();
+                if (!admin)
+                {
+                    roles.Remove(roles.Where(r => r.Name == "SuperAdmin").FirstOrDefault());
+                    roles.Remove(roles.Where(r => r.Name == "ChurchAdmin").FirstOrDefault());
+                }
+
                 return Ok(roles);
             }
             catch (Exception ex)

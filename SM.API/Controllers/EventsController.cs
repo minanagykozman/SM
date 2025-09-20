@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.API.Services;
@@ -150,16 +151,93 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Events.View")]
+        [HttpGet("DownloadEventMembers")]
+        public IActionResult DownloadEventMembers(int eventID)
+        {
+
+            try
+            {
+                if (eventID <= 0)
+                {
+                    return BadRequest("Invalid event ID");
+                }
+                List<MemberEventView> members = new List<MemberEventView>();
+                using (SM.BAL.EventHandler handler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    members = handler.GetEventMembers(eventID, true, null);
+                }
+                using var workbook = new XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("Event Members");
+
+                // Add header
+                worksheet.Cell(1, 1).Value = "Code";
+                worksheet.Cell(1, 2).Value = "Full Name";
+                worksheet.Cell(1, 3).Value = "Nickname";
+                worksheet.Cell(1, 4).Value = "UN File Number";
+                worksheet.Cell(1, 5).Value = "UN Personal Number";
+                worksheet.Cell(1, 6).Value = "Mobile";
+                worksheet.Cell(1, 7).Value = "Baptised";
+                worksheet.Cell(1, 8).Value = "Birthdate";
+                worksheet.Cell(1, 9).Value = "Age";
+                worksheet.Cell(1, 10).Value = "Gender";
+                worksheet.Cell(1, 11).Value = "Card Status";
+                worksheet.Cell(1, 12).Value = "Status";
+                worksheet.Cell(1, 13).Value = "Team";
+                worksheet.Cell(1, 14).Value = "Bus";
+                worksheet.Cell(1, 15).Value = "Paid";
+                worksheet.Cell(1, 16).Value = "Notes";
+
+                int row = 2;
+                foreach (var member in members)
+                {
+                    worksheet.Cell(row, 1).Value = member.Code;
+                    worksheet.Cell(row, 2).Value = member.FullName;
+                    worksheet.Cell(row, 3).Value = member.Nickname ?? "";
+                    worksheet.Cell(row, 4).Value = member.UNFileNumber;
+                    worksheet.Cell(row, 5).Value = member.UNPersonalNumber;
+                    worksheet.Cell(row, 6).Value = member.Mobile ?? "";
+                    worksheet.Cell(row, 7).Value = member.Baptised ? "Yes" : "No";
+                    worksheet.Cell(row, 8).Value = member.Birthdate.ToShortDateString();
+                    worksheet.Cell(row, 9).Value = member.Age;
+                    worksheet.Cell(row, 10).Value = member.Gender.ToString();
+                    worksheet.Cell(row, 11).Value = member.CardStatus ?? "";
+                    worksheet.Cell(row, 12).Value = member.Attended == null ? "Registered" : (member.Attended.Value ? "Present" : "Absent");
+                    worksheet.Cell(row, 13).Value = member.Team ?? "";
+                    worksheet.Cell(row, 14).Value = member.Bus ?? "";
+                    worksheet.Cell(row, 15).Value = member.Paid.HasValue ? member.Paid : "";
+                    worksheet.Cell(row, 16).Value = member.Notes ?? "";
+
+                    row++;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var fileName = $"ClassMembers_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    fileName);
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [Authorize(Policy = "Events.Register")]
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, int eventID, bool isException, string? notes)
+        public ActionResult<RegistrationStatus> Register(string memberCode, float paid, int eventID, bool isException, string? notes)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    var status = eventHandler.Register(memberCode, eventID, User.Identity.Name, isException, notes);
+                    var status = eventHandler.Register(memberCode, eventID, paid, User.Identity.Name, isException, notes);
                     return Ok(status);
                 }
 

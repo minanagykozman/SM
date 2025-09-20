@@ -3,172 +3,77 @@
 @{
     ViewData["Title"] = "Event Members";
 }
-@using SM.APP.Pages.Events;
-@using SM.DAL.DataModel;
-<div class="container my-4">
-    <!-- Page Title -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Event Members</h4> <!-- Optional title -->
-        <span class="badge bg-success px-3 py-2 fs-6">Registered @Model.RegisteredCount</span>
+<div class="container mt-4" id="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h4 class="mb-0">
+            Event Members <span id="counter" class="text-muted fw-normal"></span>
+        </h4>
+        <div>
+            <button class="btn btn-outline-primary" id="download-excel">
+                <i class="bi bi-download me-1"></i>Download as Excel
+            </button>
+        </div>
     </div>
-    <!-- Table for Larger Screens -->
-    <div class="d-none d-md-block">
-        <div class="table-responsive">
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table table-hover table-striped  align-middle" id="dataTable">
-                    <thead class="table-primary">
-                        <tr>
-                            <th onclick="sortBySequence(this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].Code)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="0" placeholder="Search Code">
-                            </th>
-                            <th onclick="sortTable(1,this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].FullName)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="1" placeholder="Search Name">
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.EventMembers[0].UNFileNumber)
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="2" placeholder="Search UN File">
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.EventMembers[0].UNPersonalNumber)
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="3" placeholder="Search UN No">
-                            </th>
-                            <th onclick="sortTable(4,this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].Age)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="4" placeholder="Search Age">
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.EventMembers[0].Baptised)
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="5" placeholder="Search Baptised">
-                            </th>
-                            <th onclick="sortTable(6,this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].CardStatus)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="6" placeholder="Search Card Status">
-                            </th>
-                            <th onclick="sortTable(7,this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].Team)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="7" placeholder="Search Card Status">
-                            </th>
-                            <th onclick="sortTable(8,this)">
-                                @Html.DisplayNameFor(model => model.EventMembers[0].Bus)
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="8" placeholder="Search Card Status">
-                            </th>
-                            <th onclick="sortTable(9,this)">
-                                Attendance
-                                <i class="fa-solid fa-sort"></i>
-                                <input type="text" class="form-control form-control-sm border-primary filter-input" data-column="9" placeholder="Search Attendance">
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.EventMembers)
-                        {
-                            <tr>
-                                <td>
-                                    <span class="sequence" style="display: none;">@item.Sequence</span>
-                                    <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.FullName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.UNFileNumber)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.UNPersonalNumber)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Age)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Baptised)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.CardStatus)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Team)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Bus)
-                                </td>
-                                <td>
-                                    @if (item.Attended == true)
-                                    {
-                                        <span class="text-success">
-                                            <i class="bi bi-check-circle"></i> Present
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-danger">
-                                            <i class="bi bi-x-circle"></i> Absent
-                                        </span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <input type="hidden" id="eventID" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+
+    <div class="d-flex flex-wrap align-items-end gap-3 mb-4 p-3 border rounded bg-light">
+        <div class="flex-grow-1" style="min-width: 200px;">
+            <label for="search-filter" class="form-label small">Search</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="search-filter" placeholder="Code, Name, Age...">
+            </div>
+        </div>
+
+        <div>
+            <label for="active-filter" class="form-label small">Status</label>
+            <select id="active-filter" class="form-select">
+                <option value="all" selected>All</option>
+                <option value="null" >Registered</option>
+                <option value="true">Present</option>
+                <option value="false">Absent</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="baptised-filter" class="form-label small">Baptism Status</label>
+            <select id="baptised-filter" class="form-select">
+                <option value="all" selected>Show All</option>
+                <option value="true">Baptised Only</option>
+                <option value="false">Not Baptised Only</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="sort-by" class="form-label small">Sort by</label>
+            <div class="input-group">
+                <select class="form-select" id="sort-by">
+                    <option value="sequence">Sequence</option>
+                    <option value="attended">Status</option>
+                    <option value="age">Age</option>
+                    <option value="team">Team</option>
+                    <option value="bus">Bus</option>
+                </select>
+                <button class="btn btn-outline-secondary" id="sort-direction">
+                    <i class="bi bi-arrow-down"></i>
+                </button>
             </div>
         </div>
     </div>
-    <!-- Mobile View -->
-    <div class="d-block d-md-none">
-        <div class="card p-2 mb-2 bg-light">
-            <h6 class="text-primary">Filter</h6>
-            <input type="text" class="form-control form-control-sm mobile-filter" placeholder="Search members...">
-        </div>
 
-        <div class="list-group" id="mobileList">
-            @foreach (var item in Model.EventMembers)
-            {
-                <div class="list-group-item list-group-item-action flex-column align-items-start">
-                    <h5 class="mb-1 text-primary">
-                        <a asp-page="/Admin/Members/Edit" asp-route-id="@item.MemberID" target="_blank" rel="noopener noreferrer">@Html.DisplayFor(modelItem => item.Code)</a>
-                    </h5>
-                    <p class="mb-1"><strong>Name:</strong> @Html.DisplayFor(modelItem => item.FullName)</p>
-                    <p class="mb-1"><strong>Age:</strong> @Html.DisplayFor(modelItem => item.Age)</p>
-                    <p class="mb-1">
-                        <strong>Mobile:</strong>
-                        @Html.DisplayFor(modelItem => item.Mobile)
 
-                        @if (!string.IsNullOrEmpty(item.Mobile))
-                        {
-                            <a href="tel:@item.Mobile" class="ms-2">
-                                <i class="fas fa-phone-alt"></i>
-                            </a>
-                        }
-                    </p>
-                    <p class="mb-1"><strong>Card Status:</strong> @Html.DisplayFor(modelItem => item.CardStatus)</p>
-                    <p class="mb-1"><strong>Team:</strong> @Html.DisplayFor(modelItem => item.Team)</p>
-                    <p class="mb-1"><strong>Bus:</strong> @Html.DisplayFor(modelItem => item.Bus)</p>
-                    <p class="mb-1">
-                        @if (item.Attended == true)
-                        {
-                            <span class="text-success">
-                                <i class="bi bi-check-circle"></i> Present
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="text-danger">
-                                <i class="bi bi-x-circle"></i> Absent
-                            </span>
-                        }
-                    </p>
-
-                </div>
-            }
-        </div>
+    <div class="row g-4" id="members-grid">
     </div>
 </div>
-
-
+<partial name="_MemberDetailsModalPartial" />
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+    <script src="~/js/funds/common.js" asp-append-version="true"></script>
+    <script src="~/js/funds/listing.js" asp-append-version="true"></script>
+    <script src="~/js/aids/listing.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
+    <script src="~/js/members/details.js" asp-append-version="true"></script>
+    <script src="~/js/events/event-members.js" asp-append-version="true"></script>
+}

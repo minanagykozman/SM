@@ -46,6 +46,7 @@ namespace SM.DAL.DataModel
         public DateTime? AttendanceTimeStamp { get; set; }
         public string? Team { get; set; }
         public string? Bus { get; set; }
+        public float? Paid { get; set; } = null;
         public int Age
         {
             get

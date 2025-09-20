@@ -34,8 +34,10 @@ namespace SM.DAL.DataModel
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
+        public int ChurchID{ get; set; }
         public string? Notes { get; set; }
         public ICollection<Class> Classes { get; set; } = new List<Class>();
+        public Church Church { get; set; }
     }
 
 }

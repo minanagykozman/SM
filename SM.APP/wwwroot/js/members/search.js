@@ -1,12 +1,13 @@
-﻿let allMembers = [];
+﻿// MODIFICATION: allMembers is no longer needed to store the full list
 let allClasses = [];
 let selectedMemberIDs = new Set();
 
 // DOM Elements
 const elements = {
     mainContainer: document.getElementById('main-container'),
-    refreshBtn: document.getElementById('refresh-btn'),
     codeSearchInput: document.getElementById('code-search-input'),
+    // MODIFICATION: Added button for code search
+    codeSearchBtn: document.getElementById('code-search-btn'),
     // Advanced filter elements
     advancedFilterForm: document.getElementById('advanced-filter-form'),
     firstNameFilter: document.getElementById('first-name-filter'),
@@ -46,8 +47,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         initializeScanning();
-        await Promise.all([fetchMembers(), fetchClasses()]);
+        // MODIFICATION: Removed fetchMembers() from initial load
+        await fetchClasses();
         setupEventListeners();
+
+        // Start with an empty grid, prompting user to search
+        populateMembersGrid([], true);
         toggleFormInputs(document.getElementById('filter-search-pane'), false);
         elements.codeSearchInput.focus();
     } catch (error) {
@@ -57,19 +62,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         hideLoading();
     }
 });
-
-/**
- * Fetches the full list of members from the API.
- */
-async function fetchMembers() {
-    const response = await fetch(`${apiBaseUrl}/Member/List`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" }
-    });
-    if (!response.ok) throw new Error(`Failed to fetch members: ${response.statusText}`);
-    allMembers = await response.json();
-}
 
 /**
  * Fetches the list of classes and defensively initializes the selectpicker.
@@ -83,23 +75,16 @@ async function fetchClasses() {
     if (!response.ok) throw new Error(`Failed to fetch classes: ${response.statusText}`);
     allClasses = await response.json();
 
-    // Clear any existing options before adding new ones
     elements.classFilter.innerHTML = '';
-
     allClasses.forEach(cls => {
         const option = new Option(cls.className, cls.classID);
         elements.classFilter.add(option);
     });
 
-    // ✅ This is the key fix.
-    // It checks if bootstrap-select has already been applied to this element.
     const isAlreadyInitialized = elements.classFilter.classList.contains('bs-select-hidden');
-
     if (isAlreadyInitialized) {
-        // If it's already a selectpicker, just refresh its contents.
         $('#class-filter').selectpicker('refresh');
     } else {
-        // Otherwise, initialize it for the first time.
         $('#class-filter').selectpicker();
     }
 }
@@ -112,15 +97,17 @@ function setupEventListeners() {
     const tabs = document.querySelectorAll('#searchTabs button');
     tabs.forEach(tab => tab.addEventListener('shown.bs.tab', handleTabChange));
 
-    // Search by Code (triggers on input)
-    elements.codeSearchInput.addEventListener('input', handleCodeSearch);
+    // MODIFICATION: Changed code search to trigger on button click and 'Enter' key
+    elements.codeSearchBtn.addEventListener('click', handleCodeSearch);
+    elements.codeSearchInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            handleCodeSearch();
+        }
+    });
 
     // Advanced Filters (triggers on button click)
     elements.applyFiltersBtn.addEventListener('click', applyAdvancedFilters);
     elements.resetFiltersBtn.addEventListener('click', resetAdvancedFilters);
-
-    // Refresh button
-    elements.refreshBtn.addEventListener('click', refreshData);
 
     // Class filter UI logic
     elements.classFilterOperator.addEventListener('change', () => {
@@ -213,7 +200,7 @@ function handleTabChange(event) {
     const isCodeSearch = event.target.id === 'code-search-tab';
     toggleFormInputs(document.getElementById('code-search-pane'), isCodeSearch);
     toggleFormInputs(document.getElementById('filter-search-pane'), !isCodeSearch);
-    populateMembersGrid([], true);
+    populateMembersGrid([], true); // Clear grid on tab switch
     elements.codeSearchInput.value = '';
     resetAdvancedFilters(false);
     if (isCodeSearch) {
@@ -236,54 +223,79 @@ function toggleFormInputs(container, enable) {
     });
 }
 
+async function handleCodeSearch() {
+    clearSelection();
+    const searchTerm = elements.codeSearchInput.value.trim();
+    if (!searchTerm) {
+        populateMembersGrid([], true);
+        return;
+    }
 
-/**
- * Re-fetches members and applies the current filter.
- */
-async function refreshData() {
     showLoading();
     try {
-        await fetchMembers();
-        const activeTab = document.querySelector('#searchTabs .nav-link.active');
-        if (activeTab && activeTab.id === 'code-search-tab') {
-            handleCodeSearch();
-        } else {
-            applyAdvancedFilters();
+        const params = new URLSearchParams({ term: searchTerm });
+        const response = await fetch(`${apiBaseUrl}/Member/SearchByCode?${params}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.statusText}`);
         }
+
+        const members = await response.json();
+        populateMembersGrid(members);
     } catch (error) {
-        console.error("Failed to refresh data:", error);
-        showErrorMessage("Could not refresh data from the server.");
+        console.error("Failed to search by code:", error);
+        showErrorMessage("An error occurred while searching. Please try again.");
+        populateMembersGrid([]); // Show empty grid on error
     } finally {
         hideLoading();
     }
 }
 
-/**
- * Handles the logic for the "Search by Code" feature.
- */
-function handleCodeSearch() {
+async function applyAdvancedFilters() {
     clearSelection();
-    const searchTerm = elements.codeSearchInput.value.trim().toLowerCase();
-    if (!searchTerm) {
-        populateMembersGrid([], true);
-        return;
-    }
-    const firstMatch = allMembers.find(m => (m.code && m.code.toLowerCase().includes(searchTerm)) || (m.unFileNumber && m.unFileNumber == searchTerm) || (m.unPersonalNumber && m.unPersonalNumber == searchTerm) || (m.imageReference && m.imageReference.toLowerCase().includes(searchTerm)));
-    if (firstMatch) {
-        const familyFileNumber = firstMatch.unFileNumber;
-        const familyMembers = allMembers.filter(m => m.unFileNumber === familyFileNumber).sort((a, b) => b.age - a.age);
-        populateMembersGrid(familyMembers);
-    } else {
-        populateMembersGrid([]);
-    }
-}
 
-/**
- * Normalizes Arabic text by removing diacritics for smart search.
- */
-function normalizeArabic(text) {
-    if (!text) return "";
-    return text.normalize("NFD").replace(/[\u064B-\u0652]/g, "");
+    // Build the search criteria object to send to the server
+    const searchCriteria = {
+        firstName: elements.firstNameFilter.value.trim() || null,
+        lastName: elements.lastNameFilter.value.trim() || null,
+        isActive: elements.activeFilter.value === 'all' ? null : (elements.activeFilter.value === 'true'),
+        isBaptised: elements.baptisedFilter.value === 'all' ? null : (elements.baptisedFilter.value === 'true'),
+        cardStatus: elements.cardStatusFilter.value === 'all' ? null : elements.cardStatusFilter.value,
+        classIDs: $('#class-filter').val() || [],
+        birthdateStart: elements.birthdateStartFilter.value || null,
+        birthdateEnd: elements.birthdateEndFilter.value || null,
+        ageStart: parseInt(elements.ageStartFilter.value, 10) || null,
+        ageEnd: parseInt(elements.ageEndFilter.value, 10) || null,
+        isNotInAnyClass: elements.notInClassFilter.checked,
+        classOperatorIsOr: elements.classFilterOperator.checked
+    };
+
+    showLoading();
+    try {
+        const response = await fetch(`${apiBaseUrl}/Member/Search`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(searchCriteria)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.statusText}`);
+        }
+
+        const members = await response.json();
+        populateMembersGrid(members);
+    } catch (error) {
+        console.error("Failed to apply advanced filters:", error);
+        showErrorMessage("An error occurred while searching. Please try again.");
+        populateMembersGrid([]);
+    } finally {
+        hideLoading();
+    }
 }
 
 /**
@@ -293,7 +305,7 @@ function initializeScanning() {
     const scanButton = document.getElementById("scanMemberCodeBtnSearch");
     const qrScannerContainer = document.getElementById("qrScannerContainerSearch");
     const stopScanButton = document.getElementById("btnStopScanSearch");
-    const codeBtn = document.getElementById("code-search-input");
+    const codeInput = document.getElementById("code-search-input");
     if (scanButton) {
         let html5QrCode;
         scanButton.addEventListener("click", function () {
@@ -305,13 +317,13 @@ function initializeScanning() {
                 fps: 10,
                 qrbox: { width: 250, height: 250 }
             }, (decodedText) => {
-                codeBtn.value = decodedText;
+                codeInput.value = decodedText;
                 html5QrCode.stop().then(() => {
                     qrScannerContainer.classList.add("d-none");
                     handleCodeSearch();
                 });
             }, (errorMessage) => {
-                // console.warn("QR Code scan error: ", errorMessage);
+                 console.warn("QR Code scan error: ", errorMessage);
             }).catch((err) => {
                 console.error("QR Code scanning failed: ", err);
             });
@@ -324,51 +336,6 @@ function initializeScanning() {
             }
         });
     }
-}
-
-/**
- * Applies all advanced filters together with AND logic.
- */
-function applyAdvancedFilters() {
-    clearSelection();
-    const filters = {
-        firstName: normalizeArabic(elements.firstNameFilter.value.trim().toLowerCase()),
-        lastName: normalizeArabic(elements.lastNameFilter.value.trim().toLowerCase()),
-        isActive: elements.activeFilter.value,
-        isBaptised: elements.baptisedFilter.value,
-        cardStatus: elements.cardStatusFilter.value,
-        classIDs: $('#class-filter').val() || [],
-        birthStart: elements.birthdateStartFilter.value,
-        birthEnd: elements.birthdateEndFilter.value,
-        ageStart: parseInt(elements.ageStartFilter.value, 10) || null,
-        ageEnd: parseInt(elements.ageEndFilter.value, 10) || null,
-        isNotInAnyClass: elements.notInClassFilter.checked,
-        classOperatorIsOr: elements.classFilterOperator.checked
-    };
-    const filteredMembers = allMembers.filter(member => {
-        if (filters.firstName && (!member.unFirstName || !normalizeArabic(member.unFirstName.toLowerCase()).includes(filters.firstName))) return false;
-        if (filters.lastName && (!member.unLastName || !normalizeArabic(member.unLastName.toLowerCase()).includes(filters.lastName))) return false;
-        if (filters.isActive !== 'all' && member.isActive !== (filters.isActive === 'true')) return false;
-        if (filters.isBaptised !== 'all' && member.baptised !== (filters.isBaptised === 'true')) return false;
-        if (filters.cardStatus !== 'all' && member.cardStatus !== filters.cardStatus) return false;
-        if (filters.isNotInAnyClass) {
-            if (member.classesIDs && member.classesIDs.length > 0) return false;
-        } else if (filters.classIDs.length > 0) {
-            const memberClasses = member.classesIDs || [];
-            if (filters.classOperatorIsOr) {
-                if (!filters.classIDs.some(id => memberClasses.includes(parseInt(id, 10)))) return false;
-            } else {
-                if (!filters.classIDs.every(id => memberClasses.includes(parseInt(id, 10)))) return false;
-            }
-        }
-        const birthDate = new Date(member.birthdate);
-        if (filters.birthStart && birthDate < new Date(filters.birthStart)) return false;
-        if (filters.birthEnd && birthDate > new Date(filters.birthEnd)) return false;
-        if (filters.ageStart && member.age < filters.ageStart) return false;
-        if (filters.ageEnd && member.age > filters.ageEnd) return false;
-        return true;
-    });
-    populateMembersGrid(filteredMembers);
 }
 
 /**
@@ -414,9 +381,9 @@ function populateMembersGrid(members, showInitialMessage = false) {
         }
         if (member.permissions["canDelete"]) {
             deleteButtonHtml = `<li>
-                     <hr class="dropdown-divider">
-                  </li>
-                  <li><a href="#" class="dropdown-item text-danger" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li>`;
+                                  <hr class="dropdown-divider">
+                                </li>
+                                <li><a href="#" class="dropdown-item text-danger" onclick="showMemberDeleteModal(${member.memberID}, null)">Delete</a></li>`;
         }
         const memberCard = `<div class="col-xl-4 col-lg-6 col-12">
    <div class="card h-100 shadow-sm position-relative">
@@ -481,16 +448,16 @@ function clearSelection() {
     updateBulkActionsUI();
 }
 
-// --- Bulk Action Functions (Placeholders) ---
+/**
+ * --- Bulk Action Functions ---
+ */
 async function bulkPrintCards(memberIds) {
     if (!memberIds || memberIds.length === 0) {
         alert("No members selected to print.");
         return;
     }
-
     console.log("Requesting cards for member IDs:", memberIds);
-    showLoading(); // Show the full-page loading indicator
-
+    showLoading();
     try {
         const response = await fetch(`${apiBaseUrl}/MemberImages/generate-cards`, {
             method: 'POST',
@@ -498,41 +465,27 @@ async function bulkPrintCards(memberIds) {
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify(memberIds) // Send the array as a JSON string
+            body: JSON.stringify(memberIds)
         });
-
         if (!response.ok) {
-            // Try to get a meaningful error message from the server
             const errorText = await response.text();
             throw new Error(`Failed to generate cards. Server responded with: ${errorText || response.statusText}`);
         }
-
-        // The response is the zip file itself (a blob)
         const blob = await response.blob();
-
-        // Create a temporary URL for the blob
         const url = window.URL.createObjectURL(blob);
-
-        // Create a temporary link element to trigger the download
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        // Set the default filename for the download
         a.download = 'MemberCards.zip';
-
-        // Add the link to the page, click it, and then remove it
         document.body.appendChild(a);
         a.click();
-
-        // Clean up by revoking the temporary URL
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-
     } catch (error) {
         console.error("Error printing member cards:", error);
-        alert(`An error occurred: ${error.message}`); // Show a more user-friendly error
+        alert(`An error occurred: ${error.message}`);
     } finally {
-        hideLoading(); // Always hide the loading indicator
+        hideLoading();
     }
 }
 

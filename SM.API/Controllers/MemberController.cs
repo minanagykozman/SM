@@ -1,8 +1,11 @@
 using Amazon.S3;
+//using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.API.Services;
+using SM.BAL;
 using SM.DAL.DataModel;
+using SM.DAL.DataModel.APIModels;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using static SM.BAL.EventHandler;
@@ -22,6 +25,50 @@ namespace SM.API.Controllers
             _s3Client = s3Client;
             _authorizationService = authorizationService;
         }
+        [Authorize(Policy = "Members.View")]
+        [HttpPost("Search")]
+        public async Task<IActionResult> Search([FromBody] MemberSearchCriteria criteria)
+        {
+            var canEdit = (await _authorizationService.AuthorizeAsync(User, "Members.Manage")).Succeeded;
+            var canDelete = (await _authorizationService.AuthorizeAsync(User, "Members.Delete")).Succeeded;
+            using (MemberHandler handler = new MemberHandler())
+            {
+                var members = handler.Search(criteria, User.Identity.Name);
+                members.ForEach(m =>
+                {
+                    m.Permissions = new Dictionary<string, bool>();
+                    m.Permissions.Add("canEdit", canEdit);
+                    m.Permissions.Add("canDelete", canDelete);
+                });
+                return Ok(members);
+            }
+
+        }
+        [HttpGet("SearchByCode")]
+        public async Task<IActionResult> SearchByCode([FromQuery] string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return Ok(new List<DAL.DataModel.Member>());
+            }
+            else
+            {
+                var canEdit = (await _authorizationService.AuthorizeAsync(User, "Members.Manage")).Succeeded;
+                var canDelete = (await _authorizationService.AuthorizeAsync(User, "Members.Delete")).Succeeded;
+                using (MemberHandler handler = new MemberHandler())
+                {
+                    var members = handler.SearchByCode(term);
+                    members.ForEach(m =>
+                    {
+                        m.Permissions = new Dictionary<string, bool>();
+                        m.Permissions.Add("canEdit", canEdit);
+                        m.Permissions.Add("canDelete", canDelete);
+                    });
+                    return Ok(members);
+                }
+            }
+        }
+
         [Authorize(Policy = "Members.View")]
         [HttpGet("List")]
         public async Task<ActionResult> List()
@@ -103,24 +150,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        [Authorize(Policy = "Members.View")]
-        [HttpGet("SearchMembers")]
-        public ActionResult<List<Member>> SearchMembers(string? memberCode, string? firstName, string? lastName)
-        {
-            try
-            {
-                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
-                {
-                    List<Member> members = memberHandler.GetMembers(memberCode, firstName, lastName);
-                    return Ok(members);
-                }
 
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex);
-            }
-        }
         [Authorize(Policy = "Members.View")]
         [HttpGet("GetMembersByCardStatus")]
         public ActionResult<List<Member>> GetMembersByCardStatus(CardStatus cardStatus)
@@ -252,7 +282,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        
+
         [Authorize(Policy = "Members.Manage")]
         [HttpPost("CreateMemberWImage")]
         public async Task<IActionResult> CreateMemberWImage([FromForm] MemberParam param)
@@ -372,13 +402,15 @@ namespace SM.API.Controllers
         [Authorize(Policy = "Funds.View")]
         // Get member fund transactions
         [HttpGet("GetMemberFunds")]
-        public ActionResult<IEnumerable<MemberFund>> GetMemberFunds(int memberID)
+        public async Task<ActionResult> GetMemberFunds(int memberID)
         {
             try
             {
+                bool viewAll = (await _authorizationService.AuthorizeAsync(User, "Church.ViewAll")).Succeeded;
+                //bool editAll = (await _authorizationService.AuthorizeAsync(User, "Church.ViewAll")).Succeeded;
                 using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
-                    var funds = memberHandler.GetMemberFunds(memberID);
+                    var funds = memberHandler.GetMemberFunds(memberID, User.Identity.Name, viewAll);
                     return Ok(funds);
                 }
             }

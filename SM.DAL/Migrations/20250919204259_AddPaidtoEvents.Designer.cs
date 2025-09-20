@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919204259_AddPaidtoEvents")]
+    partial class AddPaidtoEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -551,7 +554,7 @@ namespace SM.DAL.Migrations
                     b.Property<DateTime>("AgeStartDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("ChurchID")
+                    b.Property<int?>("ChurchID")
                         .HasColumnType("int");
 
                     b.Property<string>("Gender")
@@ -1286,9 +1289,7 @@ namespace SM.DAL.Migrations
                 {
                     b.HasOne("SM.DAL.DataModel.Church", "Church")
                         .WithMany("ChurchMeetings")
-                        .HasForeignKey("ChurchID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChurchID");
 
                     b.Navigation("Church");
                 });

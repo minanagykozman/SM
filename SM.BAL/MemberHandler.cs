@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SM.DAL.DataModel;
+using SM.DAL.DataModel.APIModels;
 using System.Text.Json;
 
 namespace SM.BAL
@@ -454,41 +455,25 @@ namespace SM.BAL
         {
             return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).OrderByDescending(m => m.ModifiedAt).ToList();
         }
-        public List<Member> GetMembers(string memberCode, string firstName, string lastName)
+        public List<Member> SearchByCode(string memberCode)
         {
             List<Member> members = new List<Member>();
-            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
-            {
-                memberCode = memberCode.Trim();
-                var member = _dbcontext.Members.
-                    FirstOrDefault(m => m.Code.Contains(memberCode) ||
-                    m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode
-                    || m.ImageReference == memberCode);
 
-                if (member == null)
-                    return members;
-                if (string.IsNullOrEmpty(member.UNFileNumber))
-                {
-                    members.Add(member);
-                    return members;
-                }
-                members = _dbcontext.Members.Where(m => m.UNFileNumber == member.UNFileNumber).OrderBy(m => m.Birthdate).ToList();
-            }
-            else
+            memberCode = memberCode.Trim();
+            var member = _dbcontext.Members.
+                FirstOrDefault(m => m.Code.Contains(memberCode) ||
+                m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode
+                || m.ImageReference == memberCode);
+
+            if (member == null)
+                return members;
+            if (string.IsNullOrEmpty(member.UNFileNumber))
             {
-                if (string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
-                {
-                    members = _dbcontext.Members.Where(m => m.UNLastName.Contains(lastName)).ToList();
-                }
-                else if (!string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
-                {
-                    members = _dbcontext.Members.Where(m => m.UNFirstName.Contains(firstName)).ToList();
-                }
-                else
-                {
-                    members = _dbcontext.Members.Where(m => m.UNFirstName.Contains(firstName) && m.UNLastName.Contains(lastName)).ToList();
-                }
+                members.Add(member);
+                return members;
             }
+            members = _dbcontext.Members.Where(m => m.UNFileNumber == member.UNFileNumber).OrderBy(m => m.Birthdate).ToList();
+
             return members;
 
         }
@@ -625,9 +610,15 @@ namespace SM.BAL
         }
 
         // Get member fund transactions
-        public List<MemberFund> GetMemberFunds(int memberId)
+        public List<MemberFund> GetMemberFunds(int memberId, string servantUsername, bool viewAllChurches)
         {
-            return _dbcontext.MemberFunds
+            var servant = GetServantByUsername(servantUsername);
+            var query = _dbcontext.MemberFunds.AsQueryable();
+            if (!viewAllChurches)
+            {
+                query = query.Where(m => m.ChurchID == servant.ChurchID);
+            }
+            return query
                 .Include(f => f.Servant)
                 .Where(f => f.MemberID == memberId)
                 .OrderByDescending(f => f.RequestDate)
@@ -678,6 +669,84 @@ namespace SM.BAL
         public List<Member> GetAllMembers()
         {
             return _dbcontext.Members.Include(m => m.ClassMembers).Where(m => !m.IsDeleted).ToList();
+        }
+
+        public List<Member> Search(MemberSearchCriteria criteria, string username)
+        {
+            Servant servant = GetServantByUsername(username);
+            var query = _dbcontext.Members.AsQueryable();
+
+            // --- Apply filters dynamically based on criteria ---
+
+            if (!string.IsNullOrWhiteSpace(criteria.FirstName))
+            {
+                query = query.Where(m => m.UNFirstName.ToLower().Contains(criteria.FirstName.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(criteria.LastName))
+            {
+                query = query.Where(m => m.UNLastName.ToLower().Contains(criteria.LastName.ToLower()));
+            }
+
+            if (criteria.IsActive.HasValue)
+            {
+                query = query.Where(m => m.IsActive == criteria.IsActive.Value);
+            }
+
+            if (criteria.IsBaptised.HasValue)
+            {
+                query = query.Where(m => m.Baptised == criteria.IsBaptised.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(criteria.CardStatus))
+            {
+                query = query.Where(m => m.CardStatus == criteria.CardStatus);
+            }
+
+            // --- Class Filtering Logic ---
+            if (criteria.IsNotInAnyClass)
+            {
+                // Assuming a navigation property 'MemberClasses' for the many-to-many relationship
+                //query = query.Where(m => !m.MemberClasses.Any());
+            }
+            else if (criteria.ClassIDs != null && criteria.ClassIDs.Any())
+            {
+                if (criteria.ClassOperatorIsOr) // Match ANY (OR)
+                {
+                    //query = query.Where(m => m.MemberClasses.Any(mc => criteria.ClassIDs.Contains(mc.ClassID)));
+                }
+                else // Match ALL (AND)
+                {
+                    // query = query.Where(m => criteria.ClassIDs.All(classId => m.MemberClasses.Any(mc => mc.ClassID == classId)));
+                }
+            }
+
+            // --- Range Filtering ---
+
+            if (criteria.BirthdateStart.HasValue)
+            {
+                query = query.Where(m => m.Birthdate >= criteria.BirthdateStart.Value);
+            }
+
+            if (criteria.BirthdateEnd.HasValue)
+            {
+                query = query.Where(m => m.Birthdate <= criteria.BirthdateEnd.Value);
+            }
+
+            // Assuming 'Age' is a calculated or stored property on your Member model
+            if (criteria.AgeStart.HasValue)
+            {
+                //query = query.Where(m => m.Age >= criteria.AgeStart.Value);
+            }
+
+            if (criteria.AgeEnd.HasValue)
+            {
+                //query = query.Where(m => m.Age <= criteria.AgeEnd.Value);
+            }
+            query = query.Where(m => m.ChurchMembers.Any(cm => cm.ChurchID == servant.ChurchID));
+            var results = query.ToList();
+            return results;
+
         }
 
         public class IamgeProperties
