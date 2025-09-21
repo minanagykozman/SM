@@ -22,10 +22,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `membereventview` AS select
 `er`.`TimeStamp` AS `TimeStamp`,`er`.`Notes` AS `RegistrationNotes`,`m`.`CardStatus` AS `CardStatus`,
 `er`.`Attended` AS `Attended`,`er`.`AttendanceServantID` AS `AttendanceServantID`,
 `er`.`AttendanceTimeStamp` AS `AttendanceTimeStamp`,`er`.`Team` AS `Team`,`er`.`Bus` AS `Bus` 
-from ((((`members` `m` join `classmembers` `cm` on((`m`.`MemberID` = `cm`.`MemberID`))) 
-join `classevents` `ce` on((`ce`.`ClassID` = `cm`.`ClassID`))) 
-join `events` `e` on((`e`.`EventID` = `ce`.`EventID`))) 
-left join `eventregistrations` `er` on(((`er`.`MemberID` = `m`.`MemberID`) and (`er`.`EventID` = `ce`.`EventID`))))
+from ((((`Members` `m` join `ClassMembers` `cm` on((`m`.`MemberID` = `cm`.`MemberID`))) 
+join `ClassEvents` `ce` on((`ce`.`ClassID` = `cm`.`ClassID`))) 
+join `Events` `e` on((`e`.`EventID` = `ce`.`EventID`))) 
+left join `EventRegistrations` `er` on(((`er`.`MemberID` = `m`.`MemberID`) and (`er`.`EventID` = `ce`.`EventID`))))
  where (`m`.`IsActive` = 1) 
  union select `m`.`MemberID` AS `MemberID`,`m`.`Code` AS `Code`,`m`.`UNFirstName` AS `UNFirstName`,
  `m`.`UNLastName` AS `UNLastName`,`m`.`UNFileNumber` AS `UNFileNumber`,`m`.`UNPersonalNumber` AS `UNPersonalNumber`,
@@ -34,7 +34,8 @@ left join `eventregistrations` `er` on(((`er`.`MemberID` = `m`.`MemberID`) and (
  `m`.`ImageReference` AS `ImageReference`,`m`.`Sequence` AS `Sequence`,
  (case when (`er`.`MemberID` is not null) then 1 else 0 end) AS `Registered`,`e`.`EventID` AS `EventID`,
  `er`.`IsException` AS `IsException`, `er`.`Paid` AS `Paid`,`er`.`ServantID` AS `ServantID`,
- `er`.`TimeStamp` AS `TimeStamp`,`er`.`Notes` AS `RegistrationNotes`,`m`.`CardStatus` AS `CardStatus`,`er`.`Attended` AS `Attended`,`er`.`AttendanceServantID` AS `AttendanceServantID`,`er`.`AttendanceTimeStamp` AS `AttendanceTimeStamp`,`er`.`Team` AS `Team`,`er`.`Bus` AS `Bus` from ((`members` `m` left join `eventregistrations` `er` on((`er`.`MemberID` = `m`.`MemberID`))) join `events` `e` on((`e`.`EventID` = `er`.`EventID`))) where (`m`.`IsActive` = 1);
+ `er`.`TimeStamp` AS `TimeStamp`,`er`.`Notes` AS `RegistrationNotes`,`m`.`CardStatus` AS `CardStatus`,`er`.`Attended` AS `Attended`,`er`.`AttendanceServantID` AS `AttendanceServantID`,`er`.`AttendanceTimeStamp` AS `AttendanceTimeStamp`,`er`.`Team` AS `Team`,`er`.`Bus` AS `Bus` 
+from ((`Members` `m` left join `EventRegistrations` `er` on((`er`.`MemberID` = `m`.`MemberID`))) join `Events` `e` on((`e`.`EventID` = `er`.`EventID`))) where (`m`.`IsActive` = 1);
             ");
         }
 
