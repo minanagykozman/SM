@@ -11,8 +11,8 @@ namespace SM.DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-                DROP VIEW IF EXISTS membereventview;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `membereventview` AS select `m`.`MemberID` AS `MemberID`,
+                DROP VIEW IF EXISTS MemberEventView;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `MemberEventView` AS select `m`.`MemberID` AS `MemberID`,
 `m`.`Code` AS `Code`,`m`.`UNFirstName` AS `UNFirstName`,`m`.`UNLastName` AS `UNLastName`,
 `m`.`UNFileNumber` AS `UNFileNumber`,`m`.`UNPersonalNumber` AS `UNPersonalNumber`,`m`.`Birthdate` AS `Birthdate`,
 `m`.`Baptised` AS `Baptised`,`m`.`Gender` AS `Gender`,`m`.`IsMainMember` AS `IsMainMember`,
