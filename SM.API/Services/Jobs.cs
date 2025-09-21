@@ -11,5 +11,12 @@ namespace SM.API.Services
                 memberHandler.UpdateMemberStatus();
             }
         }
+        public void UpdateEventAttendance()
+        {
+            using (BAL.EventHandler handler = new BAL.EventHandler())
+            {
+                handler.UpdateAttendance();
+            }
+        }
     }
 }

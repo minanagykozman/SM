@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('baptised-filter').addEventListener('change', applyFiltersAndSort);
     document.getElementById('sort-by').addEventListener('change', applyFiltersAndSort);
     document.getElementById('sort-direction').addEventListener('click', toggleSortDirection);
-    document.getElementById('download-excel').addEventListener('click', downloadEventData);
+    document.getElementById('download-excel').addEventListener('click', downloadEventData); 
+    document.getElementById('update-attendance').addEventListener('click', updateAttendance);
 });
 
 async function fetchEventMembers() {
@@ -159,5 +160,27 @@ function downloadEventData() {
         window.location.href = url;
     } else {
         alert("Cannot download data: Event ID is not available.");
+    }
+}
+
+async function updateAttendance() {
+    const eventID = document.getElementById('eventID').value;
+    if (eventID) {
+        showLoading();
+        const url = `${apiBaseUrl}/Events/UpdateAttendance?eventID=${eventID}`;
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+        fetchEventMembers();
+        hideLoading();
+        if (!response.ok) {
+            handleHTTPError(response);
+            return;
+        }
+
+    } else {
+        alert("Cannot update data: Event ID is not available.");
     }
 }

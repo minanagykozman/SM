@@ -18,6 +18,10 @@ namespace SM.API.Services
                 "Update_Member_Status",
                 job => job.UpdateMemberStatus(),
                 "0 0,12 * * *");
+            RecurringJob.AddOrUpdate<Jobs>(
+                "Update_Event_Attendance",
+                job => job.UpdateEventAttendance(),
+                "0 0,12 * * *");
             return Task.CompletedTask;
         }
 

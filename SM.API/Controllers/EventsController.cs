@@ -99,13 +99,13 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.View")]
         [HttpGet("GetEventRegisteredMembers")]
-        public ActionResult<List<Member>> GetEventRegisteredMembers(int eventID)
+        public ActionResult<List<MemberEventView>> GetEventRegisteredMembers(int eventID)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
-                    var members = eventHandler.GetEventRegisteredMembers(eventID);
+                    var members = eventHandler.GetEventMembers(eventID, true, null);
                     return Ok(members);
                 }
 
@@ -218,7 +218,7 @@ namespace SM.API.Controllers
                 workbook.SaveAs(stream);
                 stream.Seek(0, SeekOrigin.Begin);
 
-                var fileName = $"ClassMembers_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                var fileName = $"EventMembers_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
                 return File(stream.ToArray(),
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
@@ -239,6 +239,63 @@ namespace SM.API.Controllers
                     ValidateServant();
                     var status = eventHandler.Register(memberCode, eventID, paid, User.Identity.Name, isException, notes);
                     return Ok(status);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Events.Register")]
+        [HttpPost("RemoveMember")]
+        public ActionResult<RegistrationStatus> RemoveMember(int memberID, int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    eventHandler.RemoveMember(eventID, memberID, User.Identity.Name);
+                    return Ok();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Events.Register")]
+        [HttpPost("UpdatePayment")]
+        public ActionResult<RegistrationStatus> UpdatePayment(int memberID, int eventID, float paid)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    eventHandler.UpdatePaymentAmount(eventID, memberID, paid, User.Identity.Name);
+                    return Ok();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Events.Register")]
+        [HttpGet("UpdateAttendance")]
+        public ActionResult<RegistrationStatus> UpdateAttendance(int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    eventHandler.UpdateAttendance(eventID);
+                    return Ok();
                 }
 
             }

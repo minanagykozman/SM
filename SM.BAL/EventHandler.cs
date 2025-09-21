@@ -94,6 +94,25 @@ namespace SM.BAL
             var ev = _dbcontext.Events.Include(e => e.ClassEvents).Where(e => e.EventID == eventID).FirstOrDefault();
             return ev;
         }
+        public void RemoveMember(int eventID, int memberID, string username)
+        {
+            var evr = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID && e.MemberID == memberID).FirstOrDefault();
+            if (evr != null)
+            {
+                _dbcontext.EventRegistrations.Remove(evr);
+
+                _dbcontext.SaveChanges();
+            }
+        }
+        public void UpdatePaymentAmount(int eventID, int memberID, float paid, string username)
+        {
+            var evr = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID && e.MemberID == memberID).FirstOrDefault();
+            if (evr != null)
+            {
+                evr.Paid = paid;
+                _dbcontext.SaveChanges();
+            }
+        }
         public RegistrationStatus CheckRegistationStatus(string memberCode, int eventID, out Member member)
         {
             memberCode = memberCode.Trim();
@@ -124,6 +143,25 @@ namespace SM.BAL
             if (!eventClasses.Intersect(memberClasses).Any())
                 return RegistrationStatus.MemberNotEligible;
             return RegistrationStatus.ReadyToRegister;
+        }
+        public void UpdateAttendance()
+        {
+            var pastEvents = _dbcontext.Events.Where(e => e.IsActive && e.EventEndDate <= CurrentTime).Select(e => e.EventID).ToList();
+            var unAttendedMembers = _dbcontext.EventRegistrations.Where(er => pastEvents.Contains(er.EventID) && !er.Attended.HasValue).ToList();
+            unAttendedMembers.ForEach(e =>
+            {
+                e.Attended = false;
+            });
+            _dbcontext.SaveChanges();
+        }
+        public void UpdateAttendance(int eventID)
+        {
+            var unAttendedMembers = _dbcontext.EventRegistrations.Where(er => er.EventID == eventID && !er.Attended.HasValue).ToList();
+            unAttendedMembers.ForEach(e =>
+            {
+                e.Attended = false;
+            });
+            _dbcontext.SaveChanges();
         }
         public RegistrationStatus CheckEventAttendance(int eventID, string memberCode, out MemberEventView member)
         {
