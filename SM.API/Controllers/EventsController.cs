@@ -186,8 +186,9 @@ namespace SM.API.Controllers
                 worksheet.Cell(1, 12).Value = "Status";
                 worksheet.Cell(1, 13).Value = "Team";
                 worksheet.Cell(1, 14).Value = "Bus";
-                worksheet.Cell(1, 15).Value = "Paid";
-                worksheet.Cell(1, 16).Value = "Notes";
+                worksheet.Cell(1, 15).Value = "Room";
+                worksheet.Cell(1, 16).Value = "Paid";
+                worksheet.Cell(1, 17).Value = "Notes";
 
                 int row = 2;
                 foreach (var member in members)
@@ -206,8 +207,9 @@ namespace SM.API.Controllers
                     worksheet.Cell(row, 12).Value = member.Attended == null ? "Registered" : (member.Attended.Value ? "Present" : "Absent");
                     worksheet.Cell(row, 13).Value = member.Team ?? "";
                     worksheet.Cell(row, 14).Value = member.Bus ?? "";
-                    worksheet.Cell(row, 15).Value = member.Paid.HasValue ? member.Paid : "";
-                    worksheet.Cell(row, 16).Value = member.Notes ?? "";
+                    worksheet.Cell(row, 15).Value = member.Room ?? "";
+                    worksheet.Cell(row, 16).Value = member.Paid.HasValue ? member.Paid : "";
+                    worksheet.Cell(row, 17).Value = member.Notes ?? "";
 
                     row++;
                 }
