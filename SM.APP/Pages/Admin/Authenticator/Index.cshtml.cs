@@ -6,7 +6,7 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Admin.Authenticator
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin")]
     public class IndexModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
