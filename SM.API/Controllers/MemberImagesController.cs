@@ -43,16 +43,16 @@ namespace SM.API.Controllers
             _bahnschriftFamily = _fontCollection.Add(Path.Combine(fontPath, "bahnschrift.ttf"));
         }
         [HttpPost("generate-cards")]
-        public async Task<IActionResult> GenerateMemberCards([FromBody] List<int> memberIDs)
+        public async Task<IActionResult> GenerateMemberCards([FromBody] GenerateCardsRequest request)
         {
-            if (memberIDs == null || !memberIDs.Any())
+            if (request.MemberIDs == null || !request.MemberIDs.Any())
             {
                 return BadRequest("Member ID list cannot be empty.");
             }
             List<Member> members;
             using (MemberHandler handler = new MemberHandler())
             {
-                members = handler.GetMembersCardData(memberIDs);
+                members = handler.GetMembersCardData(request.MemberIDs);
             }
 
             if (members == null || !members.Any())
@@ -69,8 +69,18 @@ namespace SM.API.Controllers
 
             try
             {
+                string baseURL = "";
+                switch(request.CardType)
+                {
+                    case "Trip":
+                        baseURL = SMConfigurationManager.TripImageURL;
+                        break;
+                    case "Standard":
+                        baseURL = SMConfigurationManager.BaseImageURL;
+                        break;
+                }
                 // Download the base card image ONCE.
-                using (Image baseCardTemplate = await DownloadImageAsync(SMConfigurationManager.BaseImageURL))
+                using (Image baseCardTemplate = await DownloadImageAsync(baseURL))
                 {
                     if (baseCardTemplate == null)
                     {
@@ -315,6 +325,11 @@ namespace SM.API.Controllers
         public class ZipParams
         {
             public IFormFile ZipFile { get; set; }
+        }
+        public class GenerateCardsRequest
+        {
+            public List<int> MemberIDs { get; set; }
+            public string CardType { get; set; }
         }
 
         // Optional helper method

@@ -8,13 +8,27 @@
         <h4 class="mb-0">
             Event Members <span id="counter" class="text-muted fw-normal"></span>
         </h4>
-        <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-secondary" id="update-attendance">
-                <i class="bi bi-person-check me-1"></i>Update Attendance
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear me-1"></i> Actions
             </button>
-            <button class="btn btn-outline-primary" id="download-excel">
-                <i class="bi bi-download me-1"></i>Download
-            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li>
+                    <a class="dropdown-item" href="#" id="update-attendance">
+                        <i class="bi bi-person-check me-1"></i>Update Attendance
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#" id="download-excel">
+                        <i class="bi bi-download me-1"></i>Download as Excel
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#" id="download-cards">
+                        <i class="bi bi-person-vcard me-1"></i>Download Cards
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
     <input type="hidden" id="eventID" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />

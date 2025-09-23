@@ -101,6 +101,16 @@ namespace SM.API.Services
                     return Environment.GetEnvironmentVariable("BaseImageURL") ?? string.Empty;
             }
         }
+        public static string TripImageURL
+        {
+            get
+            {
+                if (IsDevelopment)
+                    return _configuration["TripImageURL"] ?? string.Empty;
+                else
+                    return Environment.GetEnvironmentVariable("TripImageURL") ?? string.Empty;
+            }
+        }
         public static bool IsDevelopment
         {
             get

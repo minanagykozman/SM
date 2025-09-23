@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('sort-direction').addEventListener('click', toggleSortDirection);
     document.getElementById('download-excel').addEventListener('click', downloadEventData); 
     document.getElementById('update-attendance').addEventListener('click', updateAttendance);
+    document.getElementById('download-cards').addEventListener('click', downloadCards);
 });
 
 async function fetchEventMembers() {
@@ -183,4 +184,13 @@ async function updateAttendance() {
     } else {
         alert("Cannot update data: Event ID is not available.");
     }
+}
+
+async function downloadCards() {
+    if (!allMembers || allMembers.length === 0) {
+        alert("No member data available to download cards.");
+        return;
+    }
+    const memberIDs = allMembers.map(member => member.memberID);
+    bulkPrintCards(memberIDs,"Trip");
 }

@@ -440,3 +440,47 @@ function refreshToken() {
     // Start the timer
     setInterval(keepSessionAlive, keepAliveInterval);
 }
+
+/**
+* --- Bulk Action Functions ---
+*/
+async function bulkPrintCards(memberIds, cardType) {
+    if (!memberIds || memberIds.length === 0) {
+        alert("No members selected to print.");
+        return;
+    }
+    console.log("Requesting cards for member IDs:", memberIds);
+    showLoading();
+    try {
+        const response = await fetch(`${apiBaseUrl}/MemberImages/generate-cards`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                memberIDs: memberIds,
+                cardType: cardType
+            })
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to generate cards. Server responded with: ${errorText || response.statusText}`);
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'MemberCards.zip';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error("Error printing member cards:", error);
+        alert(`An error occurred: ${error.message}`);
+    } finally {
+        hideLoading();
+    }
+}
