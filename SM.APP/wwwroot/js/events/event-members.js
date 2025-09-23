@@ -63,6 +63,7 @@ function applyFiltersAndSort() {
             member.fullName.toLowerCase().includes(searchTerm) ||
             (member.team && member.team.toLowerCase().includes(searchTerm)) ||
             (member.bus && member.bus.toLowerCase().includes(searchTerm)) ||
+            (member.room && member.room.toLowerCase().includes(searchTerm)) ||
             member.age.toString().includes(searchTerm)
         );
     }
@@ -128,6 +129,7 @@ function populateMembersGrid(members) {
                             <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || '-'}</small></p>
                             <p class="mb-1"><small class="text-muted"><strong>Team:</strong> ${member.team || '-'}</small></p>
                             <p class="mb-1"><small class="text-muted"><strong>Bus:</strong> ${member.bus || '-'}</small></p>
+                            <p class="mb-1"><small class="text-muted"><strong>Room:</strong> ${member.room || '-'}</small></p>
                             <p class="mb-1"><small class="text-muted"><strong>Paid:</strong> ${member.paid || '-'} EGP</small></p>
                             <span class="badge bg-primary me-2">${member.gender === 'M' ? 'Male' : 'Female'}</span>
                             <span class="badge bg-secondary me-2">Baptised: ${member.baptised ? 'Yes' : 'No'}</span>

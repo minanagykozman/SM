@@ -23,6 +23,8 @@ namespace SM.DAL.DataModel
         public string? Team { get; set; } = null;
         [MaxLength(25)]
         public string? Bus { get; set; } = null;
+        [MaxLength(25)]
+        public string? Room { get; set; } = null;
         public float? Paid{ get; set; } = null;
         public virtual Member Member { get; set; } = null!;
         public virtual Servant Servant { get; set; } = null!;
