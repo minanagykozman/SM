@@ -37,13 +37,7 @@ async function fetchEventMembers() {
         }
 
         allMembers = await response.json();
-
-        if (!Array.isArray(allMembers) || allMembers.length === 0) {
-            showWarningMessage("No members found for this event.");
-            document.getElementById("counter").textContent = `(0)`;
-        } else {
-            applyFiltersAndSort();
-        }
+        applyFiltersAndSort();
     } catch (error) {
         console.error("Network error:", error);
         showErrorMessage("Failed to fetch data. Please try again later.");

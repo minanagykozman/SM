@@ -153,6 +153,7 @@ function populateModal(data) {
             $("#submitBtn").hide();
             break;
         case 5:
+            console.log(data.member);
             document.getElementById("MemberStatus").value = "Can attend";
             $("#divStatus").show();
             $("#divStatusAlert").hide();
