@@ -104,6 +104,18 @@ namespace SM.BAL
                 _dbcontext.SaveChanges();
             }
         }
+        public void RemoveMemberAttendance(int eventID, int memberID, string username)
+        {
+            var evr = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID && e.MemberID == memberID).FirstOrDefault();
+            if (evr != null)
+            {
+                evr.Attended = null;
+                evr.AttendanceServantID = null;
+                evr.AttendanceTimeStamp = null;
+
+                _dbcontext.SaveChanges();
+            }
+        }
         public void UpdatePaymentAmount(int eventID, int memberID, float paid, string username)
         {
             var evr = _dbcontext.EventRegistrations.Where(e => e.EventID == eventID && e.MemberID == memberID).FirstOrDefault();

@@ -58,16 +58,16 @@ namespace SM.API.Controllers
             try
             {
                 Member member;
-                List<MemberClassOverview> memberClasses;
+                List<MemberClassOverview> memberClasses=new List<MemberClassOverview>();
                 RegistrationStatus status;
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     status = eventHandler.CheckRegistationStatus(memberCode, eventID, out member);
                 }
-                using (SM.BAL.MemberHandler meetingHandler = new SM.BAL.MemberHandler())
-                {
-                    memberClasses = meetingHandler.GetMemberClassOverviews(member.MemberID);
-                }
+                //using (SM.BAL.MemberHandler meetingHandler = new SM.BAL.MemberHandler())
+                //{
+                //    memberClasses = meetingHandler.GetMemberClassOverviews(member.MemberID);
+                //}
                 RegistrationStatusResponse response = new RegistrationStatusResponse() { Member = member, Status = status, MemberClasses = memberClasses };
                 return Ok(response);
 
@@ -252,6 +252,25 @@ namespace SM.API.Controllers
         [Authorize(Policy = "Events.Register")]
         [HttpPost("RemoveMember")]
         public ActionResult<RegistrationStatus> RemoveMember(int memberID, int eventID)
+        {
+            try
+            {
+                using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
+                {
+                    ValidateServant();
+                    eventHandler.RemoveMember(eventID, memberID, User.Identity.Name);
+                    return Ok();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Events.Register")]
+        [HttpPost("RemoveMemberAttendance")]
+        public ActionResult<RegistrationStatus> RemoveMemberAttendance(int memberID, int eventID)
         {
             try
             {
