@@ -277,7 +277,7 @@ namespace SM.API.Controllers
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    eventHandler.RemoveMember(eventID, memberID, User.Identity.Name);
+                    eventHandler.RemoveMemberAttendance(eventID, memberID, User.Identity.Name);
                     return Ok();
                 }
 
