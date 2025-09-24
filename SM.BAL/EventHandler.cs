@@ -179,9 +179,9 @@ namespace SM.BAL
         {
             memberCode = memberCode.Trim();
             var lmember = _dbcontext.MemberEventView.
-                FirstOrDefault(m => m.Code.Contains(memberCode)
+                FirstOrDefault(m => (m.Code.Contains(memberCode)
                 || m.UNPersonalNumber == memberCode
-                || (m.UNFileNumber == memberCode && m.IsMainMember) && m.EventID == eventID);
+                || (m.UNFileNumber == memberCode && m.IsMainMember)) && m.EventID == eventID);
             member = lmember;
             if (member == null)
             {
