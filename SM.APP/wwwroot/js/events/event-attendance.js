@@ -53,13 +53,7 @@ async function fetchEventAttendedMembers() {
         }
 
         const members = await response.json();
-
-        if (!Array.isArray(members) || members.length === 0) {
-            showWarningMessage("No members found for this event.");
-            return;
-        }
-
-        document.getElementById("counter").textContent = `Attended: ${members.length}`;
+       
         populateTable(members);
     } catch (error) {
         console.error("Network error:", error);
