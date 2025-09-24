@@ -63,7 +63,7 @@ function applyFiltersAndSort() {
             member.fullName.toLowerCase().includes(searchTerm) ||
             (member.team && member.team.toLowerCase().includes(searchTerm)) ||
             (member.bus && member.bus.toLowerCase().includes(searchTerm)) ||
-            (member.room && member.room.toLowerCase().includes(searchTerm)) ||
+            (member.room && member.room.toLowerCase() == searchTerm.toLowerCase()) ||
             member.age.toString().includes(searchTerm)
         );
     }
