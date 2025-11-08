@@ -9,7 +9,6 @@
     <div class="container mt-5">
         <h2 class="text-center mb-4">System Modules</h2>
         <div class="row g-3">
-            <!-- Attendance -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Class.View">
                 <a href="/Classess" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -19,7 +18,6 @@
                 </a>
             </div>
 
-            <!-- Members -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Members.View">
                 <a href="/Admin/Members/Search" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -29,7 +27,6 @@
                 </a>
             </div>
 
-            <!-- Events -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Events.View">
                 <a href="/Events" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -38,7 +35,6 @@
                     </div>
                 </a>
             </div>
-            <!-- Cards -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Members.ManageCards">
                 <a href="/Cards" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -47,7 +43,6 @@
                     </div>
                 </a>
             </div>
-            <!-- Aids -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Aids.View">
                 <a href="/Aids" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -57,7 +52,6 @@
                 </a>
             </div>
 
-            <!-- Funds -->
             <div class="col-6 col-md-4 col-lg-3" auth-policy="Funds.View">
                 <a href="/Funds" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -66,7 +60,16 @@
                     </div>
                 </a>
             </div>
-            <!-- Administration -->
+
+            <div class="col-6 col-md-4 col-lg-3" auth-policy="Medical.View">
+                <a href="/Medical" class="text-decoration-none">
+                    <div class="card text-center p-4 shadow-sm">
+                        <i class="bi bi-clipboard-pulse fs-1"></i>
+                        <h5 class="mt-2">Medical</h5>
+                    </div>
+                </a>
+            </div>
+
             <div class="col-6 col-md-4 col-lg-3">
                 <a href="/Admin" class="text-decoration-none">
                     <div class="card text-center p-4 shadow-sm">
@@ -80,7 +83,6 @@
 }
 else
 {
-    <!-- Show message for non-logged-in users -->
     <div class="container text-center mt-5">
         <div class="alert alert-warning p-4">
             <h4>Please log in to see available modules</h4>
@@ -88,4 +90,3 @@ else
         </div>
     </div>
 }
-

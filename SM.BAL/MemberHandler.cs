@@ -455,7 +455,7 @@ namespace SM.BAL
         {
             return _dbcontext.Members.Where(m => m.CardStatus.ToLower() == status.ToString().ToLower()).OrderByDescending(m => m.ModifiedAt).ToList();
         }
-        public List<Member> SearchByCode(string memberCode)
+        public List<Member> SearchByCode(string memberCode, bool loadLastPresent)
         {
             List<Member> members = new List<Member>();
 
@@ -470,9 +470,23 @@ namespace SM.BAL
             if (string.IsNullOrEmpty(member.UNFileNumber))
             {
                 members.Add(member);
-                return members;
             }
-            members = _dbcontext.Members.Where(m => m.UNFileNumber == member.UNFileNumber).OrderBy(m => m.Birthdate).ToList();
+            else
+            {
+                members = _dbcontext.Members.Where(m => m.UNFileNumber == member.UNFileNumber).OrderBy(m => m.Birthdate).ToList();
+            }
+            if (loadLastPresent)
+            {
+                var attendanceData = _dbcontext.MemberClasssAttendanceView.Where(m => members.Select(m => m.MemberID).ToList().Contains(m.MemberID)).ToList();
+                foreach (var item in members)
+                {
+                    var max = attendanceData.Where(m => m.MemberID == item.MemberID && m.Present).OrderByDescending(m => m.ClassOccurrenceStartDate).FirstOrDefault();
+                    if (max != null)
+                    {
+                        item.LastPresentDate = max.ClassOccurrenceStartDate;
+                    }
+                }
+            }
 
             return members;
 

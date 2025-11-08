@@ -57,7 +57,31 @@ namespace SM.API.Controllers
                 var canDelete = (await _authorizationService.AuthorizeAsync(User, "Members.Delete")).Succeeded;
                 using (MemberHandler handler = new MemberHandler())
                 {
-                    var members = handler.SearchByCode(term);
+                    var members = handler.SearchByCode(term, false);
+                    members.ForEach(m =>
+                    {
+                        m.Permissions = new Dictionary<string, bool>();
+                        m.Permissions.Add("canEdit", canEdit);
+                        m.Permissions.Add("canDelete", canDelete);
+                    });
+                    return Ok(members);
+                }
+            }
+        }
+        [HttpGet("SearchByCode-Attendance")]
+        public async Task<IActionResult> SearchByCodeAttendance([FromQuery] string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return Ok(new List<DAL.DataModel.Member>());
+            }
+            else
+            {
+                var canEdit = (await _authorizationService.AuthorizeAsync(User, "Members.Manage")).Succeeded;
+                var canDelete = (await _authorizationService.AuthorizeAsync(User, "Members.Delete")).Succeeded;
+                using (MemberHandler handler = new MemberHandler())
+                {
+                    var members = handler.SearchByCode(term, true);
                     members.ForEach(m =>
                     {
                         m.Permissions = new Dictionary<string, bool>();

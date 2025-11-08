@@ -89,6 +89,8 @@ namespace SM.DAL.DataModel
         public List<Member> FamilyMembers { get; set; }
         [NotMapped]
         public Dictionary<string, bool> Permissions { get; set; }
+        [NotMapped]
+        public DateTime? LastPresentDate { get; set; }
         public List<int> ClassesIDs
         {
             get

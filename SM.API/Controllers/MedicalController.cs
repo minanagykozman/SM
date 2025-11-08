@@ -12,7 +12,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class MedicalController(ILogger<FundController> logger) : SMControllerBase(logger)
     {
-
+        [Authorize(Policy = "Medical.View")]
         [HttpGet("get-appointments")]
         public IActionResult GetAppointments(DateTime? date)
         {
@@ -29,6 +29,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.View")]
         [HttpGet("list-medicines")]
         public IActionResult ListMedicines()
         {
@@ -45,6 +46,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.View")]
         [HttpGet("list-diagnosis")]
         public IActionResult ListDiagnosis()
         {
@@ -61,6 +63,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.Manage")]
         [HttpPut("update-appointment")]
         public IActionResult UpdateAppointments([FromBody] AppointmentUpdateDto update)
         {
@@ -77,6 +80,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.Manage")]
         [HttpPut("add-prescription")]
         public IActionResult AddPrescription([FromBody] PrescriptionDto update)
         {
@@ -93,6 +97,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.Manage")]
         [HttpPost("create-appointment")]
         public IActionResult CreateAppointments([FromBody] List<int> memberIDs)
         {
@@ -109,6 +114,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.Manage")]
         [HttpDelete("delete/{id}")]
         public IActionResult DeleteAppointment(int id)
         {
@@ -126,6 +132,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Medical.Manage")]
         [HttpGet("get-appointment/{id}")]
         public IActionResult GetAppointment(int id)
         {

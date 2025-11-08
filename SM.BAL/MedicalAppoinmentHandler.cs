@@ -39,6 +39,8 @@ namespace SM.BAL
                 {
                     throw new Exception("Member not found");
                 }
+                if (_dbcontext.MedicalAppoinments.Any(m => m.MemberID == memberID && m.AppoinmentDate.Date == CurrentTime.Date))
+                    continue;
                 MedicalAppointment medicalVisit = new MedicalAppointment();
                 medicalVisit.MemberID = memberID;
                 medicalVisit.AppoinmentDate = CurrentTime;
