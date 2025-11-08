@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102151740_Medical-Add-Doctor")]
+    partial class MedicalAddDoctor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -541,7 +544,7 @@ namespace SM.DAL.Migrations
                     b.ToTable("EventRegistrations");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppointment", b =>
+            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppoinment", b =>
                 {
                     b.Property<int>("MedicalAppointmentID")
                         .ValueGeneratedOnAdd()
@@ -584,21 +587,6 @@ namespace SM.DAL.Migrations
                     b.ToTable("MedicalAppoinments");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppointmentMedicine", b =>
-                {
-                    b.Property<int>("MedicalAppointmentID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MedicineID")
-                        .HasColumnType("int");
-
-                    b.HasKey("MedicalAppointmentID", "MedicineID");
-
-                    b.HasIndex("MedicineID");
-
-                    b.ToTable("MedicalAppointmentMedicines");
-                });
-
             modelBuilder.Entity("SM.DAL.DataModel.Medicine", b =>
                 {
                     b.Property<int>("MedicineID")
@@ -611,11 +599,16 @@ namespace SM.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("MedicalAppoinmentMedicalAppointmentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("MedicineName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("MedicineID");
+
+                    b.HasIndex("MedicalAppoinmentMedicalAppointmentID");
 
                     b.ToTable("Medicines");
                 });
@@ -1368,10 +1361,10 @@ namespace SM.DAL.Migrations
                     b.Navigation("Servant");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppointment", b =>
+            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppoinment", b =>
                 {
                     b.HasOne("SM.DAL.DataModel.Member", "Member")
-                        .WithMany("MedicalAppointments")
+                        .WithMany("MedicalVisits")
                         .HasForeignKey("MemberID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1393,23 +1386,11 @@ namespace SM.DAL.Migrations
                     b.Navigation("Servant");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppointmentMedicine", b =>
+            modelBuilder.Entity("SM.DAL.DataModel.Medicine", b =>
                 {
-                    b.HasOne("SM.DAL.DataModel.MedicalAppointment", "MedicalAppointment")
-                        .WithMany("MedicalAppointmentMedicines")
-                        .HasForeignKey("MedicalAppointmentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SM.DAL.DataModel.Medicine", "Medicine")
-                        .WithMany("MedicalAppointmentMedicines")
-                        .HasForeignKey("MedicineID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MedicalAppointment");
-
-                    b.Navigation("Medicine");
+                    b.HasOne("SM.DAL.DataModel.MedicalAppoinment", null)
+                        .WithMany("Medicines")
+                        .HasForeignKey("MedicalAppoinmentMedicalAppointmentID");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Meeting", b =>
@@ -1591,14 +1572,9 @@ namespace SM.DAL.Migrations
                     b.Navigation("EventRegistrations");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppointment", b =>
+            modelBuilder.Entity("SM.DAL.DataModel.MedicalAppoinment", b =>
                 {
-                    b.Navigation("MedicalAppointmentMedicines");
-                });
-
-            modelBuilder.Entity("SM.DAL.DataModel.Medicine", b =>
-                {
-                    b.Navigation("MedicalAppointmentMedicines");
+                    b.Navigation("Medicines");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Meeting", b =>
@@ -1616,7 +1592,7 @@ namespace SM.DAL.Migrations
 
                     b.Navigation("Funds");
 
-                    b.Navigation("MedicalAppointments");
+                    b.Navigation("MedicalVisits");
 
                     b.Navigation("MemberAids");
                 });

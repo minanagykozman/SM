@@ -1,0 +1,821 @@
+﻿@page
+@model SM.APP.Pages.Medical.IndexModel
+@{
+    ViewData["Title"] = "Medical Appoinments";
+}
+
+<div class="container my-4 my-md-5">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h1 class="mb-0">Medical Appointments</h1>
+        <button type="button" class="btn btn-primary shadow-sm" id="createNewAppointmentBtn" data-bs-toggle="modal" data-bs-target="#createAppointmentModal">
+            <i class="bi bi-plus-circle me-1"></i> Create New Appointment
+        </button>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4 col-lg-3">
+                    <label for="appointmentDate" class="form-label fw-bold">Appointment Date</label>
+                    <input type="date" class="form-control" id="appointmentDate">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4 d-flex flex-wrap gap-2" id="status-pills-container">
+        <!-- Pills will be rendered here by JavaScript -->
+    </div>
+
+    <div class="row g-3" id="appointment-list">
+        <div class="col-12 text-center p-5" id="loading-indicator">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 mb-0">Loading Appointments...</p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==== CREATE APPOINTMENT MODAL ==== -->
+<div class="modal fade" id="createAppointmentModal" tabindex="-1" aria-labelledby="createAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createAppointmentModalLabel">Create New Appointment(s)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Search Box -->
+                <div class="mb-3">
+                    <label for="memberCodeSearch" class="form-label">Member Code</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="memberCodeSearch" placeholder="Enter member code...">
+                        <button class="btn btn-outline-primary" type="button" id="searchMemberBtn">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="scanMemberCodeBtn" title="Scan QR Code">
+                            <i class="bi bi-qr-code-scan"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCANNER CONTAINER -->
+                <div id="qrScannerContainer" class="mt-3 d-none">
+                    <div id="reader" style="width: 100%;"></div>
+                    <button type="button" class="btn btn-danger mt-2" id="btnStopScan">Stop Scanning</button>
+                </div>
+
+                <!-- Search Results -->
+                <div id="member-search-results-container">
+                    <!-- Member list will be built here -->
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAppointmentsBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Create Appointment(s)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ==== END OF CREATE APPOINTMENT MODAL ==== -->
+
+
+<!-- ==== DELETE APPOINTMENT MODAL ==== -->
+<div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this appointment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ==== END OF DELETE MODAL ==== -->
+
+
+<!-- ==== ADD PRESCRIPTION MODAL ==== -->
+<div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPrescriptionModalLabel">Add Prescription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body position-relative">
+                
+                <!-- Loading Overlay -->
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-light bg-opacity-75 d-none justify-content-center align-items-center" id="prescriptionLoader" style="z-index: 10;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Diagnosis -->
+                <div class="mb-3">
+                    <label for="prescriptionDiagnosis" class="form-label">Diagnosis</label>
+                    <select class="form-select" id="prescriptionDiagnosis">
+                        <!-- Options loaded from API -->
+                    </select>
+                </div>
+
+                <!-- Other Diagnosis (hidden by default) -->
+                <div class="mb-3 d-none" id="otherDiagnosisContainer">
+                    <label for="otherDiagnosisText" class="form-label">Other Diagnosis</label>
+                    <input type="text" class="form-control" id="otherDiagnosisText" placeholder="Please specify diagnosis">
+                </div>
+
+                <!-- Medicines -->
+                <div class="mb-3">
+                    <label for="medicineSearch" class="form-label">Medicines</label>
+                    <div class="input-group">
+                        <input class="form-control" list="medicinesDatalist" id="medicineSearch" placeholder="Type or scan medicine name/code...">
+                        <datalist id="medicinesDatalist">
+                            <!-- Options loaded from API -->
+                        </datalist>
+                        <button class="btn btn-outline-primary" type="button" id="addMedicineBtn">
+                            <i class="bi bi-plus-circle me-1"></i> Add
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Selected Medicines List -->
+                <h6>Selected Medicines</h6>
+                <ul class="list-group" id="selectedMedicinesList">
+                    <li class="list-group-item text-muted" id="noMedicinesSelected">No medicines added yet.</li>
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="savePrescriptionBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Add Prescription
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ==== END OF PRESCRIPTION MODAL ==== -->
+
+
+@section Scripts {
+    <script>
+        // Use the same method as your reference to get the API base URL
+        const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+
+    <!-- Make sure you have included html5-qrcode.min.js in your main _Layout.cshtml or here -->
+    <!-- <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> -->
+
+    <script>
+        (async function () {
+            // --- STATE VARIABLES ---
+            let allAppointments = [];
+            let currentFilter = 'all';
+            let allMedicines = [];      
+            let allDiagnoses = [];      
+            let selectedMedicines = []; 
+            let currentAppointmentIdToDelete = null;        
+            let currentAppointmentIdForPrescription = null; 
+
+            // --- DOM ELEMENTS ---
+            const datePicker = document.getElementById('appointmentDate');
+            const appointmentListContainer = document.getElementById('appointment-list');
+            const createBtn = document.getElementById('createNewAppointmentBtn');
+            const statusPillsContainer = document.getElementById('status-pills-container');
+
+            // --- CREATE MODAL DOM ELEMENTS ---
+            const createAppointmentModalEl = document.getElementById('createAppointmentModal');
+            const createAppointmentModal = new bootstrap.Modal(createAppointmentModalEl);
+            const memberCodeSearchInput = document.getElementById('memberCodeSearch');
+            const searchMemberBtn = document.getElementById('searchMemberBtn');
+            const memberSearchResultsContainer = document.getElementById('member-search-results-container');
+            const saveAppointmentsBtn = document.getElementById('saveAppointmentsBtn');
+            const scanMemberCodeBtn = document.getElementById('scanMemberCodeBtn');
+            const qrScannerContainer = document.getElementById('qrScannerContainer');
+            const btnStopScan = document.getElementById('btnStopScan');
+            let html5QrCode; 
+
+            // --- DELETE MODAL DOM ELEMENTS ---
+            const deleteAppointmentModalEl = document.getElementById('deleteAppointmentModal');
+            const deleteAppointmentModal = new bootstrap.Modal(deleteAppointmentModalEl);
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+            // --- PRESCRIPTION MODAL DOM ELEMENTS ---
+            const addPrescriptionModalEl = document.getElementById('addPrescriptionModal');
+            const addPrescriptionModal = new bootstrap.Modal(addPrescriptionModalEl);
+            const prescriptionLoader = document.getElementById('prescriptionLoader');
+            const prescriptionDiagnosis = document.getElementById('prescriptionDiagnosis');
+            const otherDiagnosisContainer = document.getElementById('otherDiagnosisContainer');
+            const otherDiagnosisText = document.getElementById('otherDiagnosisText');
+            const medicineSearch = document.getElementById('medicineSearch');
+            const medicinesDatalist = document.getElementById('medicinesDatalist');
+            const addMedicineBtn = document.getElementById('addMedicineBtn');
+            const selectedMedicinesList = document.getElementById('selectedMedicinesList');
+            const noMedicinesSelected = document.getElementById('noMedicinesSelected');
+            const savePrescriptionBtn = document.getElementById('savePrescriptionBtn');
+
+
+            // --- INITIAL DATA LOAD (Medicines, Diagnoses) ---
+            async function loadInitialData() {
+                try {
+                    // Load Medicines
+                    const medResponse = await fetch(`${apiBaseUrl}/api/medical/list-medicines`, { credentials: 'include' });
+                    if (medResponse.ok) {
+                        allMedicines = await medResponse.json();
+                        medicinesDatalist.innerHTML = ''; 
+                        allMedicines.forEach(med => {
+                            const option = document.createElement('option');
+                            option.value = med.code; 
+                            option.label = `${med.medicineName} (${med.code})`;
+                            option.dataset.id = med.medicineID; 
+                            option.dataset.name = med.medicineName;
+                            option.dataset.code = med.code;
+                            medicinesDatalist.appendChild(option);
+                        });
+                    }
+                    
+                    // Load Diagnoses
+                    const diagResponse = await fetch(`${apiBaseUrl}/api/medical/list-diagnosis`, { credentials: 'include' });
+                    if (diagResponse.ok) {
+                        allDiagnoses = await diagResponse.json();
+                        prescriptionDiagnosis.innerHTML = '<option value="">Select Diagnosis</option>'; 
+                        allDiagnoses.forEach(diag => {
+                            const option = document.createElement('option');
+                            option.value = diag;
+                            option.textContent = diag;
+                            prescriptionDiagnosis.appendChild(option);
+                        });
+                    }
+                } catch (err) {
+                    console.error("Failed to load initial data:", err);
+                    alert("Failed to load medicines or diagnoses. Please refresh.");
+                }
+            }
+
+            // --- MAIN PAGE FUNCTIONS ---
+
+            async function getAndRenderAppointments(dateString) {
+                appointmentListContainer.innerHTML = `
+                    <div class="col-12 text-center p-5" id="loading-indicator">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 mb-0">Loading Appointments...</p>
+                    </div>`;
+                const url = `${apiBaseUrl}/api/medical/get-appointments?date=${dateString}`;
+                try {
+                    const response = await fetch(url, { method: "GET", credentials: "include" });
+                    if (!response.ok) throw new Error(`Failed to fetch appointments: ${response.statusText}`);
+                    allAppointments = await response.json();
+                    renderSummary();
+                    applyFiltersAndRender();
+                } catch (err) {
+                    console.error("Error loading appointments:", err);
+                    allAppointments = [];
+                    renderSummary();
+                    appointmentListContainer.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-5">Failed to load appointments.</div></div>`;
+                }
+            }
+
+            function applyFiltersAndRender() {
+                let filteredAppointments = [];
+                if (currentFilter === 'done') {
+                    filteredAppointments = allAppointments.filter(a => a.isAttended);
+                } else if (currentFilter === 'waiting') {
+                    filteredAppointments = allAppointments.filter(a => !a.isAttended);
+                } else {
+                    filteredAppointments = allAppointments;
+                }
+                renderAppointmentCards(filteredAppointments);
+            }
+
+            function renderAppointmentCards(appointmentsToRender) {
+                appointmentListContainer.innerHTML = '';
+
+                if (appointmentsToRender.length === 0) {
+                    let message = "No appointments found for this date.";
+                    if (currentFilter !== 'all' && allAppointments.length > 0) {
+                        message = `No appointments match the "${currentFilter}" filter.`;
+                    }
+                    appointmentListContainer.innerHTML = `<div class="col-12"><div class="alert alert-info text-center p-5">${message}</div></div>`;
+                    return;
+                }
+
+                appointmentsToRender.forEach(appointment => {
+                    const attendedClass = appointment.isAttended ? 'bg-success-subtle' : '';
+                    const isChecked = appointment.isAttended ? 'checked' : '';
+
+                    const cardHtml = `
+                        <div class="col-12 col-md-6 col-lg-4" id="appointment-card-${appointment.medicalAppointmentID}">
+                            <div class="card shadow-sm h-100 ${attendedClass}">
+                                <div class="card-body d-flex justify-content-between align-items-start gap-3">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1">${appointment.member.fullName}</h5>
+                                        <p class="card-text mb-0">
+                                            <small class="text-muted">
+                                                <strong>Code:</strong> ${appointment.member.code} |
+                                                <strong>Age:</strong> ${appointment.member.age}
+                                            </small>
+                                        </p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-check form-switch fs-4 me-2" title="Mark as Attended">
+                                            <input class="form-check-input attendance-checkbox" type="checkbox"
+                                                   role="switch" id="check-${appointment.medicalAppointmentID}"
+                                                   data-id="${appointment.medicalAppointmentID}" ${isChecked}>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item add-prescription-btn" href="#" data-id="${appointment.medicalAppointmentID}">
+                                                        <i class="bi bi-file-earmark-medical me-2"></i>Add Prescription
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger delete-appointment-btn" href="#" data-id="${appointment.medicalAppointmentID}">
+                                                        <i class="bi bi-trash me-2"></i>Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    appointmentListContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            }
+
+            function renderSummary() {
+                const totalCount = allAppointments.length;
+                const doneCount = allAppointments.filter(a => a.isAttended).length;
+                const waitingCount = totalCount - doneCount;
+                statusPillsContainer.innerHTML = '';
+                const all_bg = currentFilter === 'all' ? 'text-bg-primary' : 'text-bg-light';
+                statusPillsContainer.innerHTML += `<a class="badge rounded-pill fs-6 text-decoration-none ${all_bg}" href="#" data-filter="all" style="cursor: pointer;">All (${totalCount})</a>`;
+                const waiting_bg = currentFilter === 'waiting' ? 'text-bg-primary' : 'text-bg-light';
+                statusPillsContainer.innerHTML += `<a class="badge rounded-pill fs-6 text-decoration-none ${waiting_bg}" href="#" data-filter="waiting" style="cursor: pointer;">Waiting (${waitingCount})</a>`;
+                const done_bg = currentFilter === 'done' ? 'text-bg-primary' : 'text-bg-light';
+                statusPillsContainer.innerHTML += `<a class="badge rounded-pill fs-6 text-decoration-none ${done_bg}" href="#" data-filter="done" style="cursor: pointer;">Done (${doneCount})</a>`;
+            }
+
+            async function handleAttendanceUpdate(event) {
+                const checkbox = event.target;
+                const appointmentId = checkbox.dataset.id;
+                const isAttended = checkbox.checked;
+                const cardElement = checkbox.closest('.card');
+                const appointmentInArray = allAppointments.find(a => a.medicalAppointmentID == appointmentId);
+                if (appointmentInArray) appointmentInArray.isAttended = isAttended;
+                cardElement.classList.toggle('bg-success-subtle', isAttended);
+                renderSummary();
+                applyFiltersAndRender(); 
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/medical/update-appointment`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ appointmentID: parseInt(appointmentId), attended: isAttended })
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                } catch (err) {
+                    console.error('Failed to update attendance:', err);
+                    cardElement.classList.toggle('bg-success-subtle', !isAttended);
+                    checkbox.checked = !isAttended;
+                    if (appointmentInArray) appointmentInArray.isAttended = !isAttended;
+                    renderSummary();
+                    applyFiltersAndRender();
+                    alert('Failed to update attendance. Please try again.');
+                }
+            }
+
+            function handleFilterClick(event) {
+                event.preventDefault();
+                const clickedLink = event.target.closest('.badge');
+                if (!clickedLink) return;
+                const newFilter = clickedLink.dataset.filter;
+                if (newFilter === currentFilter) return;
+                currentFilter = newFilter;
+                renderSummary();
+                applyFiltersAndRender();
+            }
+
+            function getTodayDateString() {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                return `${yyyy}-${mm}-${dd}`;
+            }
+
+            // --- CREATE MODAL FUNCTIONS ---
+            async function searchMembers() {
+                const memberCode = memberCodeSearchInput.value.trim();
+                if (!memberCode) {
+                    memberSearchResultsContainer.innerHTML = `<div class="alert alert-warning">Please enter a member code.</div>`;
+                    return;
+                }
+                memberSearchResultsContainer.innerHTML = `<div class="text-center p-4"><div class="spinner-border text-primary" ...>...</div></div>`;
+                try {
+                    const url = `${apiBaseUrl}/Member/SearchByCode?term=${memberCode}`;
+                    const response = await fetch(url, { method: 'GET', credentials: 'include' });
+                    if (!response.ok) throw new Error('Failed to fetch members.');
+                    const members = await response.json();
+                    renderMembersList(members);
+                } catch (err) {
+                    console.error('Error searching members:', err);
+                    memberSearchResultsContainer.innerHTML = `<div class="alert alert-danger">Error finding members. Please try again.</div>`;
+                }
+            }
+
+            function renderMembersList(members) {
+                if (!members || members.length === 0) {
+                    memberSearchResultsContainer.innerHTML = `<div class="alert alert-info">No members found for that code.</div>`;
+                    return;
+                }
+                let listHtml = '<ul class="list-group">';
+                listHtml += `<li class="list-group-item list-group-item-light"><div class="form-check fw-bold"><input class="form-check-input" type="checkbox" id="selectAllMembersCheck"><label class="form-check-label" for="selectAllMembersCheck">Select All</label></div></li>`;
+                members.forEach(member => {
+                    let lastPresentDate = 'N/A';
+                    if (member.lastPresentDate) {
+                        const d = new Date(member.lastPresentDate);
+                        lastPresentDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                    }
+                    listHtml += `<li class="list-group-item"><div class="row ..."><div class="col"><div class="form-check">
+                                <input class="form-check-input member-select-check" type="checkbox" value="" id="member-${member.memberID}" data-id="${member.memberID}">
+                                <label class... for="member-${member.memberID}"><span class="fw-bold">${member.fullName}</span><small ...>Code: ${member.code} | Last Present: ${lastPresentDate}</small></label>
+                                </div></div></div></li>`;
+                });
+                listHtml += '</ul>';
+                memberSearchResultsContainer.innerHTML = listHtml;
+            }
+            
+            async function createAppointments() {
+                const checkedBoxes = memberSearchResultsContainer.querySelectorAll('.member-select-check:checked');
+                if (checkedBoxes.length === 0) {
+                    alert('Please select at least one member.');
+                    return;
+                }
+                const memberIds = Array.from(checkedBoxes).map(box => parseInt(box.dataset.id));
+                saveAppointmentsBtn.disabled = true;
+                saveAppointmentsBtn.querySelector('.spinner-border').classList.remove('d-none');
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/medical/create-appointment`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(memberIds)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    createAppointmentModal.hide();
+                    await getAndRenderAppointments(datePicker.value);
+                } catch (err) {
+                    console.error('Failed to create appointments:', err);
+                    alert('An error occurred while creating appointments.');
+                } finally {
+                    saveAppointmentsBtn.disabled = false;
+                    saveAppointmentsBtn.querySelector('.spinner-border').classList.add('d-none');
+                }
+            }
+            
+            function clearModal() {
+                memberCodeSearchInput.value = '';
+                memberSearchResultsContainer.innerHTML = '';
+                if (html5QrCode) {
+                    try {
+                        html5QrCode.stop().catch(err => console.warn("QR scanner stop error:", err));
+                    } catch (err) { console.warn("QR scanner stop error:", err); }
+                    html5QrCode = null;
+                }
+                qrScannerContainer.classList.add("d-none");
+            }
+            
+            function toggleSelectAll(event) {
+                if (event.target.id === 'selectAllMembersCheck') {
+                    const isChecked = event.target.checked;
+                    memberSearchResultsContainer.querySelectorAll('.member-select-check').forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                }
+            }
+
+            // --- DELETE MODAL FUNCTIONS ---
+            async function handleDeleteAppointment() {
+                const id = currentAppointmentIdToDelete;
+                if (!id) return;
+                confirmDeleteBtn.disabled = true;
+                confirmDeleteBtn.querySelector('.spinner-border').classList.remove('d-none');
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/medical/delete/${id}`, {
+                        method: 'DELETE', 
+                        credentials: 'include'
+                    });
+                    if (!response.ok) throw new Error('Failed to delete appointment.');
+                    deleteAppointmentModal.hide();
+                    await getAndRenderAppointments(datePicker.value); 
+                } catch (err) {
+                    console.error("Error deleting appointment:", err);
+                    alert("Failed to delete the appointment. Please try again.");
+                } finally {
+                    confirmDeleteBtn.disabled = false;
+                    confirmDeleteBtn.querySelector('.spinner-border').classList.add('d-none');
+                    currentAppointmentIdToDelete = null;
+                }
+            }
+
+            // --- PRESCRIPTION MODAL FUNCTIONS ---
+            
+            async function loadExistingPrescription(id) {
+                prescriptionLoader.classList.remove('d-none');
+                prescriptionLoader.classList.add('d-flex');
+                
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/medical/get-appointment/${id}`, { credentials: 'include' });
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch appointment data.');
+                    }
+                    const appointment = await response.json();
+
+                    // 1. Populate Diagnosis
+                    if (appointment.diagnosis) {
+                        const diagnosisExists = allDiagnoses.includes(appointment.diagnosis);
+                        
+                        if (diagnosisExists) {
+                            prescriptionDiagnosis.value = appointment.diagnosis;
+                            otherDiagnosisContainer.classList.add('d-none');
+                            otherDiagnosisText.value = '';
+                        } else {
+                            prescriptionDiagnosis.value = 'Others';
+                            otherDiagnosisContainer.classList.remove('d-none');
+                            otherDiagnosisText.value = appointment.diagnosis;
+                        }
+                    }
+
+                    // 2. Populate Medicines
+                    selectedMedicines = []; // Clear any previous
+                    if (appointment.medicalAppointmentMedicines && appointment.medicalAppointmentMedicines.length > 0) {
+                        appointment.medicalAppointmentMedicines.forEach(apptMed => {
+                            const medId = apptMed.medicineID; 
+                            const fullMed = allMedicines.find(m => m.medicineID === medId);
+                            if (fullMed) {
+                                selectedMedicines.push(fullMed);
+                            }
+                        });
+                    }
+                    renderSelectedMedicines(); 
+
+                } catch (err) {
+                    console.error("Error loading existing prescription:", err);
+                    alert("Could not load existing prescription data. A blank form will be shown.");
+                    clearPrescriptionModal();
+                } finally {
+                    prescriptionLoader.classList.add('d-none');
+                    prescriptionLoader.classList.remove('d-flex');
+                }
+            }
+
+            function handleDiagnosisChange() {
+                if (prescriptionDiagnosis.value === 'Others') {
+                    otherDiagnosisContainer.classList.remove('d-none');
+                    otherDiagnosisText.focus();
+                } else {
+                    otherDiagnosisContainer.classList.add('d-none');
+                    otherDiagnosisText.value = '';
+                }
+            }
+
+            function addMedicineToList() {
+                const searchValue = medicineSearch.value.trim();
+                if (!searchValue) return;
+                
+                let matchingMed = allMedicines.find(m => m.code.toLowerCase() === searchValue.toLowerCase());
+                if (!matchingMed) {
+                     matchingMed = allMedicines.find(m => m.medicineName.toLowerCase() === searchValue.toLowerCase());
+                }
+
+                if (matchingMed) {
+                    const isAdded = selectedMedicines.some(m => m.medicineID === matchingMed.medicineID);
+                    if (!isAdded) {
+                        selectedMedicines.push(matchingMed);
+                        renderSelectedMedicines();
+                    }
+                    medicineSearch.value = ''; 
+                } else {
+                    alert('Medicine not found. Please select from the list or scan a valid code.');
+                }
+            }
+
+            function renderSelectedMedicines() {
+                selectedMedicinesList.innerHTML = ''; 
+                if (selectedMedicines.length === 0) {
+                    selectedMedicinesList.appendChild(noMedicinesSelected);
+                    return;
+                }
+                selectedMedicines.forEach(med => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.textContent = `${med.medicineName} (${med.code})`;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn-close';
+                    removeBtn.ariaLabel = 'Remove';
+                    removeBtn.dataset.id = med.medicineID; 
+                    li.appendChild(removeBtn);
+                    selectedMedicinesList.appendChild(li);
+                });
+            }
+
+            function removeSelectedMedicine(event) {
+                if (!event.target.classList.contains('btn-close')) return;
+                const idToRemove = parseInt(event.target.dataset.id);
+                selectedMedicines = selectedMedicines.filter(m => m.medicineID !== idToRemove);
+                renderSelectedMedicines();
+            }
+
+            function clearPrescriptionModal() {
+                prescriptionDiagnosis.value = '';
+                otherDiagnosisText.value = '';
+                otherDiagnosisContainer.classList.add('d-none');
+                medicineSearch.value = '';
+                selectedMedicines = [];
+                renderSelectedMedicines();
+                currentAppointmentIdForPrescription = null;
+            }
+            
+            /**
+             * Gathers data and submits the new prescription.
+             * MEDICINE CHECK IS NOW REMOVED.
+             */
+            async function handleSavePrescription() {
+                let diagnosis = prescriptionDiagnosis.value;
+                if (!diagnosis) {
+                    alert('Please select a diagnosis.');
+                    return;
+                }
+                
+                if (diagnosis === 'Others') {
+                    diagnosis = otherDiagnosisText.value.trim();
+                    if (!diagnosis) {
+                        alert('Please enter a diagnosis for "Others".');
+                        return;
+                    }
+                }
+                
+                // --- THIS CHECK IS REMOVED ---
+                // if (selectedMedicines.length === 0) {
+                //     alert('Please add at least one medicine.');
+                //     return;
+                // }
+
+                const medicineIds = selectedMedicines.map(m => m.medicineID);
+                
+                const prescriptionDto = {
+                    AppointmentID: currentAppointmentIdForPrescription,
+                    Diagnosis: diagnosis,
+                    Medicines: medicineIds // This will be [] if empty, which is valid
+                };
+                
+                savePrescriptionBtn.disabled = true;
+                savePrescriptionBtn.querySelector('.spinner-border').classList.remove('d-none');
+                try {
+                    const response = await fetch(`${apiBaseUrl}/api/medical/add-prescription`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(prescriptionDto)
+                    });
+                    if (!response.ok) throw new Error('Failed to save prescription.');
+                    addPrescriptionModal.hide();
+                } catch (err) {
+                    console.error("Error saving prescription:", err);
+                    alert("Failed to save the prescription. Please try again.");
+                } finally {
+                    savePrescriptionBtn.disabled = false;
+                    savePrescriptionBtn.querySelector('.spinner-border').classList.add('d-none');
+                }
+            }
+            
+            // --- INITIALIZATION & EVENT LISTENERS ---
+
+            // 1. Set date picker to today
+            const todayString = getTodayDateString();
+            datePicker.value = todayString;
+
+            // 2. Add Main Page Event Listeners
+            datePicker.addEventListener('change', () => getAndRenderAppointments(datePicker.value));
+
+            // LISTENER FOR CARD CLICKS
+            appointmentListContainer.addEventListener('change', (event) => {
+                if (event.target.classList.contains('attendance-checkbox')) {
+                    handleAttendanceUpdate(event);
+                }
+            });
+            appointmentListContainer.addEventListener('click', (event) => {
+                const deleteBtn = event.target.closest('.delete-appointment-btn');
+                const prescriptionBtn = event.target.closest('.add-prescription-btn');
+                
+                if (deleteBtn) {
+                    event.preventDefault();
+                    currentAppointmentIdToDelete = parseInt(deleteBtn.dataset.id);
+                    deleteAppointmentModal.show();
+                }
+                
+                if (prescriptionBtn) {
+                    event.preventDefault();
+                    currentAppointmentIdForPrescription = parseInt(prescriptionBtn.dataset.id);
+                    addPrescriptionModal.show();
+                }
+            });
+
+            statusPillsContainer.addEventListener('click', handleFilterClick);
+
+            // 3. Add CREATE Modal Event Listeners
+            searchMemberBtn.addEventListener('click', searchMembers);
+            saveAppointmentsBtn.addEventListener('click', createAppointments);
+            createAppointmentModalEl.addEventListener('hidden.bs.modal', clearModal);
+            createAppointmentModalEl.addEventListener('shown.bs.modal', () => {
+                memberCodeSearchInput.focus();
+            });
+            memberSearchResultsContainer.addEventListener('change', toggleSelectAll);
+            // Scanner Listeners
+            if (scanMemberCodeBtn) {
+                scanMemberCodeBtn.addEventListener("click", function () {
+                    qrScannerContainer.classList.remove("d-none");
+                    memberSearchResultsContainer.innerHTML = ''; 
+                    if (typeof Html5Qrcode === 'undefined') {
+                        alert("QR Code scanner library not loaded.");
+                        return;
+                    }
+                    html5QrCode = new Html5Qrcode("reader");
+                    html5QrCode.start(
+                        { facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => {
+                            memberCodeSearchInput.value = decodedText; 
+                            if (html5QrCode) { html5QrCode.stop().catch(err => console.error("Error stopping scanner:", err)); }
+                            qrScannerContainer.classList.add("d-none");
+                            searchMembers(); 
+                        },
+                        (errorMessage) => { console.warn("QR Code scan error: ", errorMessage); }
+                    ).catch((err) => { 
+                        console.error("QR Code scanning failed: ", err); 
+                        alert("Failed to start QR scanner. Please check camera permissions.");
+                    });
+                });
+                btnStopScan.addEventListener("click", function () {
+                    if (html5QrCode) { html5QrCode.stop().catch(err => console.error("Error stopping scanner:", err)); }
+                    qrScannerContainer.classList.add("d-none");
+                });
+            }
+
+            // 4. Add DELETE Modal Listeners
+            confirmDeleteBtn.addEventListener('click', handleDeleteAppointment);
+            
+            // 5. Add PRESCRIPTION Modal Listeners
+            prescriptionDiagnosis.addEventListener('change', handleDiagnosisChange);
+            addMedicineBtn.addEventListener('click', addMedicineToList);
+            medicineSearch.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    addMedicineToList();
+                }
+            });
+            selectedMedicinesList.addEventListener('click', removeSelectedMedicine);
+            savePrescriptionBtn.addEventListener('click', handleSavePrescription);
+            addPrescriptionModalEl.addEventListener('hidden.bs.modal', clearPrescriptionModal);
+            addPrescriptionModalEl.addEventListener('shown.bs.modal', async () => {
+                if (currentAppointmentIdForPrescription) {
+                    await loadExistingPrescription(currentAppointmentIdForPrescription);
+                }
+            });
+            
+            // 6. Initial load
+            await loadInitialData(); // Load medicines/diagnoses first
+            await getAndRenderAppointments(todayString); // Then load appointments
+
+        })();
+    </script>
+}

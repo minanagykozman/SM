@@ -120,6 +120,8 @@ namespace SM.DAL.DataModel
         [JsonIgnore]
         public virtual ICollection<MemberFund> Funds { get; set; } = new List<MemberFund>();
         public ICollection<ChurchMember> ChurchMembers { get; set; }
+        [JsonIgnore]
+        public ICollection<MedicalAppointment> MedicalAppointments { get; set; }
 
     }
 

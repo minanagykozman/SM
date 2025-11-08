@@ -36,8 +36,11 @@
         public DbSet<AuditTrail> AuditTrail { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
-        public DbSet<Church> Churches{ get; set; }
+        public DbSet<Church> Churches { get; set; }
         public DbSet<ChurchMember> ChurchMembers { get; set; }
+        public DbSet<MedicalAppointment> MedicalAppoinments { get; set; }
+        public DbSet<Medicine> Medicines { get; set; }
+        public DbSet<MedicalAppointmentMedicine> MedicalAppointmentMedicines { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -92,7 +95,7 @@
 
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(rp => rp.RoleId);
 
             modelBuilder.Entity<RolePermission>()
@@ -108,7 +111,27 @@
             modelBuilder.Entity<ChurchMember>()
                .HasKey(cm => new { cm.ChurchID, cm.MemberID });
 
-           
+
+            modelBuilder.Entity<MedicalAppointment>()
+                    .HasKey(p => p.MedicalAppointmentID);
+            modelBuilder.Entity<MedicalAppointment>()
+                    .Property(p => p.MedicalAppointmentID)
+                    .ValueGeneratedOnAdd();
+
+
+            modelBuilder.Entity<MedicalAppointmentMedicine>()
+                .HasKey(mam => new { mam.MedicalAppointmentID, mam.MedicineID });
+
+            modelBuilder.Entity<MedicalAppointmentMedicine>()
+                .HasOne(mam => mam.MedicalAppointment)
+                .WithMany(ma => ma.MedicalAppointmentMedicines)
+                .HasForeignKey(mam => mam.MedicalAppointmentID);
+
+            modelBuilder.Entity<MedicalAppointmentMedicine>()
+                .HasOne(mam => mam.Medicine)
+                .WithMany(m => m.MedicalAppointmentMedicines)
+                .HasForeignKey(mam => mam.MedicineID);
+
 
             modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
