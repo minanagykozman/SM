@@ -463,7 +463,7 @@ namespace SM.BAL
             var member = _dbcontext.Members.
                 FirstOrDefault(m => m.Code.Contains(memberCode) ||
                 m.UNPersonalNumber == memberCode || m.UNFileNumber == memberCode
-                || m.ImageReference == memberCode);
+                || m.ImageReference.Contains(memberCode));
 
             if (member == null)
                 return members;

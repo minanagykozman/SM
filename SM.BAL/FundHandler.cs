@@ -32,7 +32,10 @@ namespace SM.BAL
 
             return query.OrderByDescending(f => f.RequestDate).ToList();
         }
-
+        public void AutoUpdateStatus()
+        {
+            //var funds = _dbcontext.MemberFunds.Where(f=>(f.Status==FundStatus.Open|| f.Status==FundStatus.Approved) && (f.RequestDate<DateTime.Now.));
+        }
         // Get funds grouped by status for workflow board
         public object GetFundsByStatus(int? assigneeId, string? status, string? searchTerm, string username)
         {
