@@ -200,7 +200,7 @@ namespace SM.API.Controllers
                     worksheet.Cell(row, 5).Value = member.UNPersonalNumber;
                     worksheet.Cell(row, 6).Value = member.Mobile ?? "";
                     worksheet.Cell(row, 7).Value = member.Baptised ? "Yes" : "No";
-                    worksheet.Cell(row, 8).Value = member.Birthdate.ToShortDateString();
+                    worksheet.Cell(row, 8).Value = member.Birthdate.ToString("dd/MM/yyyy");
                     worksheet.Cell(row, 9).Value = member.Age;
                     worksheet.Cell(row, 10).Value = member.Gender.ToString();
                     worksheet.Cell(row, 11).Value = member.CardStatus ?? "";
