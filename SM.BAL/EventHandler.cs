@@ -112,7 +112,7 @@ namespace SM.BAL
                 evr.Attended = null;
                 evr.AttendanceServantID = null;
                 evr.AttendanceTimeStamp = null;
-
+                evr.Bus = null;
                 _dbcontext.SaveChanges();
             }
         }
@@ -203,7 +203,7 @@ namespace SM.BAL
             }
             return RegistrationStatus.Ok;
         }
-        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode, string userName)
+        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode,string busName, string userName)
         {
             var servant = GetServantByUsername(userName);
             var member = _dbcontext.Members.Include(m => m.ClassMembers).
@@ -229,6 +229,10 @@ namespace SM.BAL
             eventRegistration.Attended = true;
             eventRegistration.AttendanceServantID = servant.ServantID;
             eventRegistration.AttendanceTimeStamp = CurrentTime;
+            if (!string.IsNullOrEmpty(busName))
+            {
+                eventRegistration.Bus = busName;
+            }
             _dbcontext.SaveChanges();
 
             return RegistrationStatus.Ok;

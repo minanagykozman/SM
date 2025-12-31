@@ -13,6 +13,24 @@
         </h4>
     </div>
     <input type="hidden" name="eventID" value="@ViewContext.HttpContext.Request.Query["eventID"]" />
+    <div class="card mb-3 border-0 bg-light">
+        <div class="card-body py-2">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="toggleUpdateBus">
+                        <label class="form-check-label fw-bold" for="toggleUpdateBus">Update Bus</label>
+                    </div>
+                </div>
+                <div class="col-md-4" id="busNameContainer" style="display: none;">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="txtBusName" placeholder="Bus Name">
+                        <label for="txtBusName">Bus Name</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <partial name="_SearchPartial" />
     <hr class="my-4">
     <div class="row g-4" id="members-grid">

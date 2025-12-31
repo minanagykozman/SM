@@ -381,14 +381,14 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.Attendance")]
         [HttpPost("TakeAttendance")]
-        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID)
+        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID,string busName)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    var status = eventHandler.TakeEventAttendance(eventID, memberCode, User.Identity.Name);
+                    var status = eventHandler.TakeEventAttendance(eventID, memberCode, busName, User.Identity.Name);
                     return Ok(status);
                 }
 

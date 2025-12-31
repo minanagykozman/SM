@@ -192,7 +192,7 @@
         {
             get
             {
-                _serverVersion = new MySqlServerVersion(new Version(8, 0, 40));
+                _serverVersion = new MySqlServerVersion(new Version(8, 0, 42));
                 return _serverVersion;
             }
         }

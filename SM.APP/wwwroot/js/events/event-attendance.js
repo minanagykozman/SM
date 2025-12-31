@@ -1,5 +1,14 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     fetchEventAttendedMembers();
+    document.getElementById('toggleUpdateBus').addEventListener('change', function () {
+        const busContainer = document.getElementById('busNameContainer');
+        if (this.checked) {
+            busContainer.style.display = 'block';
+        } else {
+            busContainer.style.display = 'none';
+            document.getElementById('txtBusName').value = ''; // Clear input when hidden
+        }
+    });
 });
 async function btnDelete_click() {
     let eventID = document.querySelector('input[name="eventID"]').value;
@@ -53,7 +62,7 @@ async function fetchEventAttendedMembers() {
         }
 
         const members = await response.json();
-       
+
         populateTable(members);
     } catch (error) {
         console.error("Network error:", error);
@@ -137,6 +146,7 @@ document.getElementById("btnCheck").addEventListener("click", function () {
 
 // Function to fill modal with API response
 function populateModal(data) {
+    const isUpdateBusEnabled = document.getElementById('toggleUpdateBus').checked;
     switch (data.status) {
         case 0:
             document.getElementById("MemberStatusAlert").value = "Member not found or not registered";
@@ -167,6 +177,12 @@ function populateModal(data) {
             $("#divBus").show();
             $("#MemberDataBody").show();
             $("#submitBtn").show();
+
+            if (isUpdateBusEnabled) {
+                document.getElementById("Bus").value = document.getElementById('txtBusName').value;
+            }
+
+
             break;
         case 7:
             document.getElementById("MemberStatusAlert").value = "Member not registered in this event!";
@@ -198,8 +214,12 @@ document.getElementById("submitBtn").addEventListener("click", function () {
 
     const eventID = document.querySelector('input[name="eventID"]').value; // Get eventID from hidden input
     const memberCode = document.querySelector('input[name="MemberCode"]').value;
-
-    const apiUrl = `${apiBaseUrl}/Events/TakeAttendance?memberCode=${encodeURIComponent(memberCode)}&eventID=${eventID}`;
+    const isUpdateBusEnabled = document.getElementById('toggleUpdateBus').checked;
+    let busName = "";
+    if (isUpdateBusEnabled) {
+        busName = document.getElementById('txtBusName').value;
+    }
+    const apiUrl = `${apiBaseUrl}/Events/TakeAttendance?memberCode=${encodeURIComponent(memberCode)}&eventID=${eventID}&busName=${busName}`;
 
 
     fetch(apiUrl, {
@@ -208,7 +228,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ memberCode: memberCode, eventID: eventID })
+        body: JSON.stringify({ memberCode: memberCode, eventID: eventID, busName: busName })
     })
         .then(response => response.json())
         .then(data => {
