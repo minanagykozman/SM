@@ -40,12 +40,12 @@
                                                 <li><a class="dropdown-item" asp-page="./RegisterEvent" auth-policy="Events.Register" asp-route-eventID="@item.EventID">Registration</a></li>
                                                 <li><a class="dropdown-item" asp-page="./EventAttendance" auth-policy="Events.Attendance" asp-route-eventID="@item.EventID">Attendance</a></li>
                                                 <li><a class="dropdown-item" asp-page="./ListEventMembers" auth-policy="Events.View" asp-route-eventID="@item.EventID">View Members</a></li>
+                                                <li><a class="dropdown-item" asp-page="./EventStatistics" auth-policy="Events.View" asp-route-eventID="@item.EventID">View Statistics</a></li>
                                             </ul>
                                         </div>
                                     </div>
                                     <p class="card-text text-muted small">
                                         <i class="bi bi-calendar-event me-2"></i> @item.EventStartDate <br />
-                                        <i class="bi bi-geo-alt me-2"></i> Placeholder Location
                                     </p>
                                 </div>
                             </div>
@@ -80,9 +80,13 @@
                                                 <li><a class="dropdown-item" asp-page="./RegisterEvent" auth-policy="Events.Register" asp-route-eventID="@item.EventID">Registration</a></li>
                                                 <li><a class="dropdown-item" asp-page="./EventAttendance" auth-policy="Events.Attendance" asp-route-eventID="@item.EventID">Attendance</a></li>
                                                 <li><a class="dropdown-item" asp-page="./ListEventMembers" auth-policy="Events.View" asp-route-eventID="@item.EventID">View Members</a></li>
+                                                <li><a class="dropdown-item" asp-page="./EventStatistics" auth-policy="Events.View" asp-route-eventID="@item.EventID">View Statistics</a></li>
                                             </ul>
                                         </div>
                                     </div>
+                                    <p class="card-text text-muted small">
+                                        <i class="bi bi-calendar-event me-2"></i> @item.EventStartDate <br />
+                                    </p>
                                 </div>
                             </div>
                         </div>
