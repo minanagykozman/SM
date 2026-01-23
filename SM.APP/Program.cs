@@ -44,6 +44,12 @@ internal class Program
         {
             options.LoginPath = "/Identity/Account/Login";
             options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+
+            if (!builder.Environment.IsDevelopment())
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Allows HTTP
+                options.Cookie.SameSite = SameSiteMode.Lax; // "None" requires Secure, so use "Lax" for HTTP localhost
+            }
         });
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         builder.Services.AddAuthorization(options =>
@@ -114,8 +120,8 @@ internal class Program
         //});
 
         app.UseCors("AllowAppAndApi");
-
-        app.UseHttpsRedirection();
+        if (!builder.Environment.IsDevelopment())
+            app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseSession();
         app.UseRouting();

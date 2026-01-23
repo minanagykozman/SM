@@ -200,7 +200,8 @@ internal class Program
         //Apply CORS 
         app.UseCors("AllowAppAndApi");
 
-        app.UseHttpsRedirection();
+        if (!builder.Environment.IsDevelopment())
+            app.UseHttpsRedirection();
 
         app.UseAuthorization();
 

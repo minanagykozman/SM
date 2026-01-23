@@ -118,7 +118,6 @@
                     filteredMembers = allMembersData.filter(m => m.attended === true);
                     break;
                 case "Absent":
-                    // Note: Depending on your logic, absent might mean (Registered == true AND Attended != true)
                     filteredMembers = allMembersData.filter(m => !m.attended);
                     break;
                 case "All":

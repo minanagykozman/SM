@@ -25,7 +25,11 @@ namespace SM.API.Controllers
                 ValidateServant();
                 using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
                 {
-                    List<Class> classes = classHandler.GetServantClasses(User.Identity.Name);
+                    List<Class> classes = new List<Class>();
+                    if (User.IsInRole("SuperAdmin"))
+                        classes = classHandler.GetAllClasses();
+                    else
+                        classes = classHandler.GetServantClasses(User.Identity.Name);
                     return Ok(classes);
                 }
 
@@ -336,7 +340,7 @@ namespace SM.API.Controllers
                     worksheet.Cell(row, 20).Value = member.Attendance ?? "";
                     worksheet.Cell(row, 21).Value = member.AttendanceCounter;
                     worksheet.Cell(row, 22).Value = member.Servant ?? "";
-                    
+
                     row++;
                 }
 

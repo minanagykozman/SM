@@ -12,7 +12,11 @@ namespace SM.BAL
         public List<Class> GetServantClasses(string username)
         {
             var servant = GetServantByUsername(username);
-            return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servant.ServantID)).ToList();
+            return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servant.ServantID) && c.IsActive).ToList();
+        }
+        public List<Class> GetAllClasses()
+        {
+            return _dbcontext.Classes.ToList();
         }
         public List<ClassOccurrence> GetClassOccurences(int classID)
         {
@@ -52,7 +56,7 @@ namespace SM.BAL
             return membersExtended;
         }
 
-        
+
         public Class CreateClass(string className, int meetingID)
         {
             try
