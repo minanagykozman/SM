@@ -721,17 +721,27 @@ namespace SM.BAL
             if (criteria.IsNotInAnyClass)
             {
                 // Assuming a navigation property 'MemberClasses' for the many-to-many relationship
-                //query = query.Where(m => !m.MemberClasses.Any());
+                query = query.Where(m => !m.ClassMembers.Any());
             }
             else if (criteria.ClassIDs != null && criteria.ClassIDs.Any())
             {
                 if (criteria.ClassOperatorIsOr) // Match ANY (OR)
                 {
-                    //query = query.Where(m => m.MemberClasses.Any(mc => criteria.ClassIDs.Contains(mc.ClassID)));
+                    query = query.Where(m => m.ClassMembers.Any(mc => criteria.ClassIDs.Contains(mc.ClassID)));
                 }
                 else // Match ALL (AND)
                 {
-                    // query = query.Where(m => criteria.ClassIDs.All(classId => m.MemberClasses.Any(mc => mc.ClassID == classId)));
+                    //query = query.Where(m => criteria.ClassIDs.All(classId => m.ClassMembers.Any(mc => mc.ClassID == classId)));
+                    if (criteria.ClassIDs != null && criteria.ClassIDs.Any())
+                    {
+                        foreach (var id in criteria.ClassIDs)
+                        {
+                            // Vital: Capture the variable locally to avoid closure issues
+                            var currentId = id;
+
+                            query = query.Where(m => m.ClassMembers.Any(mc => mc.ClassID == currentId));
+                        }
+                    }
                 }
             }
 
@@ -747,16 +757,6 @@ namespace SM.BAL
                 query = query.Where(m => m.Birthdate <= criteria.BirthdateEnd.Value);
             }
 
-            // Assuming 'Age' is a calculated or stored property on your Member model
-            if (criteria.AgeStart.HasValue)
-            {
-                //query = query.Where(m => m.Age >= criteria.AgeStart.Value);
-            }
-
-            if (criteria.AgeEnd.HasValue)
-            {
-                //query = query.Where(m => m.Age <= criteria.AgeEnd.Value);
-            }
             query = query.Where(m => m.ChurchMembers.Any(cm => cm.ChurchID == servant.ChurchID));
             var results = query.ToList();
             return results;

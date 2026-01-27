@@ -18,8 +18,6 @@ const elements = {
     classFilter: document.getElementById('class-filter'),
     birthdateStartFilter: document.getElementById('birthdate-start-filter'),
     birthdateEndFilter: document.getElementById('birthdate-end-filter'),
-    ageStartFilter: document.getElementById('age-start-filter'),
-    ageEndFilter: document.getElementById('age-end-filter'),
     resetFiltersBtn: document.getElementById('reset-filters-btn'),
     applyFiltersBtn: document.getElementById('apply-filters-btn'),
     notInClassFilter: document.getElementById('not-in-class-filter'),
@@ -76,17 +74,21 @@ async function fetchClasses() {
     allClasses = await response.json();
 
     elements.classFilter.innerHTML = '';
+    
     allClasses.forEach(cls => {
-        const option = new Option(cls.className, cls.classID);
-        elements.classFilter.add(option);
+        const option = document.createElement("option");
+        option.value = cls.classID;
+        option.textContent = cls.className;
+        elements.classFilter.appendChild(option);
     });
 
-    const isAlreadyInitialized = elements.classFilter.classList.contains('bs-select-hidden');
-    if (isAlreadyInitialized) {
-        $('#class-filter').selectpicker('refresh');
-    } else {
-        $('#class-filter').selectpicker();
-    }
+    $('#class-filter').select2({
+        placeholder: "Select classes",
+        allowClear: true,
+        width: '100%' // Ensures proper styling with Bootstrap
+    });
+
+    
 }
 
 /**
@@ -112,7 +114,7 @@ function setupEventListeners() {
     // Class filter UI logic
     elements.classFilterOperator.addEventListener('change', () => {
         const label = document.getElementById('class-filter-operator-label');
-        label.textContent = elements.classFilterOperator.checked ? 'Match ANY (OR)' : 'Match ALL (AND)';
+        label.textContent = elements.classFilterOperator.checked ? 'Attending Any Class' : 'Attending All Claasses';
     });
     elements.notInClassFilter.addEventListener('change', () => {
         const isChecked = elements.notInClassFilter.checked;
@@ -268,8 +270,6 @@ async function applyAdvancedFilters() {
         classIDs: $('#class-filter').val() || [],
         birthdateStart: elements.birthdateStartFilter.value || null,
         birthdateEnd: elements.birthdateEndFilter.value || null,
-        ageStart: parseInt(elements.ageStartFilter.value, 10) || null,
-        ageEnd: parseInt(elements.ageEndFilter.value, 10) || null,
         isNotInAnyClass: elements.notInClassFilter.checked,
         classOperatorIsOr: elements.classFilterOperator.checked
     };

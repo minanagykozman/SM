@@ -16,8 +16,6 @@ namespace SM.DAL.DataModel.APIModels
         public List<int>? ClassIDs { get; set; }
         public DateTime? BirthdateStart { get; set; }
         public DateTime? BirthdateEnd { get; set; }
-        public int? AgeStart { get; set; }
-        public int? AgeEnd { get; set; }
         public bool IsNotInAnyClass { get; set; }
         public bool ClassOperatorIsOr { get; set; }
     }
