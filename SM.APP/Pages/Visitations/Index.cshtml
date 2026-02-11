@@ -4,9 +4,8 @@
     ViewData["Title"] = "Visitation Requests";
 }
 
-<input type="hidden" id="currentServantID" value="@Model.CurrentServantID" />
-
 <div class="container mt-4" id="main-container">
+    <partial name="_SuccessToastPartial" />
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
             Visitation Requests <span id="counter" class="text-muted fw-normal"></span>
@@ -38,21 +37,21 @@
                     </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" >
                     <label for="filterClass" class="form-label small">Class</label>
                     <select class="form-select" id="filterClass">
                         <option value="">All Classes</option>
                         </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" auth-policy="Visitation.Manage">
                     <label for="filterAssignedTo" class="form-label small">Assigned To</label>
                     <select class="form-select" id="filterAssignedTo">
                         <option value="">All Servants</option>
                         </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" auth-policy="Visitation.Manage">
                     <label for="filterCreatedBy" class="form-label small">Created By</label>
                     <select class="form-select" id="filterCreatedBy">
                         <option value="">All Servants</option>
@@ -77,7 +76,7 @@
                     <input type="hidden" id="updateVisitationID">
                     <input type="hidden" id="updateMainMemberID">
 
-                    <div class="mb-3">
+                    <div class="mb-3" auth-policy="Visitation.Manage">
                         <label for="updateAssignedServant" class="form-label">Assigned Servant</label>
                         <select class="form-select" id="updateAssignedServant">
                         </select>
@@ -98,8 +97,6 @@
                     </div>
 
                     <div id="updateDetailsContainer" class="d-none border-top pt-3 mt-3">
-                        <h6 class="text-muted mb-3">Feedback & Details</h6>
-
                         <div class="mb-3">
                             <label for="updateVisitationDate" class="form-label">Visitation Date</label>
                             <input type="date" class="form-control" id="updateVisitationDate">

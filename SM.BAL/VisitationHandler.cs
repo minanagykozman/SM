@@ -50,14 +50,18 @@ namespace SM.BAL
             visitation.LastModifiedDate = CurrentTime;
             visitation.Status = status;
             visitation.VisitationType = visitationType;
-            visitation.VisitaionDate = visitationDate.Value;
+            visitation.VisitaionDate = visitationDate;
 
+            Member mainMember = _dbcontext.Members.Where(m => m.MemberID == visitation.MemberID).FirstOrDefault();
+            mainMember.LastVisitationDate = visitationDate;
+            mainMember.LastVisitationType = visitationType;
             if (memberIDs != null && (status == "Done" || status == "Follow up needed"))
             {
                 foreach (int memberID in memberIDs)
                 {
                     if (memberID == visitation.MemberID)
                         continue;
+
                     Visitation newVisitaion = new Visitation()
                     {
                         VisitaionDate = visitationDate.Value,
@@ -68,6 +72,10 @@ namespace SM.BAL
                         ServantID = visitation.AssignedServantID.Value,
                         MemberID = memberID
                     };
+
+                    Member familyMember = _dbcontext.Members.Where(m => m.MemberID == memberID).FirstOrDefault();
+                    familyMember.LastVisitationDate = visitationDate;
+                    familyMember.LastVisitationType = visitationType;
                     _dbcontext.Visitations.Add(newVisitaion);
                 }
             }

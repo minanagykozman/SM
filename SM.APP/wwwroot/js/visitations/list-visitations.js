@@ -103,7 +103,6 @@ function populateServantDropdowns(servants) {
     const assignedSelect = document.getElementById('filterAssignedTo');
     const createdSelect = document.getElementById('filterCreatedBy');
     const updateSelect = document.getElementById('updateAssignedServant');
-    const currentServantID = document.getElementById('currentServantID') ? document.getElementById('currentServantID').value : null;
 
     let optionsHtml = '';
     servants.forEach(s => { optionsHtml += `<option value="${s.servantID}">${s.servantName}</option>`; });
@@ -114,8 +113,6 @@ function populateServantDropdowns(servants) {
         updateSelect.innerHTML = '';
         updateSelect.insertAdjacentHTML('beforeend', optionsHtml);
     }
-
-    if (currentServantID && assignedSelect) assignedSelect.value = currentServantID;
 }
 
 function populateClassDropdown(classes) {
@@ -237,7 +234,7 @@ function renderGrid(visitations) {
                         </div>
                         <div class="col-6">
                             <span class="text-muted d-block">Visitation Date:</span>
-                            <span>${formatDate(v.visitationDate)}</span>
+                            <span>${formatDate(v.visitaionDate)}</span>
                         </div>
                     </div>
                     
@@ -475,7 +472,7 @@ async function submitUpdateVisitation() {
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
             await fetchVisitations();
-            alert("Visitation updated successfully.");
+            showSuccessToast("Visitation updated successfully.");
         } else {
             const err = await response.text();
             alert("Failed to update: " + err);

@@ -335,7 +335,7 @@ async function submitVisitationRequest() {
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
 
-            alert(`Successfully added visitation request for ${targetIDs.length} member(s).`);
+            showSuccessToast("Successfully added visitation request(s)");
 
             // If this was a bulk action, clear the UI selection
             if (!singleMemberID) {
