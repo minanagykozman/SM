@@ -1,0 +1,135 @@
+﻿@page
+@model SM.APP.Pages.Visitations.IndexModel
+@{
+    ViewData["Title"] = "Visitation Requests";
+}
+
+<input type="hidden" id="currentServantID" value="@Model.CurrentServantID" />
+
+<div class="container mt-4" id="main-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">
+            Visitation Requests <span id="counter" class="text-muted fw-normal"></span>
+        </h4>
+        <button class="btn btn-outline-primary" onclick="fetchVisitations()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-funnel me-1"></i> Filters
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="filterMember" class="form-label small">Member (Name/Code)</label>
+                    <input type="text" class="form-control" id="filterMember" placeholder="Search member...">
+                </div>
+
+                <div class="col-md-2">
+                    <label for="filterStatus" class="form-label small">Status</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">All</option>
+                        <option value="Assigned" selected>Assigned</option>
+                        <option value="Done">Done</option>
+                        <option value="Follow up needed">Follow up needed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="filterClass" class="form-label small">Class</label>
+                    <select class="form-select" id="filterClass">
+                        <option value="">All Classes</option>
+                        </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="filterAssignedTo" class="form-label small">Assigned To</label>
+                    <select class="form-select" id="filterAssignedTo">
+                        <option value="">All Servants</option>
+                        </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="filterCreatedBy" class="form-label small">Created By</label>
+                    <select class="form-select" id="filterCreatedBy">
+                        <option value="">All Servants</option>
+                        </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" id="visitations-grid">
+        </div>
+</div>
+<div class="modal fade" id="updateVisitationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Visitation Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateVisitationForm">
+                    <input type="hidden" id="updateVisitationID">
+                    <input type="hidden" id="updateMainMemberID">
+
+                    <div class="mb-3">
+                        <label for="updateAssignedServant" class="form-label">Assigned Servant</label>
+                        <select class="form-select" id="updateAssignedServant">
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="updateVisitationType" class="form-label">Visitation Type</label>
+                        <select class="form-select" id="updateVisitationType">
+                            <option value="Phone">Phone</option>
+                            <option value="Home">Home</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="updateVisitationStatus" class="form-label">Status</label>
+                        <select class="form-select" id="updateVisitationStatus">
+                        </select>
+                    </div>
+
+                    <div id="updateDetailsContainer" class="d-none border-top pt-3 mt-3">
+                        <h6 class="text-muted mb-3">Feedback & Details</h6>
+
+                        <div class="mb-3">
+                            <label for="updateVisitationDate" class="form-label">Visitation Date</label>
+                            <input type="date" class="form-control" id="updateVisitationDate">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="updateFeedback" class="form-label">Feedback / Notes</label>
+                            <textarea class="form-control" id="updateFeedback" rows="3"></textarea>
+                        </div>
+
+                        <div id="familyChecklistContainer" class="d-none">
+                            <label class="form-label d-block">Family Members Visited:</label>
+                            <div id="familyChecklistItems" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                <div class="text-center text-muted small">Loading family...</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnPerformUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script> 
+    <script src="~/js/visitations/list-visitations.js" asp-append-version="true"></script>
+}

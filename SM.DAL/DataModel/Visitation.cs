@@ -10,17 +10,21 @@ namespace SM.DAL.DataModel
     {
         public int VisitationID { get; set; }
         public int MemberID { get; set; }
+        public int? ClassID { get; set; }
         public string VisitationType { get; set; } = default!;
-        public int ServantID {  get; set; }
-        public string? Feedback {  get; set; }
+        public int ServantID { get; set; }
+        public string? Feedback { get; set; }
         public string? AssignedServantFeedback { get; set; }
-        public int? AssignedServantID {  get; set; }
-        public bool? Checked {  get; set; }
-        public DateTime VisitaionDate {  get; set; }
+        public string? Status { get; set; }
+        public int? AssignedServantID { get; set; }
+        public bool? Checked { get; set; }
+        public DateTime? VisitaionDate { get; set; }
+        public DateTime CreatedAt { get; set; }
         public DateTime? LastModifiedDate { get; set; }
-        public virtual Member Member { get; set; }
         public virtual Servant Servant { get; set; }
         public virtual Servant? AssignedServant { get; set; }
+        public virtual Member Member { get; set; }
+        public virtual Class? Class { get; set; }
 
     }
 }

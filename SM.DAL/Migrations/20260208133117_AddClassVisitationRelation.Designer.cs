@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260208133117_AddClassVisitationRelation")]
+    partial class AddClassVisitationRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1227,7 +1230,7 @@ namespace SM.DAL.Migrations
                     b.Property<bool?>("Checked")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int?>("ClassID")
+                    b.Property<int>("ClassID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1248,7 +1251,7 @@ namespace SM.DAL.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("VisitaionDate")
+                    b.Property<DateTime>("VisitaionDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("VisitationType")
@@ -1598,7 +1601,9 @@ namespace SM.DAL.Migrations
 
                     b.HasOne("SM.DAL.DataModel.Class", "Class")
                         .WithMany("Visitations")
-                        .HasForeignKey("ClassID");
+                        .HasForeignKey("ClassID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SM.DAL.DataModel.Member", "Member")
                         .WithMany()

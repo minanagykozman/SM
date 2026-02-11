@@ -18,6 +18,8 @@ namespace SM.DAL.DataModel
         public virtual ICollection<ServantClass> ServantClasses { get; set; } = new List<ServantClass>();
         [JsonIgnore]
         public virtual ICollection<ClassEvent> ClassEvents { get; set; } = new List<ClassEvent>();
+        [JsonIgnore]
+        public virtual ICollection<Visitation> Visitations { get; set; } = new List<Visitation>();
     }
 
 }

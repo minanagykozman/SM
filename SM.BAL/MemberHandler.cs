@@ -403,7 +403,15 @@ namespace SM.BAL
                 ex.Source = "Show message";
                 throw ex;
             }
+
             Servant servant = GetServantByUsername(modifiedByUserName);
+            if (servant == null)
+            {
+                var ex = new Exception(string.Format("Couldn't retrieve servant data {0}", modifiedByUserName));
+                ex.Source = "Show message";
+                throw ex;
+            }
+
             int sequence = 0;
             Member newMember = new Member();
             newMember.Gender = gender;
@@ -436,8 +444,8 @@ namespace SM.BAL
             newMember.ModifiedLog = "Member created.";
 
             _dbcontext.Members.Add(newMember);
-            _dbcontext.SaveChanges();
-
+            _dbcontext.SaveChangesAsync();
+           
             _dbcontext.ChurchMembers.Add(new ChurchMember() { MemberID = newMember.MemberID, ChurchID = servant.ChurchID });
             if (classes != null)
             {
@@ -445,8 +453,8 @@ namespace SM.BAL
                 {
                     _dbcontext.ClassMembers.Add(new ClassMember() { MemberID = newMember.MemberID, ClassID = cl });
                 }
-                _dbcontext.SaveChanges();
             }
+            _dbcontext.SaveChanges();
             return newMember;
         }
 

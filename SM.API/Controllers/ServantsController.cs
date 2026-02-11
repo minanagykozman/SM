@@ -64,7 +64,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        [HttpGet("GetServants")]
+        [HttpGet("get-servants")]
         public ActionResult<List<Servant>> GetServants(bool? isActive)
         {
             try

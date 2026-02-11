@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260204123558_AdjustVisitationCreationDate")]
+    partial class AdjustVisitationCreationDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -827,53 +830,6 @@ namespace SM.DAL.Migrations
                     b.ToTable("MemberAids");
                 });
 
-            modelBuilder.Entity("SM.DAL.DataModel.MemberAttendanceSummaryView", b =>
-                {
-                    b.Property<int>("MemberID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AttendedTimes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClassName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("LastAttendanceDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("MeetingStartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("TotalOccurrencesToDate")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UNFileNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UNFirstName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UNLastName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("MemberID", "ClassID");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("MemberAttendanceSummaryView", (string)null);
-                });
-
             modelBuilder.Entity("SM.DAL.DataModel.MemberClasssAttendanceView", b =>
                 {
                     b.Property<int>("MemberID")
@@ -1227,7 +1183,7 @@ namespace SM.DAL.Migrations
                     b.Property<bool?>("Checked")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int?>("ClassID")
+                    b.Property<int>("ClassID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1239,16 +1195,13 @@ namespace SM.DAL.Migrations
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("MemberID")
-                        .HasColumnType("int");
-
                     b.Property<int>("ServantID")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("VisitaionDate")
+                    b.Property<DateTime>("VisitaionDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("VisitationType")
@@ -1259,13 +1212,24 @@ namespace SM.DAL.Migrations
 
                     b.HasIndex("AssignedServantID");
 
-                    b.HasIndex("ClassID");
-
-                    b.HasIndex("MemberID");
-
                     b.HasIndex("ServantID");
 
                     b.ToTable("Visitations");
+                });
+
+            modelBuilder.Entity("SM.DAL.DataModel.VisitationMember", b =>
+                {
+                    b.Property<int>("MemberID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VisitationID")
+                        .HasColumnType("int");
+
+                    b.HasKey("MemberID", "VisitationID");
+
+                    b.HasIndex("VisitationID");
+
+                    b.ToTable("VisitationMembers");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.AidClass", b =>
@@ -1596,16 +1560,6 @@ namespace SM.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("AssignedServantID");
 
-                    b.HasOne("SM.DAL.DataModel.Class", "Class")
-                        .WithMany("Visitations")
-                        .HasForeignKey("ClassID");
-
-                    b.HasOne("SM.DAL.DataModel.Member", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SM.DAL.DataModel.Servant", "Servant")
                         .WithMany()
                         .HasForeignKey("ServantID")
@@ -1614,11 +1568,16 @@ namespace SM.DAL.Migrations
 
                     b.Navigation("AssignedServant");
 
-                    b.Navigation("Class");
-
-                    b.Navigation("Member");
-
                     b.Navigation("Servant");
+                });
+
+            modelBuilder.Entity("SM.DAL.DataModel.VisitationMember", b =>
+                {
+                    b.HasOne("SM.DAL.DataModel.Visitation", null)
+                        .WithMany("Members")
+                        .HasForeignKey("VisitationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Aid", b =>
@@ -1646,8 +1605,6 @@ namespace SM.DAL.Migrations
                     b.Navigation("ClassOccurrences");
 
                     b.Navigation("ServantClasses");
-
-                    b.Navigation("Visitations");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Event", b =>
@@ -1701,6 +1658,11 @@ namespace SM.DAL.Migrations
                     b.Navigation("MemberAids");
 
                     b.Navigation("ServantClasses");
+                });
+
+            modelBuilder.Entity("SM.DAL.DataModel.Visitation", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

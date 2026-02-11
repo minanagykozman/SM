@@ -32,6 +32,7 @@
         public DbSet<MemberClasssAttendanceView> MemberClasssAttendanceView { get; set; }
         public DbSet<AidClass> AidClasses { get; set; }
         public DbSet<Visitation> Visitations { get; set; }
+        public DbSet<MemberAttendanceSummaryView> MemberAttendanceSummaryView { get; set; }
         public DbSet<MemberFund> MemberFunds { get; set; }
         public DbSet<AuditTrail> AuditTrail { get; set; }
         public DbSet<Permission> Permissions { get; set; }
@@ -91,7 +92,7 @@
             .HasIndex(m => m.Sequence).IsUnique();
 
             modelBuilder.Entity<RolePermission>()
-           .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
 
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
@@ -138,6 +139,7 @@
             modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
             modelBuilder.Entity<MemberEventView>().ToView("MemberEventView").HasKey(v => new { v.MemberID, v.EventID });
             modelBuilder.Entity<MemberClasssAttendanceView>().ToView("MemberClasssAttendanceView").HasKey(v => new { v.MemberID, v.ClassOccurrenceID });
+            modelBuilder.Entity<MemberAttendanceSummaryView>().ToView("MemberAttendanceSummaryView").HasKey(v => new { v.MemberID, v.ClassID });
 
             modelBuilder.Entity<MemberFund>().HasOne(m => m.Approver)
                 .WithMany().HasForeignKey("ApproverID");

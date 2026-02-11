@@ -61,11 +61,69 @@
         </div>
     </div>
 
+    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border">
+        <div class="form-check ms-2">
+            <input class="form-check-input" type="checkbox" id="selectAllMembers">
+            <label class="form-check-label" for="selectAllMembers">
+                Select All (<span id="selectedCount">0</span>)
+            </label>
+        </div>
 
+        <div class="dropdown d-none" id="bulkActionsContainer">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="bulkActionsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                Bulk Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bulkActionsBtn">
+                <li><a class="dropdown-item" href="#" data-action="bulk-visitation">Visitation Request</a></li>
+                <li><a class="dropdown-item" href="#" data-action="bulk-baptism">Update Baptism Status</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" data-action="bulk-remove">Remove from Class</a></li>
+            </ul>
+        </div>
+    </div>
     <div class="row g-4" id="members-grid">
     </div>
 </div>
 <partial name="_MemberDetailsModalPartial" />
+<div class="modal fade" id="addVisitationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Visitation Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="visitationForm">
+                    <input type="hidden" id="visitationMemberID">
+
+                    <div class="mb-3">
+                        <label for="servantSelect" class="form-label">Assign to</label>
+                        <select class="form-select" id="servantSelect">
+                            <option value="" selected disabled>Select a Servant...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="visitationType" class="form-label">Visitation Type</label>
+                        <select class="form-select" id="visitationType">
+                            <option value="Phone">Phone</option>
+                            <option value="Home">Home</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="visitationNotes" class="form-label">Visitation Notes</label>
+                        <textarea class="form-control" id="visitationNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSaveVisitation">Add Request</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
