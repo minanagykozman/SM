@@ -93,7 +93,11 @@ async function fetchVisitations() {
             const grid = document.getElementById('visitations-grid');
             if (grid) grid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load visitations.</div></div>`;
         }
-    } catch (error) { console.error("Error fetching visitations:", error); }
+    } catch (error) {
+        console.error("Error fetching visitations:", error);
+        const grid = document.getElementById('visitations-grid');
+        if (grid) grid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load visitations.</div></div>`;
+    }
     finally { if (typeof hideLoading === 'function') hideLoading(); }
 }
 
@@ -132,17 +136,30 @@ function applyFilters() {
     const memberTxt = document.getElementById('filterMember').value.toLowerCase();
     const status = document.getElementById('filterStatus').value;
     const classId = document.getElementById('filterClass').value;
-    const assignedId = document.getElementById('filterAssignedTo').value;
-    const createdId = document.getElementById('filterCreatedBy').value;
+
+    // Check if elements exist before accessing .value
+    const assignedEl = document.getElementById('filterAssignedTo');
+    const assignedId = assignedEl ? assignedEl.value : null;
+
+    const createdEl = document.getElementById('filterCreatedBy');
+    const createdId = createdEl ? createdEl.value : null;
 
     const filtered = allVisitations.filter(v => {
         const matchMember = !memberTxt ||
             (v.member.fullName && v.member.fullName.toLowerCase().includes(memberTxt)) ||
             (v.member.code && v.member.code.toString().includes(memberTxt));
+
         const matchStatus = !status || v.status === status;
+
+        // Safe check for classID vs string input
         const matchClass = !classId || (v.classID != null && v.classID == classId);
+
+        // If assignedId is null (element missing), !assignedId is true, so we skip filtering
         const matchAssigned = !assignedId || (v.assignedServantID != null && v.assignedServantID == assignedId);
+
+        // If createdId is null (element missing), !createdId is true, so we skip filtering
         const matchCreated = !createdId || (v.servantID != null && v.servantID == createdId);
+
         return matchMember && matchStatus && matchClass && matchAssigned && matchCreated;
     });
     renderGrid(filtered);
