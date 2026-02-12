@@ -12,7 +12,7 @@ namespace SM.API.Controllers
     [Authorize]
     public class VisitationController(ILogger<FundController> logger) : SMControllerBase(logger)
     {
-        //[Authorize(Policy = "Member.Manage")]
+        [Authorize(Policy = "Visitation.View")]
         [HttpGet("get-visitations")]
         public IActionResult GetVisitations()
         {
@@ -34,6 +34,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Visitation.View")]
         [HttpGet("get-family-attendance")]
         public IActionResult GetMemberFamilyAttendance(int memberID)
         {
@@ -51,7 +52,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-
+        [Authorize(Policy = "Visitation.Manage")]
         [HttpPost("create-visitations")]
         public IActionResult CreateVisitations([FromBody] VisitationDto visitation)
         {
@@ -69,6 +70,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Visitation.View")]
         [HttpPut("update-visitation")]
         public IActionResult UpdateVisitations([FromBody] UpdateVisitationDto visitation)
         {
@@ -86,15 +88,15 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        [Authorize(Policy = "Medical.Manage")]
+        [Authorize(Policy = "Visitation.Manage")]
         [HttpDelete("delete/{id}")]
-        public IActionResult DeleteAppointment(int id)
+        public IActionResult DeleteVisitation(int id)
         {
             try
             {
-                using (MedicalAppoinmentHandler handler = new MedicalAppoinmentHandler())
+                using (VisitationHandler handler = new VisitationHandler())
                 {
-                    var result = handler.DeleteAppointment(id);
+                    var result = handler.DeleteVisitation(id);
 
                     return Ok(result);
                 }
@@ -104,25 +106,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        //[Authorize(Policy = "Medical.Manage")]
-        [HttpGet("get-appointment/{id}")]
-        public IActionResult GetAppointment(int id)
-        {
-            try
-            {
-                using (MedicalAppoinmentHandler handler = new MedicalAppoinmentHandler())
-                {
-                    var result = handler.GetAppointment(id);
-
-                    return Ok(result);
-                }
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex);
-            }
-        }
-
+        
         public class VisitationDto
         {
             public List<int> MemberIDs { get; set; }

@@ -83,7 +83,7 @@
     async function loadEditServants() {
             try {
                 const servantsDropDown = $("#editAssigneeSelect");
-                const request = `${apiBaseUrlEidt}/Servants/GetServants?isActive=true`;
+                const request = `${apiBaseUrlEidt}/Servants/get-servants?isActive=true`;
                 const response = await fetch(request, {
                     method: "GET",
                     credentials: "include",

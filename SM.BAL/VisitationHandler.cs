@@ -128,5 +128,16 @@ namespace SM.BAL
 
             return model;
         }
+
+        public string DeleteVisitation(int id)
+        {
+            var delete=_dbcontext.Visitations.Where(v=>v.VisitationID == id).FirstOrDefault();
+            if (delete != null)
+            {
+                _dbcontext.Visitations.Remove(delete);
+                _dbcontext.SaveChanges();
+            }
+            return "OK";
+        }
     }
 }

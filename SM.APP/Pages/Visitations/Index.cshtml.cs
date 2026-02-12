@@ -5,7 +5,7 @@ using SM.APP.Services;
 
 namespace SM.APP.Pages.Visitations
 {
-    [Authorize(Policy = "Medical.View")]
+    [Authorize(Policy = "Visitation.View")]
     public class IndexModel(ILogger<IndexModel> logger) : PageModelBase(logger)
     {
         public int CurrentServantID { get { return 3; } }
