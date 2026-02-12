@@ -333,7 +333,7 @@ function openUpdateModal(id) {
 
     // 2. Set Assigned Servant
     const servantSelect = document.getElementById('updateAssignedServant');
-    if (visitation.assignedServantID) {
+    if (visitation.assignedServantID && servantSelect) {
         servantSelect.value = visitation.assignedServantID;
     }
 
