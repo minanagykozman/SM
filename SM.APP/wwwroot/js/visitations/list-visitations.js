@@ -187,6 +187,10 @@ function renderGrid(visitations) {
         const uniqueId = `note-${v.visitationID}`; // Use ID instead of index to avoid collisions
         const isLong = noteText.length > 80;
         const clampedStyle = "display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;";
+        // Icon Logic for Visitation Type
+        let typeIcon = "bi-circle"; // default
+        if (v.visitationType === "Home") typeIcon = "bi-house-door-fill";
+        else if (v.visitationType === "Phone") typeIcon = "bi-telephone-fill";
 
         const card = `
         <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
@@ -213,7 +217,15 @@ function renderGrid(visitations) {
                          <h5 class="card-title fw-bold text-primary mb-1 text-truncate" title="${v.member.fullName}">
                             ${v.member.fullName}
                         </h5>
-                        <span class="badge bg-light text-dark border">Code: ${v.member.code || 'N/A'}</span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-light text-dark border">Code: ${v.member.code || 'N/A'}</span>
+                            
+                            ${v.visitationType ? `
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi ${typeIcon} me-1 text-secondary"></i>
+                                ${v.visitationType}
+                            </span>` : ''}
+                        </div>
                     </div>
                     
                     <hr class="my-2">

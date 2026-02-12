@@ -4,7 +4,11 @@ let selectedMemberIDs = new Set();
 
 document.addEventListener("DOMContentLoaded", function () {
     fetchClassMembers();
+    populateBaptismYears(); 
 
+    document.getElementById('not-attended-filter').addEventListener('change', applyFiltersAndSort);
+    document.getElementById('not-visited-filter').addEventListener('change', applyFiltersAndSort);
+    document.getElementById('baptism-year-filter').addEventListener('change', applyFiltersAndSort);
     document.getElementById('search-filter').addEventListener('input', applyFiltersAndSort);
     document.getElementById('active-filter').addEventListener('change', applyFiltersAndSort);
     document.getElementById('baptised-filter').addEventListener('change', applyFiltersAndSort);
@@ -25,7 +29,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (saveBtn)
         saveBtn.addEventListener('click', submitVisitationRequest);
 });
-
+function populateBaptismYears() {
+    const select = document.getElementById('baptism-year-filter');
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2016; year--) {
+        const opt = document.createElement('option');
+        opt.value = year;
+        opt.textContent = year;
+        select.appendChild(opt);
+    }
+}
 async function fetchClassMembers() {
     const classID = document.getElementById('classID').value;
     if (!classID) {
@@ -67,6 +80,14 @@ async function fetchClassMembers() {
 
 function applyFiltersAndSort() {
     let filteredMembers = [...allMembers];
+    const now = new Date();
+
+    // Helper for date difference in days
+    const getDaysDiff = (dateStr) => {
+        if (!dateStr) return Infinity;
+        const diffTime = Math.abs(now - new Date(dateStr));
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
 
     // Text Search
     const searchTerm = document.getElementById('search-filter').value.toLowerCase();
@@ -92,6 +113,23 @@ function applyFiltersAndSort() {
     if (baptisedFilterValue !== 'all') {
         const mustBeBaptised = baptisedFilterValue === 'true';
         filteredMembers = filteredMembers.filter(member => member.isBaptised === mustBeBaptised);
+    }
+
+    const attendDays = document.getElementById('not-attended-filter').value;
+    if (attendDays !== 'all') {
+        filteredMembers = filteredMembers.filter(m => getDaysDiff(m.lastPresentDate) >= parseInt(attendDays));
+    }
+
+    const visitDays = document.getElementById('not-visited-filter').value;
+    if (visitDays !== 'all') {
+        filteredMembers = filteredMembers.filter(m => getDaysDiff(m.lastVisitationDate) >= parseInt(visitDays));
+    }
+
+    const baptismYear = document.getElementById('baptism-year-filter').value;
+    if (baptismYear !== 'all') {
+        filteredMembers = filteredMembers.filter(m => {
+            return m.baptismDate && new Date(m.baptismDate).getFullYear().toString() === baptismYear;
+        });
     }
 
     // Sorting
@@ -158,8 +196,6 @@ function populateMembersGrid(members) {
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="handleAction('assign', ${member.memberID})">Assign/Unassign</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="handleAction('assignToAnother', ${member.memberID})">Assign to another</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="handleAction('editUser', ${member.memberID})">Edit user</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="handleAction('addVisitationRequest', ${member.memberID})">Visitation Request</a></li>
                                 </ul>
@@ -168,7 +204,7 @@ function populateMembersGrid(members) {
                         <p class="card-text small text-muted"><strong>Code:</strong> ${member.code} | <strong>Age:</strong> ${member.age}</p>
                         <p class="card-text mb-1"><strong>Attendance:</strong> ${member.attendance}</p>
                         <p class="card-text mb-1"><strong>Last Present:</strong> ${member.lastPresentDate ? new Date(member.lastPresentDate).toLocaleDateString("en-GB") : "N/A"}</p>
-                        <p class="card-text"><strong>Assigned Servant:</strong> <span data-member-id="${member.memberID}">${member.servant || 'N/A'}</span></p>
+                        <p class="card-text mb-1"><strong>Last Visited:</strong> ${formatDate(member.lastVisitationDate)}</p>
                     </div>
                     <div class="mt-auto pt-2">
                         ${member.mobile ? `
@@ -197,7 +233,9 @@ function toggleSortDirection() {
 function handleAction(action, memberId) {
     if (action === 'addVisitationRequest') {
         openVisitationModal(memberId);
-    } else {
+    } else if (action === 'editUser') {
+        showEditMemberModal(memberId);
+    }else {
         // Keep existing placeholder for other actions
         alert(`Functionality for '${action}' on member ID ${memberId} is not implemented yet.`);
     }

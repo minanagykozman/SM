@@ -45,7 +45,36 @@
                 <option value="false">Not Baptised Only</option>
             </select>
         </div>
+        <div>
+            <label for="not-attended-filter" class="form-label small">Not attended since</label>
+            <select id="not-attended-filter" class="form-select">
+                <option value="all" selected>All</option>
+                <option value="7">1 Week</option>
+                <option value="30">1 Month</option>
+                <option value="90">3 Months</option>
+                <option value="180">6 Months</option>
+                <option value="365">1 Year</option>
+            </select>
+        </div>
 
+        <div>
+            <label for="not-visited-filter" class="form-label small">Not visited since</label>
+            <select id="not-visited-filter" class="form-select">
+                <option value="all" selected>All</option>
+                <option value="7">1 Week</option>
+                <option value="30">1 Month</option>
+                <option value="90">3 Months</option>
+                <option value="180">6 Months</option>
+                <option value="365">1 Year</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="baptism-year-filter" class="form-label small">Baptism Year</label>
+            <select id="baptism-year-filter" class="form-select">
+                <option value="all" selected>All</option>
+            </select>
+        </div>
         <div>
             <label for="sort-by" class="form-label small">Sort by</label>
             <div class="input-group">
@@ -86,6 +115,7 @@
     </div>
 </div>
 <partial name="_MemberDetailsModalPartial" />
+<partial name="_MemberEditModalPartial" />
 <div class="modal fade" id="addVisitationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -134,5 +164,6 @@
     <script src="~/js/aids/listing.js" asp-append-version="true"></script>
     <script src="~/js/meetings/list-member-attendance.js" asp-append-version="true"></script>
     <script src="~/js/members/details.js" asp-append-version="true"></script>
+    <script src="~/js/members/edit.js" asp-append-version="true"></script>
     <script src="~/js/meetings/class-members.js" asp-append-version="true"></script>
 }

@@ -35,6 +35,8 @@ namespace SM.DAL.DataModel
             this.CreatedBy = member.CreatedBy;
             this.School = member.School;
             this.Sequence = member.Sequence;
+            this.LastVisitationType = member.LastVisitationType;
+            this.LastVisitationDate = member.LastVisitationDate;
         }
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? LastPresentDate { get; set; } = null;

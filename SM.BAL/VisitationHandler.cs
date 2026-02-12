@@ -21,6 +21,12 @@ namespace SM.BAL
             List<Visitation> visitations = new List<Visitation>();
             foreach (int memberID in memberIDs)
             {
+                var existingVisitation = _dbcontext.Visitations.Where(v => v.MemberID == memberID && v.Status == "Assigned" && v.VisitationType == visitationType).FirstOrDefault();
+                if (existingVisitation != null)
+                {
+                    existingVisitation.AssignedServantID = assignedServantID;
+                    continue;
+                }
                 Visitation visitation = new Visitation()
                 {
                     ServantID = servant.ServantID,
@@ -33,10 +39,9 @@ namespace SM.BAL
                     MemberID = memberID
                 };
                 _dbcontext.Add(visitation);
-                _dbcontext.SaveChanges();
                 visitations.Add(visitation);
             }
-
+            _dbcontext.SaveChanges();
             return visitations;
         }
         public Visitation UpdateVisitationFeedback(int visitationID, List<int> memberIDs, string feedback, string status, string visitationType, DateTime? visitationDate)
