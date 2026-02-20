@@ -444,7 +444,7 @@ namespace SM.BAL
             newMember.ModifiedLog = "Member created.";
 
             _dbcontext.Members.Add(newMember);
-            _dbcontext.SaveChangesAsync();
+            _dbcontext.SaveChanges();
            
             _dbcontext.ChurchMembers.Add(new ChurchMember() { MemberID = newMember.MemberID, ChurchID = servant.ChurchID });
             if (classes != null)
