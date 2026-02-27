@@ -1,0 +1,61 @@
+﻿@page
+@model SM.APP.Pages.Classes.IndexModel
+@{
+    ViewData["Title"] = "Classes";
+}
+<div class="container mt-4" id="main-container">
+    <partial name="_SuccessToastPartial" />
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h4 class="mb-0">
+            Class Management <span id="counter" class="text-muted fw-normal"></span>
+        </h4>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-funnel me-1"></i> Filters
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterClassName" class="form-label small">Class Name</label>
+                    <input type="text" class="form-control" id="filterClassName" placeholder="Search name...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterGender" class="form-label small">Gender</label>
+                    <select class="form-select" id="filterGender">
+                        <option value="">All</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="A">Mixed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterStatus" class="form-label small">Status</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">All</option>
+                        <option value="true" selected>Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterYear" class="form-label small">Year</label>
+                    <select class="form-select" id="filterYear">
+                        <option value="">All Years</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" id="classes-grid">
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/common.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/list-classes.js" asp-append-version="true"></script>
+}

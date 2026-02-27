@@ -57,15 +57,14 @@ namespace SM.BAL
         }
 
 
-        public Class CreateClass(string className, int meetingID)
+        public Class CreateClass(string className)
         {
             try
             {
                 Class cl = new DAL.DataModel.Class()
                 {
                     ClassName = className,
-                    IsActive = true,
-                    MeetingID = meetingID
+                    IsActive = true
                 };
                 _dbcontext.Classes.Add(cl);
                 _dbcontext.SaveChanges();
@@ -76,6 +75,30 @@ namespace SM.BAL
                 Logger.log.Error("", ex);
                 return null;
             }
+        }
+        public Class CreateClass(string username,string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
+        {
+            var servant=GetServantByUsername(username);
+            var newClass = new Class
+            {
+                ClassName = className,
+                AgeStartDate = ageStartDate,
+                AgeEndDate = ageEndDate,
+                Gender = gender,
+                ClassStartDate = classStartDate,
+                ClassEndDate = classEndDate,
+                ClassDay = classDay,
+                ClassStartTime = classStartTime,
+                ClassEndTime = classEndTime,
+                ClassFrequency = classFrequency,
+                ChurchID = servant.ChurchID,
+                Notes = notes,
+                Year = year,
+                IsActive = true
+            };
+            _dbcontext.Classes.Add(newClass);
+            _dbcontext.SaveChanges();
+            return newClass;
         }
         public string AssignMemberToServant(int memberID, int classID, string username)
         {
@@ -100,41 +123,41 @@ namespace SM.BAL
         }
         public string CreateClassOccurences(int classID)
         {
-            Class? cl = _dbcontext.Classes.Include(c => c.Meeting).FirstOrDefault(c => c.ClassID == classID);
+            Class? cl = _dbcontext.Classes.FirstOrDefault(c => c.ClassID == classID);
             if (cl == null)
             {
                 throw new ArgumentException("Class not found");
             }
             // Parse the meetingDay into a DayOfWeek enum
-            if (!Enum.TryParse(cl.Meeting.MeetingDay, true, out DayOfWeek targetDayOfWeek))
+            if (!Enum.TryParse(cl.ClassDay, true, out DayOfWeek targetDayOfWeek))
             {
                 throw new ArgumentException("Invalid meeting day");
             }
 
-            if (!cl.Meeting.MeetingStartDate.HasValue)
+            if (!cl.ClassStartDate.HasValue)
             {
                 throw new ArgumentException("Invalid meeting start date");
             }
-            if (!cl.Meeting.MeetingEndDate.HasValue)
+            if (!cl.ClassEndDate.HasValue)
             {
                 throw new ArgumentException("Invalid meeting end date");
             }
-            DateTime firstMeetingDate = cl.Meeting.MeetingStartDate.Value;
+            DateTime firstMeetingDate = cl.ClassStartDate.Value;
             while (firstMeetingDate.DayOfWeek != targetDayOfWeek)
             {
                 firstMeetingDate = firstMeetingDate.AddDays(1);
             }
 
             // Convert startTime and endTime into TimeSpan
-            if (!TimeSpan.TryParseExact(cl.Meeting.MeetingStartTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedStartTime) ||
-                !TimeSpan.TryParseExact(cl.Meeting.MeetingEndTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedEndTime))
+            if (!TimeSpan.TryParseExact(cl.ClassStartTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedStartTime) ||
+                !TimeSpan.TryParseExact(cl.ClassEndTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedEndTime))
             {
                 throw new ArgumentException("Invalid time format. Use HH:mm");
             }
 
             // Generate occurrences every 7 days until endDate
             DateTime meetingDate = firstMeetingDate;
-            while (meetingDate <= cl.Meeting.MeetingEndDate.Value)
+            while (meetingDate <= cl.ClassEndDate.Value)
             {
                 ClassOccurrence classOccurance = new ClassOccurrence()
                 {
@@ -155,11 +178,11 @@ namespace SM.BAL
             {
                 throw new ArgumentException("Class not found");
             }
-            Meeting? mt = _dbcontext.Meetings.FirstOrDefault(m => m.MeetingID == cl.ClassID);
+            //Meeting? mt = _dbcontext.Meetings.FirstOrDefault(m => m.MeetingID == cl.ClassID);
             // Parse the meetingDay into a DayOfWeek enum
-            if (!Enum.TryParse(mt.MeetingDay, true, out DayOfWeek targetDayOfWeek))
+            if (!Enum.TryParse(cl.ClassDay, true, out DayOfWeek targetDayOfWeek))
             {
-                throw new ArgumentException("Invalid meeting day");
+                throw new ArgumentException("Invalid class day");
             }
 
             DateTime firstMeetingDate = startDate;
@@ -169,8 +192,8 @@ namespace SM.BAL
             }
 
             // Convert startTime and endTime into TimeSpan
-            if (!TimeSpan.TryParseExact(mt.MeetingStartTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedStartTime) ||
-                !TimeSpan.TryParseExact(mt.MeetingEndTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedEndTime))
+            if (!TimeSpan.TryParseExact(cl.ClassStartTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedStartTime) ||
+                !TimeSpan.TryParseExact(cl.ClassEndTime, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan parsedEndTime))
             {
                 throw new ArgumentException("Invalid time format. Use HH:mm");
             }
@@ -278,12 +301,12 @@ namespace SM.BAL
         }
         public string AutoAssignClassMembers(int classID)
         {
-            Class cl = _dbcontext.Classes.Include(c => c.Meeting).FirstOrDefault(c => c.ClassID == classID);
+            Class cl = _dbcontext.Classes.FirstOrDefault(c => c.ClassID == classID);
             if (cl == null)
                 throw new Exception("Class not found");
-            List<int> members = _dbcontext.Members.Where(m => m.Birthdate <= cl.Meeting.AgeEndDate
-            && m.Birthdate >= cl.Meeting.AgeStartDate
-            && (cl.Meeting.Gender == 'A' || m.Gender == cl.Meeting.Gender)).Select(m => m.MemberID).ToList();
+            List<int> members = _dbcontext.Members.Where(m => m.Birthdate <= cl.AgeEndDate
+            && m.Birthdate >= cl.AgeStartDate
+            && (cl.Gender == 'A' || m.Gender == cl.Gender)).Select(m => m.MemberID).ToList();
             int counter = 0;
             if (members != null)
             {

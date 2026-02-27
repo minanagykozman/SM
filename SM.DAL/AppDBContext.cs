@@ -16,7 +16,7 @@
         public AppDbContext() { }
 
         public DbSet<Member> Members { get; set; }
-        public DbSet<Meeting> Meetings { get; set; }
+        //public DbSet<Meeting> Meetings { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<ClassMember> ClassMembers { get; set; }
         public DbSet<ClassOccurrence> ClassOccurrences { get; set; }

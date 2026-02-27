@@ -1,0 +1,204 @@
+﻿@page
+@model SM.APP.Pages.Admin.Classes.IndexModel
+@{
+    ViewData["Title"] = "Class Management";
+}
+
+<div class="container mt-4" id="main-container">
+    <partial name="_SuccessToastPartial" />
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h4 class="mb-0">
+            Class Management <span id="counter" class="text-muted fw-normal"></span>
+        </h4>
+        <button class="btn btn-success" onclick="openCreateModal()" auth-policy="Class.Manage">
+            <i class="bi bi-plus-circle me-1"></i> Create Class
+        </button>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-funnel me-1"></i> Filters
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterClassName" class="form-label small">Class Name</label>
+                    <input type="text" class="form-control" id="filterClassName" placeholder="Search name...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterGender" class="form-label small">Gender</label>
+                    <select class="form-select" id="filterGender">
+                        <option value="">All</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="A">Mixed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterStatus" class="form-label small">Status</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">All</option>
+                        <option value="true" selected>Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterYear" class="form-label small">Year</label>
+                    <select class="form-select" id="filterYear">
+                        <option value="">All Years</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" id="classes-grid">
+    </div>
+</div>
+
+<div class="modal fade" id="classModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="classModalTitle">Create Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="classForm">
+                    <input type="hidden" id="classId">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Class Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="className" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Year <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="classYear" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" id="classGender" required>
+                                <option value="A">Any</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Age Start Date</label>
+                            <input type="date" class="form-control" id="ageStartDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Age End Date</label>
+                            <input type="date" class="form-control" id="ageEndDate">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Class Start Date</label>
+                            <input type="date" class="form-control" id="classStartDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Class End Date</label>
+                            <input type="date" class="form-control" id="classEndDate">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Meeting Day</label>
+                            <select class="form-select" id="classDay">
+                                <option value="">Select Day...</option>
+                                <option value="Sunday">Sunday</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start Time</label>
+                            <input type="time" class="form-control" id="classStartTime">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End Time</label>
+                            <input type="time" class="form-control" id="classEndTime">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" id="classFrequency">
+                                <option value="Weekly">Weekly</option>
+                                <option value="Bi-Weekly">Bi-Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="classNotes" rows="1"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSaveClass" onclick="saveClass()">Save Class</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="autoAssignModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Auto Assign</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to assign all members within the birthdate range to this class?</p>
+                <input type="hidden" id="autoAssignClassId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmAutoAssign()">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="createMeetingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Meetings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to generate meetings for this class?</p>
+                <input type="hidden" id="createMeetingsClassId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createMeetings()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/common.js" asp-append-version="true"></script>
+    <script src="~/js/meetings/class-management.js" asp-append-version="true"></script>
+}

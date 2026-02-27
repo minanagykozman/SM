@@ -7,7 +7,7 @@ using SM.DAL.DataModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace SM.APP.Pages.Classess
+namespace SM.APP.Pages.Classes
 {
     [Authorize(Policy = "Class.View")]
     public class ClassMembersModel(ILogger<ClassMembersModel> logger) : PageModelBase(logger)

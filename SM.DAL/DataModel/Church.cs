@@ -13,6 +13,6 @@ namespace SM.DAL.DataModel
         public string? Address { get; set; }
         public ICollection<ChurchMember> ChurchMembers { get; set; }
         public ICollection<Servant> ChurchServants { get; set; }
-        public ICollection<Meeting> ChurchMeetings { get; set; }
+        public ICollection<Class> ChurchClasses { get; set; }
     }
 }

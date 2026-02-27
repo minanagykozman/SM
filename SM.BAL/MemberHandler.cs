@@ -543,7 +543,6 @@ namespace SM.BAL
         {
             return _dbcontext.ClassMembers
                 .Include(c => c.Class)
-                    .ThenInclude(c => c.Meeting)
                 .Include(c => c.Servant)
                 .Where(c => c.MemberID == memberId)
                 .ToList();

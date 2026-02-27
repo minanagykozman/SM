@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.DAL;
 
@@ -11,9 +12,11 @@ using SM.DAL;
 namespace SM.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227172238_ClassChurchIDMandatory")]
+    partial class ClassChurchIDMandatory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,6 +410,9 @@ namespace SM.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("MeetingID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Notes")
                         .HasColumnType("longtext");
 
@@ -416,6 +422,8 @@ namespace SM.DAL.Migrations
                     b.HasKey("ClassID");
 
                     b.HasIndex("ChurchID");
+
+                    b.HasIndex("MeetingID");
 
                     b.ToTable("Classes");
                 });
@@ -661,6 +669,69 @@ namespace SM.DAL.Migrations
                     b.HasKey("MedicineID");
 
                     b.ToTable("Medicines");
+                });
+
+            modelBuilder.Entity("SM.DAL.DataModel.Meeting", b =>
+                {
+                    b.Property<int>("MeetingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MeetingID"));
+
+                    b.Property<DateTime>("AgeEndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("AgeStartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ChurchID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("varchar(1)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MeetingDay")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("MeetingEndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MeetingEndTime")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MeetingFrequency")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MeetingName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("MeetingStartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MeetingStartTime")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("MeetingID");
+
+                    b.HasIndex("ChurchID");
+
+                    b.ToTable("Meetings");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Member", b =>
@@ -1302,12 +1373,20 @@ namespace SM.DAL.Migrations
             modelBuilder.Entity("SM.DAL.DataModel.Class", b =>
                 {
                     b.HasOne("SM.DAL.DataModel.Church", "Church")
-                        .WithMany("ChurchClasses")
+                        .WithMany()
                         .HasForeignKey("ChurchID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SM.DAL.DataModel.Meeting", "Meeting")
+                        .WithMany("Classes")
+                        .HasForeignKey("MeetingID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Church");
+
+                    b.Navigation("Meeting");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.ClassAttendance", b =>
@@ -1463,6 +1542,17 @@ namespace SM.DAL.Migrations
                     b.Navigation("Medicine");
                 });
 
+            modelBuilder.Entity("SM.DAL.DataModel.Meeting", b =>
+                {
+                    b.HasOne("SM.DAL.DataModel.Church", "Church")
+                        .WithMany("ChurchMeetings")
+                        .HasForeignKey("ChurchID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Church");
+                });
+
             modelBuilder.Entity("SM.DAL.DataModel.MemberAid", b =>
                 {
                     b.HasOne("SM.DAL.DataModel.Aid", "Aid")
@@ -1612,7 +1702,7 @@ namespace SM.DAL.Migrations
 
             modelBuilder.Entity("SM.DAL.DataModel.Church", b =>
                 {
-                    b.Navigation("ChurchClasses");
+                    b.Navigation("ChurchMeetings");
 
                     b.Navigation("ChurchMembers");
 
@@ -1647,6 +1737,11 @@ namespace SM.DAL.Migrations
             modelBuilder.Entity("SM.DAL.DataModel.Medicine", b =>
                 {
                     b.Navigation("MedicalAppointmentMedicines");
+                });
+
+            modelBuilder.Entity("SM.DAL.DataModel.Meeting", b =>
+                {
+                    b.Navigation("Classes");
                 });
 
             modelBuilder.Entity("SM.DAL.DataModel.Member", b =>

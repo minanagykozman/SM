@@ -6,6 +6,7 @@ using SM.API.Services;
 using SM.BAL;
 using SM.DAL.DataModel;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using static SM.BAL.EventHandler;
 
 namespace SM.API.Controllers
@@ -125,13 +126,13 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Class.Manage")]
         [HttpPost("CreateClass")]
-        public ActionResult<Class> CreateClass(string className, int meetingID)
+        public ActionResult<Class> CreateClass([FromBody]ClassDTO classData)
         {
             try
             {
                 using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
                 {
-                    var cl = meetingHandler.CreateClass(className, meetingID);
+                    var cl = meetingHandler.CreateClass(User.Identity.Name, classData.ClassName, classData.AgeStartDate, classData.AgeEndDate, classData.Gender, classData.ClassStartDate, classData.ClassEndDate, classData.ClassDay, classData.ClassStartTime, classData.ClassEndTime, classData.ClassFrequency, classData.Notes, classData.Year);
                     return Ok(cl);
                 }
 
@@ -142,8 +143,8 @@ namespace SM.API.Controllers
             }
         }
         [Authorize(Policy = "Class.Manage")]
-        [HttpPost("AutoAssignClassMembers")]
-        public ActionResult<string> AutoAssignClassMembers(int classID)
+        [HttpPost("auto-assign-class-members")]
+        public ActionResult<string> AutoAssignClassMembers([FromBody]int classID)
         {
             try
             {
@@ -160,8 +161,8 @@ namespace SM.API.Controllers
             }
         }
         [Authorize(Policy = "Class.Manage")]
-        [HttpPost("CreateClassOccurences")]
-        public ActionResult<string> CreateClassOccurences(int classID)
+        [HttpPost("create-class-occurences")]
+        public ActionResult<string> CreateClassOccurences([FromBody]int classID)
         {
             try
             {
@@ -364,6 +365,21 @@ namespace SM.API.Controllers
         {
             public AttendanceStatus AttendanceStatus { get; set; }
             public Member Member { get; set; }
+        }
+        public class ClassDTO
+        {
+            public string ClassName { get; set; }
+            public DateTime? AgeStartDate { get; set; }
+            public DateTime? AgeEndDate { get; set; }
+            public char Gender { get; set; } 
+            public DateTime? ClassStartDate { get; set; }
+            public DateTime? ClassEndDate { get; set; }
+            public string ClassDay { get; set; } = string.Empty;
+            public string ClassStartTime { get; set; } = string.Empty;
+            public string ClassEndTime { get; set; } = string.Empty;
+            public string ClassFrequency { get; set; } = string.Empty;
+            public string? Notes { get; set; }
+            public int Year { get; set; }
         }
     }
 }
