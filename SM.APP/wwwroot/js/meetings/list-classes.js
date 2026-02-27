@@ -37,8 +37,8 @@
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li><a class="dropdown-item" href="/Classes/ClassMembers?classID=${c.classID}"><i class="bi bi-pencil me-2"></i>View Members</a></li>
-                            <li><a class="dropdown-item" href="/Classes/ClassOccurances?classID=${c.classID}"><i class="bi bi-people-fill me-2"></i>Take Attendance</a></li>
+                            <li><a class="dropdown-item" href="/Classes/ClassMembers?classID=${c.classID}"><i class="bi bi-people-fill me-2"></i>View Members</a></li>
+                            <li><a class="dropdown-item" href="/Classes/ClassOccurances?classID=${c.classID}"><i class="bi bi-calendar me-2"></i>Take Attendance</a></li>
                         </ul>
                     </div>
                 </div>
