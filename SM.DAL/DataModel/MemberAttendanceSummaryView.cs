@@ -15,7 +15,7 @@ namespace SM.DAL.DataModel
         public string UNFirstName { get; set; }
         public string UNLastName { get; set; }
         public string ClassName { get; set; }
-        public DateTime MeetingStartDate { get; set; }
+        public DateTime ClassStartDate { get; set; }
         public int AttendedTimes { get; set; }
         public DateTime? LastAttendanceDate { get; set; }
         public int TotalOccurrencesToDate { get; set; }
