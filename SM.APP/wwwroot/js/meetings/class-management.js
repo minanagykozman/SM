@@ -87,6 +87,10 @@
 
 function openCreateModal() {
     document.getElementById('classForm').reset();
+
+    const activeDiv = document.getElementById('divIsActive');
+    activeDiv.style.display = 'none';
+
     document.getElementById('classId').value = '';
 
     // Set Default Year to current
@@ -105,6 +109,8 @@ function openEditModal(classID) {
     if (!cls) return;
 
     document.getElementById('classForm').reset();
+    const activeDiv = document.getElementById('divIsActive');
+    activeDiv.style.display = 'flex';
 
     document.getElementById('classId').value = cls.classID;
     document.getElementById('className').value = cls.className;
@@ -153,10 +159,11 @@ async function saveClass() {
         ClassStartTime: document.getElementById('classStartTime').value,
         ClassEndTime: document.getElementById('classEndTime').value,
         ClassFrequency: document.getElementById('classFrequency').value,
-        Notes: document.getElementById('classNotes').value
+        Notes: document.getElementById('classNotes').value,
+        IsActive: isEdit ? document.getElementById('isActive').checked : true
     };
 
-    const endpoint = isEdit ? '/Meeting/EditClass' : '/Meeting/CreateClass';
+    const endpoint = isEdit ? '/Meeting/edit-class' : '/Meeting/CreateClass';
     const url = `${apiBaseUrl}${endpoint}`;
 
     try {

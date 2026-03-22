@@ -12,11 +12,6 @@ namespace SM.APP.Pages.Classes
     [Authorize(Policy = "Class.Attendance")]
     public class TakeAttendanceModel(ILogger<TakeAttendanceModel> logger) : PageModelBase(logger)
     {
-        public List<Member> ClassOccurenceMembers { get; set; } = new List<Member>();
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await GetAPIToken();
-            return Page();
-        }
+
     }
 }

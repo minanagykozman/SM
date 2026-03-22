@@ -8,6 +8,7 @@ using SM.DAL.DataModel;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using static SM.BAL.EventHandler;
+using static SM.BAL.MeetingHandler;
 
 namespace SM.API.Controllers
 {
@@ -124,9 +125,28 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.Attendance")]
+        [HttpGet("get-meeting-data")]
+        public ActionResult<MeetingDataDto> CheckAttendance(int classOccurenceID)
+        {
+            try
+            {
+
+                using (SM.BAL.MeetingHandler classHandler = new SM.BAL.MeetingHandler())
+                {
+                    var data = classHandler.GetMeetingData(classOccurenceID);
+                    return Ok(data);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [Authorize(Policy = "Class.Manage")]
         [HttpPost("CreateClass")]
-        public ActionResult<Class> CreateClass([FromBody]ClassDTO classData)
+        public ActionResult<Class> CreateClass([FromBody] ClassDTO classData)
         {
             try
             {
@@ -143,8 +163,26 @@ namespace SM.API.Controllers
             }
         }
         [Authorize(Policy = "Class.Manage")]
+        [HttpPost("edit-class")]
+        public ActionResult<Class> EditClass([FromBody] ClassDTO classData)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    var cl = meetingHandler.EditClass(User.Identity.Name, classData.ClassID.Value, classData.ClassName, classData.AgeStartDate, classData.AgeEndDate, classData.Gender, classData.ClassStartDate, classData.ClassEndDate, classData.ClassDay, classData.ClassStartTime, classData.ClassEndTime, classData.ClassFrequency, classData.Notes, classData.Year, classData.IsActive.Value);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Class.Manage")]
         [HttpPost("auto-assign-class-members")]
-        public ActionResult<string> AutoAssignClassMembers([FromBody]int classID)
+        public ActionResult<string> AutoAssignClassMembers([FromBody] int classID)
         {
             try
             {
@@ -162,7 +200,7 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Class.Manage")]
         [HttpPost("create-class-occurences")]
-        public ActionResult<string> CreateClassOccurences([FromBody]int classID)
+        public ActionResult<string> CreateClassOccurences([FromBody] int classID)
         {
             try
             {
@@ -198,7 +236,7 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Class.Attendance")]
         [HttpPost("TakeAttendance")]
-        public ActionResult<AttendanceStatus> TakeAttendance(int classOccurenceID, string memberCode, bool forceRegister)
+        public ActionResult<int> TakeAttendance(int classOccurenceID, string memberCode, bool forceRegister)
         {
             try
             {
@@ -368,10 +406,11 @@ namespace SM.API.Controllers
         }
         public class ClassDTO
         {
+            public int? ClassID { get; set; }
             public string ClassName { get; set; }
             public DateTime? AgeStartDate { get; set; }
             public DateTime? AgeEndDate { get; set; }
-            public char Gender { get; set; } 
+            public char Gender { get; set; }
             public DateTime? ClassStartDate { get; set; }
             public DateTime? ClassEndDate { get; set; }
             public string ClassDay { get; set; } = string.Empty;
@@ -380,6 +419,7 @@ namespace SM.API.Controllers
             public string ClassFrequency { get; set; } = string.Empty;
             public string? Notes { get; set; }
             public int Year { get; set; }
+            public bool? IsActive { get; set; }
         }
     }
 }

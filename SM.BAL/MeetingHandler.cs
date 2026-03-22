@@ -57,28 +57,11 @@ namespace SM.BAL
         }
 
 
-        public Class CreateClass(string className)
+        
+        public Class CreateClass(string username, string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
         {
-            try
-            {
-                Class cl = new DAL.DataModel.Class()
-                {
-                    ClassName = className,
-                    IsActive = true
-                };
-                _dbcontext.Classes.Add(cl);
-                _dbcontext.SaveChanges();
-                return cl;
-            }
-            catch (Exception ex)
-            {
-                Logger.log.Error("", ex);
-                return null;
-            }
-        }
-        public Class CreateClass(string username,string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
-        {
-            var servant=GetServantByUsername(username);
+            var servant = GetServantByUsername(username);
+
             var newClass = new Class
             {
                 ClassName = className,
@@ -99,6 +82,29 @@ namespace SM.BAL
             _dbcontext.Classes.Add(newClass);
             _dbcontext.SaveChanges();
             return newClass;
+        }
+        public Class EditClass(string username, int classID, string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year, bool isActive)
+        {
+            var servant = GetServantByUsername(username);
+
+            var cl = _dbcontext.Classes.Where(c => c.ClassID == classID).FirstOrDefault();
+
+            cl.ClassName = className;
+            cl.AgeStartDate = ageStartDate;
+            cl.AgeEndDate = ageEndDate;
+            cl.Gender = gender;
+            cl.ClassStartDate = classStartDate;
+            cl.ClassEndDate = classEndDate;
+            cl.ClassDay = classDay;
+            cl.ClassStartTime = classStartTime;
+            cl.ClassEndTime = classEndTime;
+            cl.ClassFrequency = classFrequency;
+            cl.Notes = notes;
+            cl.Year = year;
+            cl.IsActive = isActive;
+
+            _dbcontext.SaveChanges();
+            return cl;
         }
         public string AssignMemberToServant(int memberID, int classID, string username)
         {
@@ -217,20 +223,20 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return classOccurances;
         }
-        public AttendanceStatus TakeClassAteendance(int classOccuranceID, string memberCode, string username, bool forceRegister)
+        public int TakeClassAteendance(int classOccuranceID, string memberCode, string username, bool forceRegister)
         {
             var servant = GetServantByUsername(username);
-
+            int membersCount = _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == classOccuranceID).Count();
             Member member = new Member();
             AttendanceStatus status = CheckAteendance(classOccuranceID, memberCode, out member);
             if (status == AttendanceStatus.MemberNotFound)
-                return AttendanceStatus.MemberNotFound;
+                return membersCount;
             if (status == AttendanceStatus.ClassNotFound)
-                return AttendanceStatus.ClassNotFound;
+                return membersCount;
             if (status == AttendanceStatus.AlreadyAttended)
-                return AttendanceStatus.AlreadyAttended;
+                return membersCount;
             if (status == AttendanceStatus.NotRegisteredInClass && !forceRegister)
-                return AttendanceStatus.NotRegisteredInClass;
+                return membersCount;
 
             if (status == AttendanceStatus.NotRegisteredInClass && forceRegister)
             {
@@ -258,7 +264,8 @@ namespace SM.BAL
                 _dbcontext.ClassAttendances.Add(classAttendance);
             }
             _dbcontext.SaveChanges(true);
-            return AttendanceStatus.Ok;
+            membersCount++;
+            return membersCount;
         }
 
         public string TakeClassAteendance(int classOccuranceID, List<int> memberIDs, string username)
@@ -320,6 +327,25 @@ namespace SM.BAL
                 _dbcontext.SaveChanges();
             }
             return counter.ToString();
+        }
+
+        public MeetingDataDto GetMeetingData(int classOccurenceID)
+        {
+            MeetingDataDto data = new MeetingDataDto();
+            data.Count = _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == classOccurenceID).Count();
+            var cl = _dbcontext.ClassOccurrences.Where(c => c.ClassOccurrenceID == classOccurenceID).Include(c => c.Class).FirstOrDefault();
+            if (cl != null)
+            {
+                data.Title = string.Format("{0} | {1} ", cl.Class.ClassName, cl.ClassOccurrenceStartDate.ToString("dd-MMM"));
+            }
+
+            return data;
+        }
+
+        public class MeetingDataDto
+        {
+            public string Title { get; set; }
+            public int Count { get; set; }
         }
     }
 
