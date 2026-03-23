@@ -59,12 +59,11 @@ namespace SM.DAL.DataModel
         [Display(Name = "Not Applicable")]
         NotApplicable
     }
-    public enum FundCategory
+
+    public enum UNStatus
     {
-        Rent,
-        ShantatBaraka,
-        Medical,
-        SchoolFees,
-        Others
+        New,
+        ExistSameChurch,
+        ExistDifferentChurch
     }
 }

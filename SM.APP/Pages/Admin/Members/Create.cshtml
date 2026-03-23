@@ -118,133 +118,35 @@
         </form>
     </div>
 </div>
+<div class="modal fade" id="unStatusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unModalTitle">Member Exists</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="unModalMessage"></p>
+            </div>
+            
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" id="btnUNCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" id="btnUNAction" class="btn btn-primary" >
+                    <span class="btn-text">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="_MemberEditModalPartial" />
 @section Scripts {
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-
-        async function createMember() {
-            const formData = new FormData();
-
-            formData.append("UNPersonalNumber", $("#UNPersonalNumber").val());
-            formData.append("UNFileNumber", $("#UNFileNumber").val());
-            formData.append("UNFirstName", $("#UNFirstName").val());
-            formData.append("UNLastName", $("#UNLastName").val());
-            formData.append("Gender", $("#Gender").val());
-            formData.append("Birthdate", $("#Birthdate").val());
-            formData.append("Baptised", $("#Baptised").is(':checked'));
-            formData.append("Mobile", $("#Mobile").val());
-            formData.append("Nickname", $("#Nickname").val());
-            formData.append("BaptismName", $("#BaptismName").val());
-            formData.append("School", $("#School").val());
-            formData.append("Work", $("#Work").val());
-            formData.append("Notes", $("#Notes").val());
-
-            const selectedClasses = $('#drpClasses').val();
-            if (selectedClasses) {
-                selectedClasses.forEach(classId => {
-                    formData.append("Classes", classId);
-                });
-            }
-
-            const fileInput = document.getElementById("ImageUpload");
-            if (fileInput.files.length > 0) {
-                formData.append("ImageFile", fileInput.files[0]);
-            }
-            const request = `${apiBaseUrl}/Member/CreateMemberWImage`;
-            try {
-                const response = await fetch(request, { method: "POST", credentials: "include", body: formData });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Failed to save member data:", errorData);
-                    showFailedToast("Failed to save member: " + errorData.message);
-                    return;
-                }
-                else{
-                    const memberCode = await response.text();
-                    showSuccessToast("Member created successfully with code: " + memberCode);
-                }
-            } catch (err) {
-                console.error("Failed to submit member data:", err);
-                showFailedToast("Failed to save member data!");
-            }
-        }
-
-            $(async function() {
-            showLoading();
-
-            if (typeof loadClasses === "function") { await loadClasses(apiBaseUrl); }
-            const baptisedCheckbox = document.getElementById("Baptised");
-            const baptismNameInput = document.getElementById("BaptismName");
-            function toggleBaptismName() { baptismNameInput.disabled = !baptisedCheckbox.checked; }
-            toggleBaptismName();
-            baptisedCheckbox.addEventListener("change", toggleBaptismName);
-            hideLoading();
-            $("#UNPersonalNumber").focus();
-
-            $("#frmCreate").validate({
-                ignore: [],
-                errorClass: "text-danger",
-                errorElement: "div",
-                rules: {
-                    UNPersonalNumber: {
-                        required: true,
-                        remote: {
-                            url: `${apiBaseUrl}/Member/ValidateUNNumber`,
-                            type: "get",
-                            data: { unFileNumber: function() { return $("#UNPersonalNumber").val(); } },
-                            xhrFields: { withCredentials: true }
-                        }
-                    },
-                    UNFileNumber: "required",
-                    UNFirstName: "required",
-                    UNLastName: "required",
-                    Gender: "required",
-                    Birthdate: "required"
-                },
-                messages: {
-                    UNPersonalNumber: { required: "UN Personal Number is required.", remote: "This UN number already exists." }
-                },
-
-                highlight: function(element) { $(element).addClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid'); } },
-                unhighlight: function(element) { $(element).removeClass('is-invalid'); if ($(element).hasClass('form-select')) { $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid'); } },
-
-                // The new, simplified errorPlacement function
-                errorPlacement: function(error, element) {
-                    if (element.next('.select2-container').length) {
-                        error.insertAfter(element.next('.select2-container'));
-                    } else if (element.parent().hasClass('form-floating')) {
-                        error.insertAfter(element.parent());
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
-
-                submitHandler: async function(form, event) {
-                    event.preventDefault();
-                    showLoading();
-                    await createMember();
-                    const unFileNumber = $("#UNFileNumber").val();
-
-                    form.reset();
-                    $('#drpClasses').val(null).trigger('change');
-
-                    var validator = $(form).validate();
-                    validator.resetForm(); // Using the standard reset which should now work.
-
-                    setTimeout(function() {
-                        $("#UNPersonalNumber").focus();
-                        if (event.originalEvent.submitter?.value === "AddAnother") {
-                            $("#UNFileNumber").val(unFileNumber);
-                        }
-                    }, 100);
-
-                    hideLoading();
-                }
-            });
-
-            $('#drpClasses').on('change', function() {
-                $(this).valid();
-            });
-        });
     </script>
+    <script src="~/js/members/edit.js" asp-append-version="true"></script>
+    <script src="~/js/members/create.js" asp-append-version="true"></script>
 }

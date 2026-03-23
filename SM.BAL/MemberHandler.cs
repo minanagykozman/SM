@@ -445,7 +445,7 @@ namespace SM.BAL
 
             _dbcontext.Members.Add(newMember);
             _dbcontext.SaveChanges();
-           
+
             _dbcontext.ChurchMembers.Add(new ChurchMember() { MemberID = newMember.MemberID, ChurchID = servant.ChurchID });
             if (classes != null)
             {
@@ -506,9 +506,30 @@ namespace SM.BAL
             sequence = seq;
             return string.Format("{0}{1}-{2}", birthdate.ToString("yy"), gender, seq.ToString("0000"));
         }
-        public bool ValidateUNNumber(string unPersonalNo, int? memberID)
+        public bool ValidateUNNumber(string unPersonalNo, int memberID, string username)
         {
-            return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower() && m.MemberID != memberID);
+            return _dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower() && m.MemberID == memberID);
+        }
+        public UNNumberStatus ValidateUNNumber(string unPersonalNo, string username)
+        {
+            var servant = GetServantByUsername(username);
+            var member = _dbcontext.Members.Where(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower()).Include(m => m.ChurchMembers).FirstOrDefault();
+            UNNumberStatus status = new UNNumberStatus();
+            if (member == null)
+            {
+                status.Status = UNStatus.New;
+                
+            }
+            else
+            {
+                status.MemberID = member.MemberID;
+                var memberChurches = member.ChurchMembers.Select(c => c.ChurchID).ToList();
+                if (memberChurches.Contains(servant.ChurchID))
+                    status.Status = UNStatus.ExistSameChurch;
+                else
+                    status.Status = UNStatus.ExistDifferentChurch;
+            }
+            return status;
         }
 
         public bool UpdateCardStatus(string memberCode, CardStatus cardStatus)
@@ -769,7 +790,11 @@ namespace SM.BAL
             return results;
 
         }
-
+        public class UNNumberStatus
+        {
+            public UNStatus Status { get; set; }
+            public int? MemberID { get; set; }
+        }
         public class IamgeProperties
         {
             public string Filename { get; set; }

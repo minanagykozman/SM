@@ -3,6 +3,7 @@ const editMemberModalEl = document.getElementById('editMemberModal');
 const editMemberModal = new bootstrap.Modal(editMemberModalEl);
 let formValidator; // We will store the validator instance here
 
+
 // --- 2. Setup All Modal Logic (runs once after the page is ready) ---
 $(async function () {
     // A) Initialize Form Validation (ONCE)
@@ -15,7 +16,7 @@ $(async function () {
             UNPersonalNumberEdit: {
                 required: true,
                 remote: {
-                    url: `${apiBaseUrl}/Member/ValidateUNNumber`,
+                    url: `${apiBaseUrl}/Member/validate-existing-member-UN`,
                     type: "get",
                     data: {
                         unFileNumber: () => $("#UNPersonalNumberEdit").val(),
@@ -52,6 +53,7 @@ $(async function () {
             await updateMember();
             hideLoading();
             editMemberModal.hide();
+            refreshData();
         }
     });
 
@@ -71,7 +73,7 @@ $(async function () {
     });
 
     // D) Attach other static event listeners (ONCE)
-    $('#drpClasses').on('change', function () {
+    $('#drpClassesEdit').on('change', function () {
         $(this).valid(); // Trigger validation for the classes dropdown
     });
 
@@ -93,7 +95,7 @@ function showEditMemberModal(memberID) {
 function clearEditModal() {
     const form = document.getElementById('frmEdit');
     form.reset();
-    $('#drpClasses').val(null).trigger('change');
+    $('#drpClassesEdit').val(null).trigger('change');
     if (formValidator) {
         formValidator.resetForm();
     }
@@ -136,8 +138,30 @@ async function loadMemberData(memberID) {
 
         document.getElementById("BaptismNameEdit").disabled = !memberData.baptised;
 
+        // Member Image
+        const memberImage = document.getElementById('memberEditImage');
+        const placeholder = document.getElementById('memberEditImagePlaceholder');
+
+        if (memberImage && placeholder) {
+            if (memberData?.imageURL) {
+                memberImage.src = memberData.imageURL;
+                memberImage.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+
+                memberImage.onerror = function () {
+                    // If the image fails, hide it and show the placeholder instead
+                    memberImage.classList.add('d-none');
+                    placeholder.classList.remove('d-none');
+                };
+            } else {
+                // If there's no URL, show the placeholder and hide the image
+                placeholder.classList.remove('d-none');
+                memberImage.classList.add('d-none');
+            }
+        }
+
         if (memberData.classesIDs) {
-            $('#drpClasses').val(memberData.classesIDs).trigger('change');
+            $('#drpClassesEdit').val(memberData.classesIDs).trigger('change');
         }
     } catch (err) {
         console.error("Error loading member details:", err);
@@ -171,14 +195,14 @@ async function updateMember() {
     formData.append("S3ImageKey", document.getElementById("S3KeyEdit").value);
     formData.append("CardStatus", document.getElementById("CardStatusEdit").value);
 
-    const selectedClasses = $('#drpClasses').val();
+    const selectedClasses = $('#drpClassesEdit').val();
     if (selectedClasses) {
         selectedClasses.forEach(classId => {
             formData.append("Classes", classId);
         });
     }
 
-    const fileInput = document.getElementById("ImageUpload");
+    const fileInput = document.getElementById("ImageUploadEdit");
     if (fileInput.files.length > 0) {
         formData.append("ImageFile", fileInput.files[0]);
     }
@@ -205,7 +229,7 @@ async function updateMember() {
 }
 async function loadEditClasses(apiBaseUrl) {
     try {
-        const classesDropdown = document.getElementById("drpClasses");
+        const classesDropdown = document.getElementById("drpClassesEdit");
         const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
         const classResponse = await fetch(request, {
             method: "GET",
@@ -225,7 +249,7 @@ async function loadEditClasses(apiBaseUrl) {
             classesDropdown.appendChild(option);
         });
 
-        $('#drpClasses').select2({
+        $('#drpClassesEdit').select2({
             placeholder: "Select classes",
             allowClear: true,
             width: '100%',

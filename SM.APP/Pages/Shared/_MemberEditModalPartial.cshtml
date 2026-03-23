@@ -15,7 +15,10 @@
                 <form id="frmEdit" style="position:relative">
                     <input type="hidden" id="S3KeyEdit" />
                     <input type="hidden" id="MemberIDEdit" name="MemberIDEdit" />
-
+                    <div id="memberEditImageContainer" class="text-center mb-3">
+                        <img id="memberEditImage" class="img-thumbnail shadow-sm d-none" alt="Member Photo" style="max-height: 200px;" />
+                        <i id="memberEditImagePlaceholder" class="fas fa-user-circle fa-5x text-secondary d-none"></i>
+                    </div>
                     <div class="row g-3">
                         <div class="col-md-12">
                             <div class="form-floating">
@@ -119,13 +122,13 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-floating position-relative">
-                                <input type="file" class="form-control" id="ImageUpload" accept="image/*" />
+                                <input type="file" class="form-control" id="ImageUploadEdit" accept="image/*" />
                                 <label for="ImageUpload">Upload Image</label>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label floating-label-custom">Classes</label>
-                            <select class="form-select" id="drpClasses" name="drpClasses" multiple></select>
+                            <select class="form-select" id="drpClassesEdit" name="drpClassesEdit" multiple></select>
                         </div>
                         <div class="col-md-12">
                             <div class="form-floating">

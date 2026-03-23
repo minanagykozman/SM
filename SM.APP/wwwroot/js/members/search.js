@@ -354,6 +354,10 @@ function resetAdvancedFilters(triggerSearch = true) {
     }
 }
 
+function refreshData() {
+    document.getElementById('apply-filters-btn').click();
+}
+
 /**
  * Renders the member cards in the grid.
  */

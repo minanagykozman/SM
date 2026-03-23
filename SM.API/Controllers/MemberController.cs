@@ -9,6 +9,7 @@ using SM.DAL.DataModel.APIModels;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using static SM.BAL.EventHandler;
+using static SM.BAL.MemberHandler;
 
 namespace SM.API.Controllers
 {
@@ -157,13 +158,14 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Members.Manage")]
         [HttpGet("ValidateUNNumber")]
-        public ActionResult<bool> ValidateUNNumber(string unFileNumber, int? memberID)
+        public ActionResult<UNNumberStatus> ValidateUNNumber(string unFileNumber, int? memberID)
         {
             try
             {
                 using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
                 {
-                    bool result = memberHandler.ValidateUNNumber(unFileNumber, memberID);
+                    ValidateServant();
+                    UNNumberStatus result = memberHandler.ValidateUNNumber(unFileNumber, User.Identity.Name);
                     var json = new JsonResult(result);
                     return json;
                 }
@@ -174,7 +176,26 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Members.Manage")]
+        [HttpGet("validate-existing-member-UN")]
+        public ActionResult<bool> ValidateUNNumber(string unFileNumber, int memberID)
+        {
+            try
+            {
+                using (SM.BAL.MemberHandler memberHandler = new SM.BAL.MemberHandler())
+                {
+                    ValidateServant();
+                    bool result = memberHandler.ValidateUNNumber(unFileNumber, memberID, User.Identity.Name);
+                    var json = new JsonResult(result);
+                    return json;
+                }
 
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [Authorize(Policy = "Members.View")]
         [HttpGet("GetMembersByCardStatus")]
         public ActionResult<List<Member>> GetMembersByCardStatus(CardStatus cardStatus)
