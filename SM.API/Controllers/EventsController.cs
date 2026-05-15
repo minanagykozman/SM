@@ -16,14 +16,14 @@ namespace SM.API.Controllers
         [Authorize(Policy = "Events.View")]
 
         [HttpGet("GetEvents")]
-        public ActionResult<List<Event>> GetEvents()
+        public ActionResult<List<Event>> GetEvents(bool? isActive)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    List<Event> events = eventHandler.GetEvents(User.Identity.Name);
+                    List<Event> events = eventHandler.GetEvents(User.Identity.Name, isActive);
                     return Ok(events);
                 }
             }

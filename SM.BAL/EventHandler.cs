@@ -203,7 +203,7 @@ namespace SM.BAL
             }
             return RegistrationStatus.Ok;
         }
-        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode,string busName, string userName)
+        public RegistrationStatus TakeEventAttendance(int eventID, string memberCode, string busName, string userName)
         {
             var servant = GetServantByUsername(userName);
             var member = _dbcontext.Members.Include(m => m.ClassMembers).
@@ -243,14 +243,14 @@ namespace SM.BAL
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
             return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsDeleted == false && e.IsActive).ToList<Event>();
         }
-        public List<Event> GetEvents(string username)
+        public List<Event> GetEvents(string username, bool? isActive)
         {
             var servant = GetServantByUsername(username);
             if (servant == null)
                 throw new Exception("Servant not found");
             List<int> classes = _dbcontext.ServantClasses.Where(sc => sc.ServantID == servant.ServantID).Select(sc => sc.ClassID).ToList<int>();
             List<int> events = _dbcontext.ClassEvents.Where(ce => classes.Contains(ce.ClassID)).Select(ce => ce.EventID).ToList<int>();
-            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsDeleted == false && e.IsActive).ToList<Event>();
+            return _dbcontext.Events.Where(e => events.Contains(e.EventID) && e.IsDeleted == false && (isActive.HasValue ? e.IsActive == isActive.Value : true)).ToList<Event>();
         }
         public List<Member> GetEventRegisteredMembers(int eventID)
         {

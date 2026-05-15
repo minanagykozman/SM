@@ -412,6 +412,53 @@ async function loadClasses(apiBaseUrl) {
     }
 
 }
+
+async function loadClassesDropDown(apiBaseUrl,controlName,parentControl,isActive) {
+    try {
+        const classesDropdown = document.getElementById(controlName);
+        let request = `${apiBaseUrl}/Meeting/GetServantClasses`;
+        if (isActive != null) {
+            request = `${request}?isActive=${isActive}`;
+        }
+        const classResponse = await fetch(request, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!classResponse.ok) throw new Error("Failed to fetch classes.");
+        const classList = await classResponse.json();
+
+        // Populate the dropdown
+        classesDropdown.innerHTML = "";
+        classList.forEach(cls => {
+            const option = document.createElement("option");
+            option.value = cls.classID;
+            option.textContent = cls.className;
+            classesDropdown.appendChild(option);
+        });
+
+        if (parentControl) {
+            // Initialize Select2 with Bootstrap 5 theme
+            $('#'+controlName).select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Select one or more classes',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $(parentControl)
+            });
+        } else {
+            $('#'+controlName).select2({
+                placeholder: "Select one or more classes",
+                allowClear: true,
+                width: '100%' 
+            });
+        }
+    } catch (err) {
+        console.error("Error loading classes:", err);
+    }
+
+}
 function dialMobile() {
     const mobile = document.getElementById('Mobile').value;
     if (mobile) {

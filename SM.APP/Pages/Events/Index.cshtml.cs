@@ -27,7 +27,7 @@ namespace SM.APP.Pages.Events
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
-                    string request = string.Format("{0}/Events/GetEvents", SMConfigurationManager.ApiBase);
+                    string request = string.Format("{0}/Events/GetEvents?isActive=true", SMConfigurationManager.ApiBase);
                     HttpResponseMessage response = await client.GetAsync(request);
                     if (response.IsSuccessStatusCode)
                     {

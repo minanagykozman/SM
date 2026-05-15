@@ -14,38 +14,52 @@
         <h4 class="mb-0">
             Events Management <span id="counter" class="text-muted fw-normal"></span>
         </h4>
+
         <button class="btn btn-success" onclick="openCreateModal()">
             <i class="bi bi-plus-circle me-1"></i> Create Event
         </button>
     </div>
 
-    <!-- Filters Section -->
+    <!-- Filters -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
             <i class="bi bi-funnel me-1"></i> Filters
         </div>
+
         <div class="card-body">
             <div class="row g-3">
+
                 <div class="col-md-6">
                     <label for="filterEventName" class="form-label small">Event Name</label>
+
                     <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0" id="filterEventName" placeholder="Search event name..." onkeyup="filterEvents()">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+
+                        <input type="text"
+                               class="form-control border-start-0"
+                               id="filterEventName"
+                               placeholder="Search event name..."
+                               onkeyup="filterEvents()">
                     </div>
                 </div>
+
                 <div class="col-md-6">
                     <label for="filterStatus" class="form-label small">Status</label>
+
                     <select class="form-select" id="filterStatus" onchange="filterEvents()">
                         <option value="all">All</option>
                         <option value="true" selected>Active Only</option>
                         <option value="false">Inactive Only</option>
                     </select>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Events Grid -->
+    <!-- Grid -->
     <div class="row g-4" id="events-grid"></div>
 </div>
 
@@ -53,53 +67,120 @@
 <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
+
             <div class="modal-header">
                 <h5 class="modal-title" id="eventModalTitle">Create Event</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
             </div>
+
             <div class="modal-body p-4">
+
                 <form id="eventForm">
+
                     <input type="hidden" id="eventId">
 
                     <div class="row g-3 mb-3">
                         <div class="col-12">
-                            <label class="form-label fw-bold small">Event Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="eventName" required>
+                            <label class="form-label fw-bold small">
+                                Event Name <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="eventName"
+                                   required>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-3">
+
                         <div class="col-md-6">
-                            <label class="form-label fw-bold small">Start Date <span class="text-danger">*</span></label>
-                            <input type="datetime-local" class="form-control" id="eventStartDate" required>
+                            <label class="form-label fw-bold small">
+                                Start Date <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="datetime-local"
+                                   class="form-control"
+                                   id="eventStartDate"
+                                   required>
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label fw-bold small">End Date <span class="text-danger">*</span></label>
-                            <input type="datetime-local" class="form-control" id="eventEndDate" required>
+                            <label class="form-label fw-bold small">
+                                End Date <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="datetime-local"
+                                   class="form-control"
+                                   id="eventEndDate"
+                                   required>
                         </div>
+
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
-                            <label for="EventClasses" class="form-label floating-label-custom">Classes</label>
-                            <select class="form-select" id="drpClassesManage" multiple required></select>
+
+                            <label for="EventClasses"
+                                   class="form-label floating-label-custom">
+                                Classes
+                            </label>
+
+                            <select class="form-select"
+                                    id="drpClassesManage"
+                                    multiple
+                                    required>
+                            </select>
+
                         </div>
                     </div>
 
                     <div class="row g-3">
                         <div class="col-12">
+
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="isActive" checked>
-                                <label class="form-check-label" for="isActive">Active</label>
+
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       role="switch"
+                                       id="isActive"
+                                       checked>
+
+                                <label class="form-check-label" for="isActive">
+                                    Active
+                                </label>
+
                             </div>
+
                         </div>
                     </div>
+
                 </form>
+
             </div>
+
             <div class="modal-footer bg-light border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary px-4" id="btnSaveEvent" onclick="saveEvent()">Save Event</button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary px-4"
+                        id="btnSaveEvent"
+                        onclick="saveEvent()">
+                    Save Event
+                </button>
+
             </div>
+
         </div>
     </div>
 </div>
@@ -107,184 +188,6 @@
 @section Scripts {
     <script>
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-        let allEvents = [];
-        let eventModal;
-        async function loadClasses(apiBaseUrl) {
-            try {
-                const classesDropdown = document.getElementById("drpClassesManage");
-                const request = `${apiBaseUrl}/Meeting/GetServantClasses`;
-                const classResponse = await fetch(request, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" }
-                });
-
-                if (!classResponse.ok) throw new Error("Failed to fetch classes.");
-                const classList = await classResponse.json();
-
-                // Populate the dropdown
-                classesDropdown.innerHTML = "";
-                classList.forEach(cls => {
-                    const option = document.createElement("option");
-                    option.value = cls.classID;
-                    option.textContent = cls.className;
-                    classesDropdown.appendChild(option);
-                });
-
-            } catch (err) {
-                console.error("Error loading classes:", err);
-            }
-
-        }
-
-        $(document).ready(async function() {
-            // Initialize Bootstrap Modal
-            eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-
-            // Initialize Select2 with Bootstrap 5 theme
-            $('#drpClassesManage').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Select one or more classes',
-                closeOnSelect: false,
-                dropdownParent: $('#eventModal') // Ensures search box works inside modal
-            });
-
-            // Date validation logic
-            $('#eventStartDate').on('change', function() {
-                const startVal = $(this).val();
-                if (startVal) {
-                    $('#eventEndDate').attr('min', startVal);
-                    if ($('#eventEndDate').val() < startVal) {
-                        $('#eventEndDate').val(startVal);
-                    }
-                }
-            });
-
-            await loadClasses(apiBaseUrl);
-            await loadEvents();
-        });
-
-        async function loadEvents() {
-            showLoading();
-            try {
-                const response = await fetch(`${apiBaseUrl}/Events/GetEvents`, {
-                    method: "GET",
-                    credentials: "include"
-                });
-                allEvents = await response.json();
-                filterEvents();
-            } catch (err) {
-                console.error("Load failed", err);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function filterEvents() {
-            const name = $('#filterEventName').val().toLowerCase();
-            const status = $('#filterStatus').val();
-
-            const filtered = allEvents.filter(e => {
-                const matchesName = e.eventName.toLowerCase().includes(name);
-                const matchesStatus = status === 'all' || e.isActive.toString() === status;
-                return matchesName && matchesStatus;
-            });
-
-            renderGrid(filtered);
-            $('#counter').text(`(${filtered.length})`);
-        }
-
-        function renderGrid(events) {
-            const grid = document.getElementById('events-grid');
-            grid.innerHTML = '';
-
-            if (events.length === 0) {
-                grid.innerHTML = '<div class="col-12 text-center py-5 text-muted">No events found.</div>';
-                return;
-            }
-
-            events.forEach(event => {
-                const col = document.createElement('div');
-                col.className = 'col-12 col-md-6 col-lg-4';
-                col.innerHTML = `
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="badge ${event.isActive ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} px-3">
-                                    ${event.isActive ? 'Active' : 'Inactive'}
-                                </span>
-                                <div class="dropdown">
-                                    <button class="btn btn-link btn-sm text-dark p-0" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                        <li><button class="dropdown-item" onclick="openEditModal(${event.eventID})"><i class="bi bi-pencil me-2"></i>Edit</button></li>
-                                        <li><button class="dropdown-item text-danger" onclick="deleteEvent(${JSON.stringify(event).replace(/"/g, '&quot;')})"><i class="bi bi-trash me-2"></i>Delete</button></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <h5 class="card-title fw-bold text-primary mb-3">${event.eventName}</h5>
-                            <div class="small text-muted mb-1">
-                                <i class="bi bi-calendar3 me-2"></i>${new Date(event.eventStartDate).toLocaleDateString()}
-                            </div>
-                            <div class="small text-muted">
-                                <i class="bi bi-clock me-2"></i>${new Date(event.eventStartDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </div>
-                        </div>
-                    </div>`;
-                grid.appendChild(col);
-            });
-        }
-
-        function openCreateModal() {
-            $('#eventForm')[0].reset();
-            $('#drpClassesManage').val(null).trigger('change'); // Reset Select2
-            $('#eventId').val('');
-            $('#eventModalTitle').text('Create Event');
-            eventModal.show();
-        }
-
-        async function saveEvent() {
-            const payload = {
-                event: {
-                    eventID: parseInt($('#eventId').val()) || 0,
-                    eventName: $('#eventName').val(),
-                    eventStartDate: $('#eventStartDate').val(),
-                    eventEndDate: $('#eventEndDate').val(),
-                    isActive: $('#isActive').is(':checked')
-                },
-                // Correctly fetch selected values from Select2
-                classes: $('#drpClassesManage').val() ? $('#drpClassesManage').val().map(id => parseInt(id)) : []
-            };
-
-            if (!payload.event.eventName || !payload.event.eventStartDate || payload.classes.length === 0) {
-                alert("Please fill in all required fields and select at least one class.");
-                return;
-            }
-
-            try {
-                const url = payload.event.eventID === 0 ? "/Events/CreateEvent" : "/Events/UpdateEvent";
-                const response = await fetch(`${apiBaseUrl}${url}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                    credentials: "include"
-                });
-
-                if (response.ok) {
-                    showSuccessToast("Event saved successfully");
-                    eventModal.hide();
-                    await loadEvents();
-                } else {
-                    throw new Error("Save failed");
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function deleteEvent(event) {
-            showDeleteModal('Delete Event', `Are you sure you want to delete "${event.eventName}"?`, event.eventID);
-        }
     </script>
+    <script src="~/js/events/event-manage.js" asp-append-version="true"></script>
 }

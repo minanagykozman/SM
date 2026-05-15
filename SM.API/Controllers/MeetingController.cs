@@ -20,7 +20,7 @@ namespace SM.API.Controllers
         [Authorize(Policy = "Class.View")]
 
         [HttpGet("GetServantClasses")]
-        public ActionResult<List<Class>> GetServantClasses()
+        public ActionResult<List<Class>> GetServantClasses(bool? isActive)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace SM.API.Controllers
                 {
                     List<Class> classes = new List<Class>();
                     if (User.IsInRole("SuperAdmin"))
-                        classes = classHandler.GetAllClasses();
+                        classes = classHandler.GetAllClasses(isActive, User.Identity.Name);
                     else
                         classes = classHandler.GetServantClasses(User.Identity.Name);
                     return Ok(classes);

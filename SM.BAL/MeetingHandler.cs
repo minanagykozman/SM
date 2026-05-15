@@ -14,9 +14,13 @@ namespace SM.BAL
             var servant = GetServantByUsername(username);
             return _dbcontext.Classes.Where(c => c.ServantClasses.Any(s => s.ServantID == servant.ServantID) && c.IsActive).ToList();
         }
-        public List<Class> GetAllClasses()
+        public List<Class> GetAllClasses(bool? isActive, string username)
         {
-            return _dbcontext.Classes.ToList();
+            var servant = GetServantByUsername(username);
+            if (isActive.HasValue)
+                return _dbcontext.Classes.Where(c => c.IsActive == isActive.Value && c.ChurchID == servant.ChurchID).ToList();
+            else
+                return _dbcontext.Classes.Where(c => c.ChurchID == servant.ChurchID).ToList();
         }
         public List<ClassOccurrence> GetClassOccurences(int classID)
         {
@@ -57,7 +61,7 @@ namespace SM.BAL
         }
 
 
-        
+
         public Class CreateClass(string username, string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
         {
             var servant = GetServantByUsername(username);
