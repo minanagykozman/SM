@@ -14,8 +14,8 @@ namespace SM.DAL.DataModel.APIModels
         public bool? IsBaptised { get; set; }
         public string? CardStatus { get; set; }
         public List<int>? ClassIDs { get; set; }
-        public DateTime? BirthdateStart { get; set; }
-        public DateTime? BirthdateEnd { get; set; }
+        public DateOnly? BirthdateStart { get; set; }
+        public DateOnly? BirthdateEnd { get; set; }
         public bool IsNotInAnyClass { get; set; }
         public bool ClassOperatorIsOr { get; set; }
     }

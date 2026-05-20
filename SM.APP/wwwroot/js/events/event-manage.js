@@ -113,53 +113,84 @@ function renderGrid(events) {
 
         col.className = 'col-12 col-md-6 col-lg-4';
 
-        col.innerHTML = `
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="badge ${event.isActive
-                ? 'bg-success-subtle text-success border border-success-subtle'
-                : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} px-3">
-                                    ${event.isActive ? 'Active' : 'Inactive'}
-                                </span>
-                                <div class="dropdown">
-                                    <button class="btn btn-link btn-sm text-dark p-0"
-                                            data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                        <li>
-                                            <button class="dropdown-item"
-                                                    onclick="openEditModal(${event.eventID})">
-                                                <i class="bi bi-pencil me-2"></i>Edit
+        col.innerHTML = `<div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+
+                                <!-- Header Row -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                    <!-- Event Name -->
+                                    <h5 class="card-title fw-bold text-primary mb-0">
+                                        ${event.eventName}
+                                    </h5>
+
+                                    <!-- Right Side -->
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <!-- Status Badge -->
+                                        <span class="badge ${event.isActive
+                                        ? 'bg-success-subtle text-success border border-success-subtle'
+                                        : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} px-3">
+
+                                            ${event.isActive ? 'Active' : 'Inactive'}
+
+                                        </span>
+
+                                        <!-- Dropdown -->
+                                        <div class="dropdown">
+
+                                            <button class="btn btn-link btn-sm text-dark p-0"
+                                                    data-bs-toggle="dropdown">
+
+                                                <i class="bi bi-three-dots-vertical"></i>
+
                                             </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item text-danger"
-                                                    onclick='deleteEvent(${JSON.stringify(event)})'>
-                                                <i class="bi bi-trash me-2"></i>Delete
-                                            </button>
-                                        </li>
-                                    </ul>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                                                <li>
+                                                    <button class="dropdown-item"
+                                                            onclick="openEditModal(${event.eventID})">
+
+                                                        <i class="bi bi-pencil me-2"></i>Edit
+
+                                                    </button>
+                                                </li>
+
+                                                <li>
+                                                    <button class="dropdown-item text-danger"
+                                                            onclick='deleteEvent(${JSON.stringify(event)})'>
+
+                                                        <i class="bi bi-trash me-2"></i>Delete
+
+                                                    </button>
+                                                </li>
+
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
+
+                                <!-- Date -->
+                                <div class="small text-muted mb-1">
+                                    <i class="bi bi-calendar3 me-2"></i>
+                                    ${formatDate(event.eventStartDate)}
+                                </div>
+
+                                <!-- Time -->
+                                <div class="small text-muted">
+                                    <i class="bi bi-clock me-2"></i>
+                                    ${new Date(event.eventStartDate).toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                </div>
+
                             </div>
-                            <h5 class="card-title fw-bold text-primary mb-3">
-                                ${event.eventName}
-                            </h5>
-                            <div class="small text-muted mb-1">
-                                <i class="bi bi-calendar3 me-2"></i>
-                                ${formatDate(event.eventStartDate)}
-                            </div>
-                            <div class="small text-muted">
-                                <i class="bi bi-clock me-2"></i>
-                                ${new Date(event.eventStartDate).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        </div>`;
         grid.appendChild(col);
     });
 }

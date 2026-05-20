@@ -483,7 +483,7 @@ namespace SM.API.Controllers
             public string UNPersonalNumber { get; set; }
             public string? Mobile { get; set; }
             public bool Baptised { get; set; }
-            public DateTime Birthdate { get; set; }
+            public DateOnly Birthdate { get; set; }
             public char Gender { get; set; }
             public string? School { get; set; }
             public string? Work { get; set; }

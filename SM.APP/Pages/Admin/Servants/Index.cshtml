@@ -1,113 +1,149 @@
 ﻿@page
 @model SM.APP.Pages.Admin.Servants.IndexModel
 @{
-    ViewData["Title"] = "Servants";
+    ViewData["Title"] = "Servants Management";
 }
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-4" id="main-container">
+    <partial name="_SuccessToastPartial" />
+    <partial name="_LoadingPartial" />
+    <partial name="_DeleteModalPartial" />
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <h4 class="mb-0">
-            Servants <span id="servant-counter" class="text-muted fs-6 fw-normal"></span>
+            Servants Management
+            <span id="servant-counter" class="text-muted fw-normal"></span>
         </h4>
-        <a asp-page="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-2"></i>Create New Servant
-        </a>
+        <button class="btn btn-success" onclick="openCreateModal()">
+            <i class="bi bi-plus-circle me-1"></i>
+            Create Servant
+        </button>
     </div>
-
-    <div id="servant-grid" class="row g-4">
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <i class="bi bi-funnel me-1"></i>
+            Filters
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small">
+                        Servant Name
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text"
+                               class="form-control border-start-0"
+                               id="filterServantName"
+                               placeholder="Search servant..."
+                               onkeyup="filterServants()">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">
+                        Status
+                    </label>
+                    <select class="form-select"
+                            id="filterStatus"
+                            onchange="filterServants()">
+                        <option value="all">All</option>
+                        <option value="true" selected>Active Only</option>
+                        <option value="false">Inactive Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Grid -->
+    <div class="row g-4" id="servant-grid"></div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="servantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="servantModalTitle">
+                    Create Servant
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="servantForm">
+                    <input type="hidden" id="ServantID" name="ServantID" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Servant Name
+                            </label>
+                            <input class="form-control" id="ServantName" name="ServantName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Email
+                            </label>
+                            <input type="email" class="form-control" id="Email" name="Email" required />
+                        </div>
+                        <div class="col-md-6 password-field">
+                            <label class="form-label fw-bold small">
+                                Password
+                            </label>
+                            <input type="password" class="form-control" id="Password" name="Password" />
+                        </div>
+                        <div class="col-md-6 password-field">
+                            <label class="form-label fw-bold small">
+                                Confirm Password
+                            </label>
+                            <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Mobile
+                            </label>
+                            <input class="form-control" id="Mobile" name="Mobile" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Mobile 2</label>
+                            <input class="form-control" id="Mobile2" name="Mobile2" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Classes</label>
+                            <select class="form-select" id="drpServantClasses" name="drpServantClasses" multiple></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Roles</label>
+                            <select class="form-select" id="drpRoles" name="drpRoles" multiple></select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                                <label class="form-check-label">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary px-4"
+                                id="btnSaveServant">
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-
 @section Scripts {
     <script>
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
-
-        // Placeholder function for deleting a servant
-        function deleteServant(servantId, servantName) {
-            console.log(`Delete action for ID: ${servantId}, Name: ${servantName}`);
-            alert(`Delete functionality for ${servantName} (ID: ${servantId}) is not yet implemented.`);
-        }
-
-        // Function to fetch and populate the servant grid
-        async function loadServants() {
-            const servantGrid = document.getElementById("servant-grid");
-            const counterElement = document.getElementById("servant-counter");
-
-            // Show a loading spinner
-            servantGrid.innerHTML = `<div class="d-flex justify-content-center p-5 w-100"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
-
-            try {
-                const request = `${apiBaseUrl}/Servants/get-servants`;
-                const response = await fetch(request, {
-                    method: "GET",
-                    credentials: "include"
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch servants.");
-                }
-
-                const servants = await response.json();
-                servantGrid.innerHTML = ''; // Clear the loading spinner
-
-                // Update the counter
-                counterElement.textContent = `(${servants.length} Servants)`;
-
-                // Handle the case where no servants are found
-                if (servants.length === 0) {
-                    servantGrid.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">No servants have been created yet.</div></div>';
-                    return;
-                }
-
-                // Populate the grid with servant cards
-                servants.forEach(servant => {
-                    const servantCardCol = document.createElement("div");
-                    servantCardCol.className = "col-xl-4 col-lg-6 col-md-6 col-sm-12";
-
-                    const statusBadge = servant.isActive
-                        ? `<span class="badge bg-success">Active</span>`
-                        : `<span class="badge bg-danger">Inactive</span>`;
-
-                    servantCardCol.innerHTML = `
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="card-title mb-2">${servant.servantName}</h5>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="/Admin/Servants/Edit/${servant.servantID}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                            <li><a class="dropdown-item text-danger" href="#" onclick="deleteServant(${servant.servantID}, '${servant.name}')"><i class="bi bi-trash-fill me-2"></i>Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="mb-3">${statusBadge}</div>
-
-                                <p class="card-text mb-2">
-                                    <i class="bi bi-envelope-fill me-2 text-muted"></i>
-                                    <span>${servant.email}</span>
-                                </p>
-                                <p class="card-text mb-0">
-                                    <i class="bi bi-telephone-fill me-2 text-muted"></i>
-                                    <a href="tel:${servant.mobile1}" class="text-decoration-none text-dark">${servant.mobile1}</a>
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                    servantGrid.appendChild(servantCardCol);
-                });
-
-            } catch (err) {
-                console.error("Error loading servants:", err);
-                servantGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Error: Could not load servant data.</div></div>`;
-            }
-        }
-
-        // Load the servants when the page is ready
-        $(function () {
-            loadServants();
-        });
     </script>
+    <script src="~/js/servants/servants-manage.js" asp-append-version="true"></script>
 }

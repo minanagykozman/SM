@@ -441,7 +441,6 @@ async function loadClassesDropDown(apiBaseUrl,controlName,parentControl,isActive
         if (parentControl) {
             // Initialize Select2 with Bootstrap 5 theme
             $('#'+controlName).select2({
-                theme: 'bootstrap-5',
                 placeholder: 'Select one or more classes',
                 allowClear: true,
                 width: '100%',

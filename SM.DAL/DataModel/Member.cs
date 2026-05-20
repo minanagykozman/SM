@@ -37,7 +37,7 @@ namespace SM.DAL.DataModel
         public string? Mobile { get; set; }
         public bool Baptised { get; set; }
         [DataType(DataType.Date)]
-        public DateTime Birthdate { get; set; }
+        public DateOnly Birthdate { get; set; }
         public char Gender { get; set; }
         public string? School { get; set; }
         public string? Work { get; set; }
@@ -67,7 +67,8 @@ namespace SM.DAL.DataModel
         {
             get
             {
-                DateTime today = DateTime.Today; // Current date
+                //DateTime today = DateTime.Today; // Current date
+                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
                 int age = today.Year - Birthdate.Year;
 
                 // Adjust age if the birthdate hasn't occurred yet this year

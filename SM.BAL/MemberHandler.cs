@@ -55,7 +55,7 @@ namespace SM.BAL
             string unPersonalNumber,
             string? mobile,
             bool baptised,
-            DateTime birthdate,
+            DateOnly birthdate,
             char gender,
             string? school,
             string? work,
@@ -386,7 +386,7 @@ namespace SM.BAL
             string unPersonalNumber,
             string? mobile,
             bool baptised,
-            DateTime birthdate,
+            DateOnly birthdate,
             char gender,
             string? school,
             string? work,
@@ -500,7 +500,7 @@ namespace SM.BAL
 
         }
 
-        public string GenerateCode(char gender, DateTime birthdate, out int sequence)
+        public string GenerateCode(char gender, DateOnly birthdate, out int sequence)
         {
             int seq = _dbcontext.Members.Select(m => m.Sequence).Max() + 1;
             sequence = seq;

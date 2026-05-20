@@ -148,7 +148,7 @@
                 await loadClasses(apiBaseUrl);
                 await loadRoles();
                 hideLoading();
-                // --- CUSTOM VALIDATION METHOD (Corrected for Razor View Engine) ---
+        // --- CUSTOM VALIDATION METHOD (Corrected for Razor View Engine) ---
         $.validator.addMethod("passwordComplexity", function(value, element) {
             // The '$' is escaped with a '\' as a precaution. This should now be completely safe.
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@\$!%*?&])[A-Za-z\d@@\$!%*?&]{8,}$/;

@@ -408,8 +408,8 @@ namespace SM.API.Controllers
         {
             public int? ClassID { get; set; }
             public string ClassName { get; set; }
-            public DateTime? AgeStartDate { get; set; }
-            public DateTime? AgeEndDate { get; set; }
+            public DateOnly? AgeStartDate { get; set; }
+            public DateOnly? AgeEndDate { get; set; }
             public char Gender { get; set; }
             public DateTime? ClassStartDate { get; set; }
             public DateTime? ClassEndDate { get; set; }

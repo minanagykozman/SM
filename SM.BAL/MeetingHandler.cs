@@ -62,7 +62,7 @@ namespace SM.BAL
 
 
 
-        public Class CreateClass(string username, string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
+        public Class CreateClass(string username, string className, DateOnly? ageStartDate, DateOnly? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year)
         {
             var servant = GetServantByUsername(username);
 
@@ -87,7 +87,7 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return newClass;
         }
-        public Class EditClass(string username, int classID, string className, DateTime? ageStartDate, DateTime? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year, bool isActive)
+        public Class EditClass(string username, int classID, string className, DateOnly? ageStartDate, DateOnly? ageEndDate, char gender, DateTime? classStartDate, DateTime? classEndDate, string classDay, string classStartTime, string classEndTime, string classFrequency, string? notes, int year, bool isActive)
         {
             var servant = GetServantByUsername(username);
 

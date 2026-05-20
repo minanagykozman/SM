@@ -8,8 +8,8 @@ namespace SM.DAL.DataModel
         public int ClassID { get; set; }
         [MaxLength(50)]
         public string ClassName { get; set; } = string.Empty;
-        public DateTime? AgeStartDate { get; set; }
-        public DateTime? AgeEndDate { get; set; }
+        public DateOnly? AgeStartDate { get; set; }
+        public DateOnly? AgeEndDate { get; set; }
         public char Gender { get; set; } = 'A';
         public DateTime? ClassStartDate { get; set; }
         public DateTime? ClassEndDate { get; set; }
