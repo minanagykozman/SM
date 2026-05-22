@@ -14,7 +14,10 @@ namespace SM.BAL
         }
         public void UpdateMemberStatus()
         {
-            var activeMembers = _dbcontext.ClassAttendances.Select(c => c.Member).Distinct().ToList();
+            _dbcontext.Members.ExecuteUpdate(m => m.SetProperty(u => u.IsActive, false));
+            DateTime compareDate = DateTime.Now.AddMonths(-6);
+            var classes = _dbcontext.ClassOccurrences.Where(cl => cl.ClassOccurrenceStartDate >= compareDate).Select(c => c.ClassOccurrenceID).ToList();
+            var activeMembers = _dbcontext.ClassAttendances.Where(c => classes.Contains(c.ClassOccurrenceID)).Select(c => c.Member);
             foreach (var member in activeMembers)
             {
                 member.IsActive = true;
@@ -518,7 +521,7 @@ namespace SM.BAL
             if (member == null)
             {
                 status.Status = UNStatus.New;
-                
+
             }
             else
             {
