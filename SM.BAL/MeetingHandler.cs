@@ -332,6 +332,24 @@ namespace SM.BAL
             }
             return counter.ToString();
         }
+        public string AutoRemoveClassMembers(int classID)
+        {
+            Class cl = _dbcontext.Classes.FirstOrDefault(c => c.ClassID == classID);
+            if (cl == null)
+                throw new Exception("Class not found");
+
+            var toRemove = _dbcontext.ClassMembers.Include(cm => cm.Member).Where(cm => cm.ClassID == classID
+            && (cm.Member.Birthdate > cl.AgeEndDate || cm.Member.Birthdate < cl.AgeStartDate)).ToList();
+            int counter = 0;
+            if (toRemove != null)
+            {
+                counter = toRemove.Count;
+
+                _dbcontext.ClassMembers.RemoveRange(toRemove);
+                _dbcontext.SaveChanges();
+            }
+            return counter.ToString();
+        }
 
         public MeetingDataDto GetMeetingData(int classOccurenceID)
         {

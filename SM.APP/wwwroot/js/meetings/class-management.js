@@ -39,6 +39,7 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="openEditModal(${c.classID})"><i class="bi bi-pencil me-2"></i>Edit Class</a></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAutoAssignModal(${c.classID})"><i class="bi bi-people-fill me-2"></i>Auto Assign Members</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAutoRemoveModal(${c.classID})"><i class="bi bi-people-fill me-2"></i>Auto Remove Members</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-primary" href="javascript:void(0)" onclick="openCreateMeetingsModal(${c.classID})"><i class="bi bi-calendar-plus me-2"></i>Create Meetings</a></li>
                         </ul>
@@ -201,6 +202,11 @@ function openAutoAssignModal(classID) {
     const modal = new bootstrap.Modal(document.getElementById('autoAssignModal'));
     modal.show();
 }
+function openAutoRemoveModal(classID) {
+    document.getElementById('autoRemoveClassId').value = classID;
+    const modal = new bootstrap.Modal(document.getElementById('autoRemoveModal'));
+    modal.show();
+}
 function openCreateMeetingsModal(classID) {
     document.getElementById('createMeetingsClassId').value = classID;
     const modal = new bootstrap.Modal(document.getElementById('createMeetingsModal'));
@@ -230,6 +236,38 @@ async function confirmAutoAssign() {
         } else {
             const err = await response.text();
             showFailedToast(`Failed to assign members: ${err}`);
+        }
+    } catch (e) {
+        console.error(e);
+        showFailedToast("An error occurred during auto-assignment.");
+    } finally {
+        if (typeof hideLoading === 'function') hideLoading();
+    }
+}
+
+async function confirmAutoRemove() {
+    const classID = parseInt(document.getElementById('autoRemoveClassId').value);
+    const url = `${apiBaseUrl}/Meeting/auto-remove-class-members`;
+
+    try {
+        if (typeof showLoading === 'function') showLoading();
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            // .NET [FromBody] int classID expects just the raw integer stringified
+            body: JSON.stringify(classID)
+        });
+
+        const modalEl = document.getElementById('autoRemoveModal');
+        bootstrap.Modal.getInstance(modalEl).hide();
+
+        if (response.ok) {
+            showSuccessToast("Members successfully removed based on birthdate rules.");
+        } else {
+            const err = await response.text();
+            showFailedToast(`Failed to remove members: ${err}`);
         }
     } catch (e) {
         console.error(e);

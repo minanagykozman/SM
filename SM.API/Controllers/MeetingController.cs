@@ -198,6 +198,25 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
+        
+        [Authorize(Policy = "Class.Manage")]
+        [HttpPost("auto-remove-class-members")]
+        public ActionResult<string> AutoRemoveClassMembers([FromBody] int classID)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    var cl = meetingHandler.AutoRemoveClassMembers(classID);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
         [Authorize(Policy = "Class.Manage")]
         [HttpPost("create-class-occurences")]
         public ActionResult<string> CreateClassOccurences([FromBody] int classID)
