@@ -511,7 +511,7 @@ namespace SM.BAL
         }
         public bool ValidateUNNumber(string unPersonalNo, int memberID, string username)
         {
-            return _dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower() && m.MemberID == memberID);
+            return !_dbcontext.Members.Any(m => m.UNPersonalNumber.ToLower() == unPersonalNo.ToLower() && m.MemberID != memberID);
         }
         public UNNumberStatus ValidateUNNumber(string unPersonalNo, string username)
         {
