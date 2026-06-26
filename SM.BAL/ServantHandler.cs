@@ -58,7 +58,7 @@ namespace SM.BAL
             return servant;
         }
 
-        public Servant UpdateServant(int servantID, string name, string mobile1, string mobile2, List<int> classes, List<string> roles)
+        public Servant UpdateServant(int servantID, string name, string mobile1, string mobile2, bool isActive, List<int> classes, List<string> roles)
         {
             Servant servant = _dbcontext.Servants.Where(s => s.ServantID == servantID).FirstOrDefault();
             if (servant == null)
@@ -68,7 +68,7 @@ namespace SM.BAL
             servant.ServantName = name;
             servant.Mobile1 = mobile1;
             servant.Mobile2 = mobile2;
-
+            servant.IsActive = isActive;
             var oldClasses = _dbcontext.ServantClasses.Where(cm => cm.ServantID == servantID).ToList();
             var oldIds = new List<int>(oldClasses.Select(m => m.ClassID));
             if (classes == null)

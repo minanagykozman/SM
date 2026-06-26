@@ -136,7 +136,7 @@ namespace SM.API.Controllers
             {
                 using (ServantHandler handler = new ServantHandler())
                 {
-                    var servant = handler.UpdateServant(model.ServantID, model.Name, model.Mobile, model.Mobile2, model.Classes, model.Roles);
+                    var servant = handler.UpdateServant(model.ServantID, model.Name, model.Mobile, model.Mobile2,model.IsActive, model.Classes, model.Roles);
                     return Ok(servant);
                 }
             }
@@ -172,6 +172,7 @@ namespace SM.API.Controllers
             public string Name { get; set; }
             public string Mobile { get; set; }
             public string Mobile2 { get; set; }
+            public bool IsActive{ get; set; }
             public List<int> Classes { get; set; }
         }
     }

@@ -74,7 +74,6 @@
             </div>
             <div class="modal-body p-4">
                 <form id="servantForm">
-                    <input type="hidden" id="ServantID" name="ServantID" />
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold small">
@@ -133,7 +132,7 @@
                         </button>
                         <button type="submit"
                                 class="btn btn-primary px-4"
-                                id="btnSaveServant">
+                                id="btnSaveServant">Create
                         </button>
                     </div>
                 </form>
@@ -141,6 +140,80 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="servantEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="servantModalTitle">
+                    Edit Servant
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="servantEditForm">
+                    <input type="hidden" id="ServantID" name="ServantID" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Servant Name
+                            </label>
+                            <input class="form-control" id="EditServantName" name="EditServantName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Email
+                            </label>
+                            <input type="email" class="form-control" id="EditEmail" name="EditEmail" required disabled />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">
+                                Mobile
+                            </label>
+                            <input class="form-control" id="EditMobile" name="EditMobile" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Mobile 2</label>
+                            <input class="form-control" id="EditMobile2" name="EditMobile2" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Classes</label>
+                            <select class="form-select" id="drpEditServantClasses" name="drpEditServantClasses" multiple></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Roles</label>
+                            <select class="form-select" id="drpEditRoles" name="drpEditRoles" multiple></select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="EditIsActive" name="EditIsActive" checked>
+                                <label class="form-check-label">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary px-4"
+                                id="btnEditServant">Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @section Scripts {
     <script>
         const apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';
