@@ -278,7 +278,7 @@
                     UNPersonalNumber: {
                         required: true,
                         remote: {
-                            url: `${apiBaseUrl}/Member/ValidateUNNumber`,
+                            url: `${apiBaseUrl}/Member/validate-existing-member-UN`,
                             type: "get",
                             data: {
                                 unFileNumber: function() { return $("#UNPersonalNumber").val(); },
