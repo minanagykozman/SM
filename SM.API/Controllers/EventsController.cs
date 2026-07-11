@@ -381,7 +381,7 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.Attendance")]
         [HttpPost("TakeAttendance")]
-        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID,string busName)
+        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID,string? busName)
         {
             try
             {

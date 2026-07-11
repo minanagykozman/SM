@@ -21,6 +21,7 @@ myPaymentModal.addEventListener('shown.bs.modal', function () {
 });
 // Function to fetch attended members
 async function fetchEventMembers() {
+    
     const url = `${apiBaseUrl}/Events/GetEventRegisteredMembers`;
     const eventID = document.querySelector('input[name="eventID"]').value;
     if (!eventID) {
