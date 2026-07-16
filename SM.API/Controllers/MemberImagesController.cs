@@ -42,6 +42,263 @@ namespace SM.API.Controllers
             _dubaiFamily = _fontCollection.Add(Path.Combine(fontPath, "DUBAI-REGULAR.TTF"));
             _bahnschriftFamily = _fontCollection.Add(Path.Combine(fontPath, "bahnschrift.ttf"));
         }
+        [HttpPost("generate-cards-pdf")]
+        public async Task<IActionResult> GenerateMemberCardsPdf([FromBody] GenerateCardsRequest request)
+        {
+            if (request.MemberIDs == null || !request.MemberIDs.Any())
+            {
+                return BadRequest("Member ID list cannot be empty.");
+            }
+
+            List<Member> members;
+            using (MemberHandler handler = new MemberHandler())
+            {
+                members = handler.GetMembersCardData(request.MemberIDs);
+            }
+
+            if (members == null || !members.Any())
+            {
+                return NotFound("No data found for the provided member IDs.");
+            }
+
+            // --- Step 2: Setup Temporary Directory for Processing ---
+            string tempDirectory = Path.Combine(Path.GetTempPath(), $"CardGen_{Guid.NewGuid()}");
+            Directory.CreateDirectory(tempDirectory);
+
+            string pdfFilePath = string.Empty;
+
+            try
+            {
+                string baseURL = "";
+                switch (request.CardType)
+                {
+                    case "Trip":
+                        baseURL = SMConfigurationManager.TripImageURL;
+                        break;
+                    case "Standard":
+                        baseURL = SMConfigurationManager.BaseImageURL;
+                        break;
+                }
+
+                // Download the base card image ONCE.
+                using (SixLabors.ImageSharp.Image baseCardTemplate = await DownloadImageAsync(baseURL))
+                {
+                    if (baseCardTemplate == null)
+                    {
+                        return StatusCode(500, "Failed to download the base card template from S3.");
+                    }
+
+                    // Generate all images into the temp directory
+                    foreach (var member in members)
+                    {
+                        await GenerateCard(member, baseCardTemplate, tempDirectory);
+                    }
+                }
+
+                // --- Step 4: Generate the PDF ---
+                pdfFilePath = Path.Combine(Path.GetTempPath(), $"Generated_IDs_{Guid.NewGuid()}.pdf");
+
+                // Use iText7 to create the PDF document
+                using (var writer = new iText.Kernel.Pdf.PdfWriter(pdfFilePath))
+                using (var pdf = new iText.Kernel.Pdf.PdfDocument(writer))
+                using (var document = new iText.Layout.Document(pdf))
+                {
+                    // Remove margins so images sit flush against the page edges
+                    document.SetMargins(0, 0, 0, 0);
+
+                    string[] generatedImages = Directory.GetFiles(tempDirectory, "*.jpg");
+
+                    foreach (string imagePath in generatedImages)
+                    {
+                        var imageData = iText.IO.Image.ImageDataFactory.Create(imagePath);
+                        var pdfImage = new iText.Layout.Element.Image(imageData);
+
+                        // Dynamically set the page size to match the exact dimensions of the image
+                        var pageSize = new iText.Kernel.Geom.PageSize(imageData.GetWidth(), imageData.GetHeight());
+                        pdf.AddNewPage(pageSize);
+
+                        // Place the image on the most recently added page
+                        pdfImage.SetFixedPosition(pdf.GetNumberOfPages(), 0, 0);
+                        document.Add(pdfImage);
+                    }
+                }
+
+                // --- Step 5: Read PDF File into Memory and Return ---
+                var memoryStream = new MemoryStream();
+                using (var stream = new FileStream(pdfFilePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memoryStream);
+                }
+                memoryStream.Position = 0; // Reset stream position for reading
+
+                return File(memoryStream, "application/pdf", "MemberCards.pdf");
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+            finally
+            {
+                // --- Step 6: Cleanup ---
+                if (Directory.Exists(tempDirectory))
+                {
+                    Directory.Delete(tempDirectory, true);
+                }
+
+                if (System.IO.File.Exists(pdfFilePath))
+                {
+                    System.IO.File.Delete(pdfFilePath);
+                }
+            }
+        }
+        [HttpPost("generate-cards-print")]
+        public async Task<IActionResult> GenerateMemberCardsA4([FromBody] GenerateCardsRequest request)
+        {
+            if (request.MemberIDs == null || !request.MemberIDs.Any())
+            {
+                return BadRequest("Member ID list cannot be empty.");
+            }
+
+            List<Member> members;
+            using (MemberHandler handler = new MemberHandler())
+            {
+                members = handler.GetMembersCardData(request.MemberIDs);
+            }
+
+            if (members == null || !members.Any())
+            {
+                return NotFound("No data found for the provided member IDs.");
+            }
+
+            // --- Step 2: Setup Temporary Directory for Processing ---
+            string tempDirectory = Path.Combine(Path.GetTempPath(), $"CardGen_{Guid.NewGuid()}");
+            Directory.CreateDirectory(tempDirectory);
+
+            string pdfFilePath = string.Empty;
+
+            try
+            {
+                string baseURL = "";
+                switch (request.CardType)
+                {
+                    case "Trip":
+                        baseURL = SMConfigurationManager.TripImageURL;
+                        break;
+                    case "Standard":
+                        baseURL = SMConfigurationManager.BaseImageURL;
+                        break;
+                }
+
+                // Download the base card image ONCE.
+                using (SixLabors.ImageSharp.Image baseCardTemplate = await DownloadImageAsync(baseURL))
+                {
+                    if (baseCardTemplate == null)
+                    {
+                        return StatusCode(500, "Failed to download the base card template from S3.");
+                    }
+
+                    // Generate all images into the temp directory
+                    foreach (var member in members)
+                    {
+                        await GenerateCard(member, baseCardTemplate, tempDirectory);
+                    }
+                }
+
+                // --- Step 4: Generate the A4 Print-Ready PDF ---
+                pdfFilePath = Path.Combine(Path.GetTempPath(), $"A4_Print_{Guid.NewGuid()}.pdf");
+
+                // Use iText7 to create the PDF document
+                using (var writer = new iText.Kernel.Pdf.PdfWriter(pdfFilePath))
+                using (var pdf = new iText.Kernel.Pdf.PdfDocument(writer))
+                using (var document = new iText.Layout.Document(pdf, iText.Kernel.Geom.PageSize.A4))
+                {
+                    // Remove margins to handle precise grid positioning manually
+                    document.SetMargins(0, 0, 0, 0);
+
+                    string[] generatedImages = Directory.GetFiles(tempDirectory, "*.jpg");
+
+                    if (generatedImages.Length > 0)
+                    {
+                        // Calculate dimensions based on the first image's aspect ratio
+                        var sampleImageData = iText.IO.Image.ImageDataFactory.Create(generatedImages[0]);
+                        float imgWidth = sampleImageData.GetWidth();
+                        float imgHeight = sampleImageData.GetHeight();
+
+                        // A4 size in points (72 DPI): 595 x 842
+                        float a4Width = 595f;
+                        float a4Height = 842f;
+
+                        // Set a base margin for top and bottom (e.g., 20 points)
+                        float marginY = 20f;
+                        float availableHeight = a4Height - (2 * marginY);
+
+                        // Card height to fit exactly 3 rows
+                        float cardHeight = availableHeight / 3f;
+
+                        // Maintain aspect ratio for width based on the height
+                        float cardWidth = cardHeight * (imgWidth / imgHeight);
+
+                        // Calculate symmetric left and right margins based on remaining space
+                        float totalGridWidth = cardWidth * 3f;
+                        float marginX = (a4Width - totalGridWidth) / 2f;
+
+                        int cardsOnCurrentPage = 0;
+
+                        foreach (string imagePath in generatedImages)
+                        {
+                            // Add a new A4 page if the current one is full (9 cards), OR if it's the very first card
+                            if (cardsOnCurrentPage % 9 == 0)
+                            {
+                                pdf.AddNewPage(iText.Kernel.Geom.PageSize.A4);
+                            }
+
+                            // Determine row (0, 1, or 2) and col (0, 1, or 2) on the current page
+                            int indexOnPage = cardsOnCurrentPage % 9;
+                            int row = indexOnPage / 3;
+                            int col = indexOnPage % 3;
+
+                            // Calculate X and Y coordinates (Note: iText7 Y-axis starts from the BOTTOM of the page)
+                            float xPos = marginX + (col * cardWidth);
+                            float yPos = a4Height - marginY - ((row + 1) * cardHeight);
+
+                            var imageData = iText.IO.Image.ImageDataFactory.Create(imagePath);
+                            var pdfImage = new iText.Layout.Element.Image(imageData)
+                                .ScaleAbsolute(cardWidth, cardHeight)
+                                .SetFixedPosition(pdf.GetNumberOfPages(), xPos, yPos); // Will now safely return 1, 2, etc.
+
+                            document.Add(pdfImage);
+                            cardsOnCurrentPage++;
+                        }
+                    }
+                }
+
+                // --- Step 5: Read PDF File into Memory and Return ---
+                var memoryStream = new MemoryStream();
+                using (var stream = new FileStream(pdfFilePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memoryStream);
+                }
+                memoryStream.Position = 0;
+
+                return File(memoryStream, "application/pdf", "MemberCards_A4_Print.pdf");
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+            finally
+            {
+                // --- Step 6: Cleanup ---
+                if (Directory.Exists(tempDirectory))
+                {
+                    Directory.Delete(tempDirectory, true);
+                }
+                if (System.IO.File.Exists(pdfFilePath))
+                {
+                    System.IO.File.Delete(pdfFilePath);
+                }
+            }
+        }
         [HttpPost("generate-cards")]
         public async Task<IActionResult> GenerateMemberCards([FromBody] GenerateCardsRequest request)
         {

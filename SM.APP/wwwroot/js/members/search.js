@@ -185,6 +185,12 @@ function setupEventListeners() {
             case 'print-card':
                 bulkPrintCards(memberIds,"Standard");
                 break;
+            case 'print-card-pdf':
+                bulkPrintCardsPDF(memberIds, "Standard");
+                break;
+            case 'print-card-print':
+                bulkPrintCardsPrint(memberIds, "Standard");
+                break;
             case 'update-baptism':
                 bulkUpdateBaptism(memberIds);
                 break;
