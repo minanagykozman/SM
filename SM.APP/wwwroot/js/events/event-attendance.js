@@ -172,6 +172,7 @@ function populateModal(data) {
             document.getElementById("Mobile").value = data.member.mobile;
             document.getElementById("Team").value = data.member.team;
             document.getElementById("Bus").value = data.member.bus;
+            document.getElementById("Notes").value = data.member.registrationNotes;
             document.querySelector('input[name="MemberCode"]').value = data.member.code;
             $("#divTeam").show();
             $("#divBus").show();

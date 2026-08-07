@@ -21,7 +21,7 @@ myPaymentModal.addEventListener('shown.bs.modal', function () {
 });
 // Function to fetch attended members
 async function fetchEventMembers() {
-    
+
     const url = `${apiBaseUrl}/Events/GetEventRegisteredMembers`;
     const eventID = document.querySelector('input[name="eventID"]').value;
     if (!eventID) {
@@ -93,6 +93,7 @@ function populateTable(members) {
                             <div class="card-text">
                                 <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || '-'}</small></p>
                                 <p class="mb-1"><small class="text-muted"><strong>Paid:</strong> ${member.paid || '-'}</small></p>
+                                <p class="mb-1"><small class="text-muted"><strong>Notes:</strong> ${member.registrationNotes || '-'}</small></p>
                              </div>
                         </div>
                     </div>
@@ -231,6 +232,8 @@ async function populateModal(data) {
             $("#divStatusAlert").show();
             document.getElementById("MemberCode").value = data.member.code;
             document.getElementById("MemberName").value = data.member.fullName;
+            document.getElementById("Mobile").value = data.member.mobile;
+            document.getElementById("Notes").value = '';
             document.querySelector('input[name="MemberCode"]').value = data.member.code;
             document.getElementById("Paid").value = 0;
 
@@ -254,6 +257,8 @@ async function populateModal(data) {
             document.getElementById("MemberCode").value = data.member.code;
             document.getElementById("MemberName").value = data.member.fullName;
             document.querySelector('input[name="MemberCode"]').value = data.member.code;
+            document.getElementById("Notes").value = "";
+            document.getElementById("Mobile").value = data.member.mobile;
             document.getElementById("Paid").value = 0;
             await loadMemberAttendancePartial(data.member.memberID);
             $("#MemberDataBody").show();
@@ -269,9 +274,10 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     const memberCode = document.querySelector('input[name="MemberCode"]').value;
     const paid = document.querySelector('input[name="Paid"]').value;
     const notes = document.querySelector('input[name="Notes"]').value;
+    const mobile = document.querySelector('input[name="Mobile"]').value;
     const memberStatusCode = document.querySelector('input[name="MemberStatusCode"]').value;
     let isException = memberStatusCode === 2;
-    const apiUrl = `${apiBaseUrl}/Events/Register?memberCode=${encodeURIComponent(memberCode)}&paid=${paid}&eventID=${eventID}&isException=${isException}&notes=''`;
+    const apiUrl = `${apiBaseUrl}/Events/Register?memberCode=${encodeURIComponent(memberCode)}&paid=${paid}&eventID=${eventID}&isException=${isException}&notes=${notes}&mobile=${mobile}`;
 
 
     fetch(apiUrl, {
@@ -280,7 +286,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ memberCode: memberCode, paid: paid, eventID: eventID, isException: isException, notes: notes })
+        body: JSON.stringify({ memberCode: memberCode, paid: paid, eventID: eventID, isException: isException, notes: notes, mobile: mobile })
     })
         .then(response => response.json())
         .then(data => {

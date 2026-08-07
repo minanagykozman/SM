@@ -271,7 +271,7 @@ namespace SM.BAL
                 .OrderByDescending(ev => ev.TimeStamp).ToList();
             return members;
         }
-        public RegistrationStatus Register(string memberCode, int eventID, float paid, string username, bool isException, string? notes)
+        public RegistrationStatus Register(string memberCode, int eventID, float paid, string username, bool isException, string? notes,string mobile)
         {
             var servant = GetServantByUsername(username);
             if (servant == null)
@@ -294,6 +294,7 @@ namespace SM.BAL
                 IsException = isException,
                 Paid = paid
             });
+            member.Mobile = mobile;
             _dbcontext.SaveChanges();
             return RegistrationStatus.Ok;
 

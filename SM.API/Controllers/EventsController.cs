@@ -58,7 +58,7 @@ namespace SM.API.Controllers
             try
             {
                 Member member;
-                List<MemberClassOverview> memberClasses=new List<MemberClassOverview>();
+                List<MemberClassOverview> memberClasses = new List<MemberClassOverview>();
                 RegistrationStatus status;
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
@@ -232,14 +232,14 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.Register")]
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, float paid, int eventID, bool isException, string? notes)
+        public ActionResult<RegistrationStatus> Register(string memberCode, float paid, int eventID, bool isException, string? notes, string mobile)
         {
             try
             {
                 using (SM.BAL.EventHandler eventHandler = new SM.BAL.EventHandler())
                 {
                     ValidateServant();
-                    var status = eventHandler.Register(memberCode, eventID, paid, User.Identity.Name, isException, notes);
+                    var status = eventHandler.Register(memberCode, eventID, paid, User.Identity.Name, isException, notes, mobile);
                     return Ok(status);
                 }
 
@@ -381,7 +381,7 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.Attendance")]
         [HttpPost("TakeAttendance")]
-        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID,string? busName)
+        public ActionResult<RegistrationStatus> TakeAttendance(string memberCode, int eventID, string? busName)
         {
             try
             {

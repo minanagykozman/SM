@@ -121,6 +121,7 @@ function populateMembersGrid(members) {
                         </div>
                         <div class="card-text">
                             <p class="mb-1"><small class="text-muted"><strong>Code:</strong> ${member.code || '-'}</small></p>
+                            <p class="mb-1"><small class="text-muted"><strong>Notes:</strong> ${member.registrationNotes || '-'}</small></p>
                             <p class="mb-1"><small class="text-muted">
                                 <strong>Team:</strong> ${member.team || '-'}</small> | <small class="text-muted"><strong>Bus:</strong> ${member.bus || '-'}</small> | <small class="text-muted"><strong>Room:</strong> ${member.room || '-'}</small> | <small class="text-muted"><strong>Paid:</strong> ${member.paid || '-'} EGP</small>
                             </p>
