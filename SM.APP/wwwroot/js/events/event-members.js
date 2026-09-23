@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('download-excel').addEventListener('click', downloadEventData); 
     document.getElementById('update-attendance').addEventListener('click', updateAttendance);
     document.getElementById('download-cards').addEventListener('click', downloadCards);
+    document.getElementById('print-card-pdf').addEventListener('click', downloadCardsPDF);
+    document.getElementById('print-card-print').addEventListener('click', downloadCardsPrint);
 });
 
 async function fetchEventMembers() {
@@ -189,4 +191,20 @@ async function downloadCards() {
     }
     const memberIDs = allMembers.map(member => member.memberID);
     bulkPrintCards(memberIDs,"Trip");
+}
+async function downloadCardsPDF() {
+    if (!allMembers || allMembers.length === 0) {
+        alert("No member data available to download cards.");
+        return;
+    }
+    const memberIDs = allMembers.map(member => member.memberID);
+    bulkPrintCardsPDF(memberIDs,"Trip");
+}
+async function downloadCardsPrint() {
+    if (!allMembers || allMembers.length === 0) {
+        alert("No member data available to download cards.");
+        return;
+    }
+    const memberIDs = allMembers.map(member => member.memberID);
+    bulkPrintCardsPrint(memberIDs,"Trip");
 }

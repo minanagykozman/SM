@@ -232,7 +232,7 @@ namespace SM.API.Controllers
         }
         [Authorize(Policy = "Events.Register")]
         [HttpPost("Register")]
-        public ActionResult<RegistrationStatus> Register(string memberCode, float paid, int eventID, bool isException, string? notes, string mobile)
+        public ActionResult<RegistrationStatus> Register(string memberCode, float paid, int eventID, bool isException, string? notes, string? mobile)
         {
             try
             {
