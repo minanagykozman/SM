@@ -40,13 +40,13 @@ namespace SM.DAL.Migrations
                     ca.ServantID AS ServantID,
                     ca.TimeStamp AS TimeStamp
                 FROM members m
-                INNER JOIN classmembers cm
+                INNER JOIN ClassMembers cm
                     ON m.MemberID = cm.MemberID
-                INNER JOIN classes c
+                INNER JOIN Classes c
                     ON cm.ClassID = c.ClassID
-                INNER JOIN classoccurrences co
+                INNER JOIN ClassOccurrences co
                     ON cm.ClassID = co.ClassID
-                LEFT JOIN classattendances ca
+                LEFT JOIN ClassAttendances ca
                     ON ca.ClassOccurrenceID = co.ClassOccurrenceID
                     AND ca.MemberID = m.MemberID;
         ");
