@@ -33,6 +33,7 @@ namespace SM.DAL.DataModel
         public string? ImageReference { get; set; }
         public string? Notes { get; set; }
         public bool Present { get; set; }
+        public bool IsActive { get; set; }
         public int ClassID { get; set; }
         public int ClassOccurrenceID { get; set; }
         public int? ServantID { get; set; }

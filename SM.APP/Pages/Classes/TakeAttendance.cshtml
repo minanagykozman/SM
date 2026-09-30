@@ -10,10 +10,70 @@
         <span id="title"> Take Ateendance </span><span id="counter" class="text-muted fw-normal"></span>
     </h4>
 </div>
+<partial name="_LoadingPartial" />
 <input type="hidden" name="classOccurenceID" value="@ViewContext.HttpContext.Request.Query["classOccurenceID"]" />
 <partial name="_SuccessToastPartial" />
-<partial name="_SearchPartial" />
+<div class="row align-items-end">
+    <div class="col">
+        <label for="code-search-input" class="form-label">Take Ateendance</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="SearchString" placeholder="Enter search term...">
+            <button class="btn btn-primary" type="button" id="btnCheck">
+                <i class="bi bi-search"></i>
+            </button>
+            <button class="btn btn-outline-secondary" type="button" id="btnScanQR" title="Scan QR Code">
+                <i class="bi bi-qr-code-scan"></i>
+            </button>
+        </div>
+        <div id="qrScannerContainer" class="mt-3 d-none">
+            <div id="reader" style="width: 100%;"></div>
+            <button id="btnStopScan" class="btn btn-danger mt-2">Stop Scanning</button>
+        </div>
+    </div>
+</div>
 <partial name="_ModalPartial" />
+<!-- Members Section (Conditionally displayed) -->
+<div id="membersSection" style="display: none;" class="mt-4">
+    <!-- Filter Area -->
+    <div class="card p-3 mb-3 shadow-sm">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label class="form-label text-muted small">Take Ateendance</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    <input type="text" id="memberFilterSearch" class="form-control" placeholder="Code, Name, Age..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small">Attendance Status</label>
+                <select id="filterAttendanceStatus" class="form-select">
+                    <option value="all">All</option>
+                    <option value="present" selected>Present</option>
+                    <option value="absent">Absent</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-muted small">Status</label>
+                <select id="filterActiveStatus" class="form-select">
+                    <option value="all">All</option>
+                    <option value="active" selected>Active</option>
+                    <option value="inactive">InActive</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small">Baptism Status</label>
+                <select id="filterBaptismStatus" class="form-select">
+                    <option value="all" selected>All</option>
+                    <option value="baptized">Baptized</option>
+                    <option value="not_baptized">Not Baptized</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Members Cards Container -->
+    <div id="membersContainer" class="row g-3"></div>
+</div>
 @section Scripts {
     <script>
         var apiBaseUrl = '@Services.SMConfigurationManager.ApiBase';

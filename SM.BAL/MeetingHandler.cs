@@ -227,6 +227,31 @@ namespace SM.BAL
             _dbcontext.SaveChanges();
             return classOccurances;
         }
+        public int RemoveClassAteendance(int classOccuranceID, string memberCode, string username)
+        {
+            var servant = GetServantByUsername(username);
+            var member = _dbcontext.Members.Where(m => m.Code == memberCode).FirstOrDefault();
+            var memberAttendance = _dbcontext.ClassAttendances.Where(ma => ma.ClassOccurrenceID == classOccuranceID && ma.MemberID == member.MemberID).Include(c => c.ClassOccurrence).Include(c => c.ClassOccurrence.Class).FirstOrDefault();
+            string className = memberAttendance.ClassOccurrence.Class.ClassName;
+            string meetingName = memberAttendance.ClassOccurrence.ClassOccurrenceName;
+            _dbcontext.ClassAttendances.Remove(memberAttendance);
+            
+
+            AuditTrail aud = new AuditTrail()
+            {
+                EntityID = memberCode,
+                EntityName = "Attendance",
+                ServantName = username,
+                Timestamp = CurrentTime,
+                AiditTrail = string.Format("Removed attendance on {0} for class {1}", meetingName, className)
+            };
+            _dbcontext.AuditTrail.Add(aud);
+            _dbcontext.SaveChanges();
+            int membersCount = _dbcontext.ClassAttendances.Where(c => c.ClassOccurrenceID == classOccuranceID).Count();
+            return membersCount;
+
+
+        }
         public int TakeClassAteendance(int classOccuranceID, string memberCode, string username, bool forceRegister)
         {
             var servant = GetServantByUsername(username);
@@ -350,7 +375,10 @@ namespace SM.BAL
             }
             return counter.ToString();
         }
-
+        public List<MemberClasssAttendanceView> GetClassOccurenceMembers(int occuranceID)
+        {
+            return _dbcontext.MemberClasssAttendanceView.Where(c => c.ClassOccurrenceID == occuranceID).ToList();
+        }
         public MeetingDataDto GetMeetingData(int classOccurenceID)
         {
             MeetingDataDto data = new MeetingDataDto();

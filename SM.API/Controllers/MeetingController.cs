@@ -18,7 +18,6 @@ namespace SM.API.Controllers
     public class MeetingController(ILogger<MeetingController> logger) : SMControllerBase(logger)
     {
         [Authorize(Policy = "Class.View")]
-
         [HttpGet("GetServantClasses")]
         public ActionResult<List<Class>> GetServantClasses(bool? isActive)
         {
@@ -32,6 +31,28 @@ namespace SM.API.Controllers
                         classes = classHandler.GetAllClasses(isActive, User.Identity.Name);
                     else
                         classes = classHandler.GetServantClasses(User.Identity.Name);
+                    return Ok(classes);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Class.Attendance")]
+        [HttpGet("get-class-occurance-membres")]
+        public ActionResult<List<MemberClasssAttendanceView>> GetClassOccurenceMembers(int occurenceID)
+        {
+            try
+            {
+                if (occurenceID <= 0)
+                {
+                    return BadRequest("Invalid class ID");
+                }
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    List<MemberClasssAttendanceView> classes = meetingHandler.GetClassOccurenceMembers(occurenceID);
                     return Ok(classes);
                 }
 
@@ -263,6 +284,25 @@ namespace SM.API.Controllers
                 {
                     ValidateServant();
                     var cl = meetingHandler.TakeClassAteendance(classOccurenceID, memberCode, User.Identity.Name, forceRegister);
+                    return Ok(cl);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+        [Authorize(Policy = "Class.Attendance")]
+        [HttpPost("remove-attendance")]
+        public ActionResult<int> RemoveAttendance(int classOccurenceID, string memberCode)
+        {
+            try
+            {
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    ValidateServant();
+                    var cl = meetingHandler.RemoveClassAteendance(classOccurenceID, memberCode, User.Identity.Name);
                     return Ok(cl);
                 }
 
