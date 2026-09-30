@@ -12,7 +12,7 @@ namespace SM.DAL.Migrations
         {
             migrationBuilder.Sql("DROP VIEW IF EXISTS MemberClasssAttendanceView;");
             migrationBuilder.Sql(@"
-            CREATE VIEW memberclasssattendanceview AS
+            CREATE VIEW MemberClasssAttendanceView AS
                 SELECT
                     m.MemberID AS MemberID,
                     m.Code AS Code,
@@ -39,7 +39,7 @@ namespace SM.DAL.Migrations
                     END AS Present,
                     ca.ServantID AS ServantID,
                     ca.TimeStamp AS TimeStamp
-                FROM members m
+                FROM Members m
                 INNER JOIN ClassMembers cm
                     ON m.MemberID = cm.MemberID
                 INNER JOIN Classes c

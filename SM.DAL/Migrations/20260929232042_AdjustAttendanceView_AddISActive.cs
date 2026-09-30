@@ -12,7 +12,7 @@ namespace SM.DAL.Migrations
         {
             migrationBuilder.Sql("DROP VIEW IF EXISTS MemberClasssAttendanceView;");
             migrationBuilder.Sql(@"
-            CREATE VIEW memberclasssattendanceview AS
+            CREATE VIEW MemberClasssAttendanceView AS
                 SELECT
                     m.MemberID AS MemberID,
                     m.Code AS Code,
