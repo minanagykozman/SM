@@ -557,6 +557,7 @@ namespace SM.API.Controllers
                     var cell = attendanceSheet.Cell(1, colIndex);
                     cell.Value = distinctDates[i];
                     cell.Style.NumberFormat.Format = "MMM-dd-yy";
+                    cell.Style.Alignment.TextRotation = 90;
                 }
 
                 // 4. Set up Total Column Header

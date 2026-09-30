@@ -235,7 +235,7 @@ namespace SM.BAL
             string className = memberAttendance.ClassOccurrence.Class.ClassName;
             string meetingName = memberAttendance.ClassOccurrence.ClassOccurrenceName;
             _dbcontext.ClassAttendances.Remove(memberAttendance);
-            
+
 
             AuditTrail aud = new AuditTrail()
             {
@@ -381,7 +381,7 @@ namespace SM.BAL
         }
         public List<MemberClasssAttendanceView> GetClassMembers(int classID)
         {
-            return _dbcontext.MemberClasssAttendanceView.Where(c => c.ClassID == classID).ToList();
+            return _dbcontext.MemberClasssAttendanceView.Where(c => c.ClassID == classID && c.ClassOccurrenceStartDate <= CurrentTime).OrderBy(c=>c.ClassOccurrenceStartDate).ToList();
         }
         public MeetingDataDto GetMeetingData(int classOccurenceID)
         {
