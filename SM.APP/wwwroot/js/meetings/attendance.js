@@ -111,6 +111,7 @@ function renderMembers(members) {
 
 function toggleMemberAttendance(memberCode, action) {
     const occurenceID = document.querySelector('input[name="classOccurenceID"]').value;
+    showLoading();
     let apiUrl = "";
     let body = null;
     if (action == "add") {
@@ -139,6 +140,7 @@ function toggleMemberAttendance(memberCode, action) {
             console.error("Error:", error);
             alert("Failed to update attendance.");
         });
+    hideLoading();
 }
 
 // Filter Event Listeners
@@ -177,6 +179,7 @@ function filterMembers() {
 }
 
 document.getElementById("btnCheck").addEventListener("click", function () {
+    showLoading();
     const searchValue = document.getElementById("SearchString").value.trim();
     if (!searchValue) {
         alert("Please enter a search value.");
@@ -200,7 +203,7 @@ document.getElementById("btnCheck").addEventListener("click", function () {
             console.error("Error fetching data:", error);
             alert("Failed to fetch data. Please try again.");
         });
-
+    hideLoading();
 });
 
 function populateModal(data) {

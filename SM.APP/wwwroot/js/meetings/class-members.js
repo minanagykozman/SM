@@ -241,13 +241,39 @@ function handleAction(action, memberId) {
     }
 }
 
-function downloadClassData() {
+
+async function downloadClassData() {
     const classID = document.getElementById('classID').value;
-    if (classID) {
-        const url = `${apiBaseUrl}/Meeting/DownloadClassMembers?classID=${classID}`;
-        window.location.href = url;
-    } else {
-        alert("Cannot download data: Class ID is not available.");
+    showLoading();
+    try {
+        const downloadUrl = `${apiBaseUrl}/Meeting/download-class-attendance`;
+        const response = await fetch(downloadUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(classID)
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to generate excel sheet. Server responded with: ${errorText || response.statusText}`);
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'ClassMembers.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error("Error printing member cards:", error);
+        alert(`An error occurred: ${error.message}`);
+    } finally {
+        hideLoading();
     }
 }
 

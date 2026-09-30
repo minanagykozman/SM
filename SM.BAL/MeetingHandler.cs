@@ -379,6 +379,10 @@ namespace SM.BAL
         {
             return _dbcontext.MemberClasssAttendanceView.Where(c => c.ClassOccurrenceID == occuranceID).ToList();
         }
+        public List<MemberClasssAttendanceView> GetClassMembers(int classID)
+        {
+            return _dbcontext.MemberClasssAttendanceView.Where(c => c.ClassID == classID).ToList();
+        }
         public MeetingDataDto GetMeetingData(int classOccurenceID)
         {
             MeetingDataDto data = new MeetingDataDto();

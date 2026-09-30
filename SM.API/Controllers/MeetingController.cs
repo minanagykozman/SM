@@ -1,13 +1,8 @@
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SM.API.Services;
-using SM.BAL;
 using SM.DAL.DataModel;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using static SM.BAL.EventHandler;
 using static SM.BAL.MeetingHandler;
 
 namespace SM.API.Controllers
@@ -219,7 +214,7 @@ namespace SM.API.Controllers
                 return HandleError(ex);
             }
         }
-        
+
         [Authorize(Policy = "Class.Manage")]
         [HttpPost("auto-remove-class-members")]
         public ActionResult<string> AutoRemoveClassMembers([FromBody] int classID)
@@ -449,15 +444,188 @@ namespace SM.API.Controllers
                 stream.Seek(0, SeekOrigin.Begin);
 
                 var fileName = $"ClassMembers_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                return File(stream.ToArray(),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
+                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {
                 return HandleError(ex);
             }
         }
+        [Authorize(Policy = "Class.View")]
+        [HttpPost("download-class-attendance")]
+        public async Task<IActionResult> DownloadClassAttendance([FromBody]int classID)
+        {
+            try
+            {
+                if (classID <= 0)
+                {
+                    return BadRequest("Invalid class ID");
+                }
+
+                List<MemberClasssAttendanceView> attendanceData = new List<MemberClasssAttendanceView>();
+                List<ClassMemberExtended> members = new List<ClassMemberExtended>();
+                using (SM.BAL.MeetingHandler meetingHandler = new SM.BAL.MeetingHandler())
+                {
+                    ValidateServant();
+                    attendanceData = meetingHandler.GetClassMembers(classID);
+                    members = meetingHandler.GetClassMembers(classID, User.Identity.Name);
+                }
+
+                if (attendanceData == null || !attendanceData.Any())
+                {
+                    return NotFound("No attendance records found for this class.");
+                }
+
+                using var workbook = new XLWorkbook();
+
+                var sheetMembers = workbook.Worksheets.Add("Class Members");
+
+                // Add header
+                sheetMembers.Cell(1, 1).Value = "Code";
+                sheetMembers.Cell(1, 2).Value = "Full Name";
+                sheetMembers.Cell(1, 3).Value = "Nickname";
+                sheetMembers.Cell(1, 4).Value = "UN File Number";
+                sheetMembers.Cell(1, 5).Value = "UN Personal Number";
+                sheetMembers.Cell(1, 6).Value = "Mobile";
+                sheetMembers.Cell(1, 7).Value = "Baptised";
+                sheetMembers.Cell(1, 8).Value = "Baptism Name";
+                sheetMembers.Cell(1, 9).Value = "Birthdate";
+                sheetMembers.Cell(1, 10).Value = "Age";
+                sheetMembers.Cell(1, 11).Value = "Gender";
+                sheetMembers.Cell(1, 12).Value = "School";
+                sheetMembers.Cell(1, 13).Value = "Work";
+                sheetMembers.Cell(1, 14).Value = "Is Main Member";
+                sheetMembers.Cell(1, 15).Value = "Is Active";
+                sheetMembers.Cell(1, 16).Value = "Card Status";
+                sheetMembers.Cell(1, 17).Value = "Card Delivery Count";
+                sheetMembers.Cell(1, 18).Value = "Notes";
+                sheetMembers.Cell(1, 19).Value = "Last Present Date";
+                sheetMembers.Cell(1, 20).Value = "Attendance";
+                sheetMembers.Cell(1, 21).Value = "Attendance Count";
+                sheetMembers.Cell(1, 22).Value = "Assigned Servant";
+
+                int row = 2;
+                foreach (var member in members)
+                {
+                    sheetMembers.Cell(row, 1).Value = member.Code;
+                    sheetMembers.Cell(row, 2).Value = member.FullName;
+                    sheetMembers.Cell(row, 3).Value = member.Nickname ?? "";
+                    sheetMembers.Cell(row, 4).Value = member.UNFileNumber;
+                    sheetMembers.Cell(row, 5).Value = member.UNPersonalNumber;
+                    sheetMembers.Cell(row, 6).Value = member.Mobile ?? "";
+                    sheetMembers.Cell(row, 7).Value = member.Baptised ? "Yes" : "No";
+                    sheetMembers.Cell(row, 8).Value = member.BaptismName ?? "";
+                    sheetMembers.Cell(row, 9).Value = member.Birthdate.ToShortDateString();
+                    sheetMembers.Cell(row, 10).Value = member.Age;
+                    sheetMembers.Cell(row, 11).Value = member.Gender.ToString();
+                    sheetMembers.Cell(row, 12).Value = member.School ?? "";
+                    sheetMembers.Cell(row, 13).Value = member.Work ?? "";
+                    sheetMembers.Cell(row, 14).Value = member.IsMainMember ? "Yes" : "No";
+                    sheetMembers.Cell(row, 15).Value = member.IsActive ? "Yes" : "No";
+                    sheetMembers.Cell(row, 16).Value = member.CardStatus ?? "";
+                    sheetMembers.Cell(row, 17).Value = member.CardDeliveryCount;
+                    sheetMembers.Cell(row, 18).Value = member.Notes ?? "";
+                    sheetMembers.Cell(row, 19).Value = member.LastPresentDate?.ToShortDateString() ?? "";
+                    sheetMembers.Cell(row, 20).Value = member.Attendance ?? "";
+                    sheetMembers.Cell(row, 21).Value = member.AttendanceCounter;
+                    sheetMembers.Cell(row, 22).Value = member.Servant ?? "";
+
+                    row++;
+                }
+
+                sheetMembers.Columns().AdjustToContents();
+
+
+                var attendanceSheet = workbook.Worksheets.Add("Members Attendance");
+
+                // 1. Extract all unique class occurrence dates sorted chronologically for dynamic columns
+                var distinctDates = attendanceData
+                    .Select(x => x.ClassOccurrenceStartDate.Date)
+                    .Distinct()
+                    .OrderBy(d => d)
+                    .ToList();
+
+                // 2. Set up Static Headers
+                attendanceSheet.Cell(1, 1).Value = "Code";
+                attendanceSheet.Cell(1, 2).Value = "Fullname";
+
+                // 3. Set up Dynamic Date Columns (Formatted as "MMM-dd-yy")
+                int dateColStart = 3;
+                for (int i = 0; i < distinctDates.Count; i++)
+                {
+                    var colIndex = dateColStart + i;
+                    var cell = attendanceSheet.Cell(1, colIndex);
+                    cell.Value = distinctDates[i];
+                    cell.Style.NumberFormat.Format = "MMM-dd-yy";
+                }
+
+                // 4. Set up Total Column Header
+                int totalColIndex = dateColStart + distinctDates.Count;
+                attendanceSheet.Cell(1, totalColIndex).Value = "Total";
+
+                // 5. Group data by each unique member using Code and FullName properties
+                var memberGroups = attendanceData
+                    .GroupBy(x => new { x.MemberID, x.Code, x.FullName })
+                    .ToList();
+
+                row = 2;
+                foreach (var group in memberGroups)
+                {
+                    // Write Code and FullName
+                    attendanceSheet.Cell(row, 1).Value = group.Key.Code ?? "";
+                    attendanceSheet.Cell(row, 2).Value = group.Key.FullName ?? "";
+
+                    // Create a lookup set of dates where this specific member was present
+                    var presentDates = group
+                        .Where(x => x.Present)
+                        .Select(x => x.ClassOccurrenceStartDate.Date)
+                        .ToHashSet();
+
+                    // Fill in "+" signs under the respective date columns
+                    for (int i = 0; i < distinctDates.Count; i++)
+                    {
+                        var colIndex = dateColStart + i;
+                        var currentDate = distinctDates[i];
+
+                        if (presentDates.Contains(currentDate))
+                        {
+                            var cell = attendanceSheet.Cell(row, colIndex);
+                            cell.Value = "+";
+                            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        }
+                    }
+
+                    // Add the Total formula counting "+" across the row's date cells using COUNTIF
+                    string startColLetter = attendanceSheet.Column(dateColStart).ColumnLetter();
+                    string endColLetter = attendanceSheet.Column(dateColStart + distinctDates.Count - 1).ColumnLetter();
+
+                    attendanceSheet.Cell(row, totalColIndex).FormulaA1 = $"COUNTIF({startColLetter}{row}:{endColLetter}{row}, \"+\")";
+
+                    row++;
+                }
+
+                // Apply consistent styling to the header row
+                var headerRange = attendanceSheet.Range(1, 1, 1, totalColIndex);
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                attendanceSheet.Columns().AdjustToContents();
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var fileName = $"ClassAttendance_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+
+
         public class MemberAttendanceResult
         {
             public AttendanceStatus AttendanceStatus { get; set; }
