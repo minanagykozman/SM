@@ -32,6 +32,7 @@ namespace SM.DAL.DataModel
             this.ModifiedBy = member.ModifiedBy;
             this.Nickname = member.Nickname;
             this.Work = member.Work;
+            this.Notes= member.Notes;
             this.CreatedBy = member.CreatedBy;
             this.School = member.School;
             this.Sequence = member.Sequence;
